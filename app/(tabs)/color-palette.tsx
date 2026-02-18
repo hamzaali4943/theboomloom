@@ -1,3 +1,3 @@
-import { ColorPaletteScreen } from '@/components/screens/ColorPaletteScreen';
+import { ColorPaletteScreen } from '@/screens/ColorPaletteScreen';
 
 export default ColorPaletteScreen;

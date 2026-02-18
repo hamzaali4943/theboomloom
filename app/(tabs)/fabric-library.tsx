@@ -1,3 +1,3 @@
-import { FabricLibraryScreen } from '@/components/screens/FabricLibraryScreen';
+import { FabricLibraryScreen } from '@/screens/FabricLibraryScreen';
 
 export default FabricLibraryScreen;

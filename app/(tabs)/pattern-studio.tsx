@@ -1,3 +1,3 @@
-import { PatternStudioScreen } from '@/components/screens/PatternStudioScreen';
+import { PatternStudioScreen } from '@/screens/PatternStudioScreen';
 
 export default PatternStudioScreen;

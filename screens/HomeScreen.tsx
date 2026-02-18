@@ -1,16 +1,16 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useRouter } from 'expo-router';
 
-import { SafeScreen } from '@/components/shared/SafeScreen';
-import { Header } from '@/components/shared/Header';
-import { WelcomeBanner } from '@/components/home/WelcomeBanner';
 import { QuickToolCard } from '@/components/home/QuickToolCard';
 import { TipCard } from '@/components/home/TipCard';
+import { WelcomeBanner } from '@/components/home/WelcomeBanner';
+import { Header } from '@/components/shared/Header';
+import { SafeScreen } from '@/components/shared/SafeScreen';
 import { ThemedText } from '@/components/themed-text';
+import { TEXTILE_TIPS } from '@/constants/appData';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { TEXTILE_TIPS } from '@/constants/appData';
 
 const TOOLS = [
   {
