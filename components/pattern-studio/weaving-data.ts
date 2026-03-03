@@ -10,7 +10,18 @@ export type PatternIndex = 0 | 1 | 2;
 export const WARP_COUNT = 40;        // number of vertical warp threads
 export const MAX_WEFT = 100;         // max weft rows in state arrays
 export const TREADLE_COUNT = 4;      // number of treadles (foot pedals)
-export const LOOM_HEIGHT = 392;      // virtual loom height for sNum calc
+export const DH = 11.5;              // horizontal grid square size — matches web's dh
+
+// ── Web Canvas Reference Dimensions ───────────────────
+// Web canvas: 950 × 1066, patternStart = 140, weftTop = 240, weftBottom = 42
+// Pattern area: waNum*dh = 660 wide, warpLength = canH−weftTop−weftBottom = 784 tall
+// Aspect ratio of the pattern area: 784 / 660 ≈ 1.18788
+export const WEB_PATTERN_WIDTH = WARP_COUNT * DH;          // 660
+export const WEB_WARP_LENGTH = 784;                         // warpLength on web
+export const PATTERN_ASPECT = WEB_WARP_LENGTH / WEB_PATTERN_WIDTH; // ≈1.18788
+
+// Kept for backward compat — prefer computing grid height from cellWidth at runtime
+export const LOOM_HEIGHT = 784;
 
 // ── Default Colors ─────────────────────────────────────
 export const DEFAULT_WARP_COLOR = '#cccccc';

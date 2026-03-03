@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      Pattern Explorer for the Plain/Twill/Diamond Pattern Bars for the Boomloom
+      Boss
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ========================================
+   GLOBAL LAYOUT & RESPONSIVE CONTAINER
+   ======================================== */
+
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        /* background-color: #f5f5f5; */
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+      }
+
+      /* Main container - centers content and allows scroll */
+      #mainContainer {
+        max-width: 100vw;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: white;
+        font-family: "Poppins" !important;
+        /* padding: 30px; */
+        /* border-radius: 10px; */
+        /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
+      }
+
+      /* ========================================
+   PATTERN SELECTOR BUTTONS (100x100px)
+   ======================================== */
+      #headPlain {
+        border: 5px solid #0f434f;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 5px;
+      }
+
+      #headTwill {
+        border: 5px solid #c4e9f2;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 5px;
+      }
+
+      #headDiamond {
+        border: 5px solid #c4e9f2;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 5px;
+      }
+
+      #headPlain:hover,
+      #headTwill:hover,
+      #headDiamond:hover {
+        opacity: 0.8;
+        transform: scale(1.02);
+        transition: all 0.2s ease;
+      }
+
+      /* ========================================
+   BUTTONS AND CONTROLS (950px width)
+   ======================================== */
+      #buttonClear {
+        cursor: pointer;
+        width: 950px;
+        max-width: 100%;
+        height: 50px;
+        font-size: 18px;
+        background-color: #0f434f;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+
+      #buttonClear:hover {
+        background-color: #1a5f6f;
+        transition: background-color 0.3s ease;
+      }
+
+      #favcolor {
+        cursor: pointer;
+        width: 120px;
+        height: 120px;
+        padding: 0;
+        border: 5px solid #0f434f;
+        border-radius: 50%;
+        box-sizing: border-box;
+        flex-shrink: 0;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background: none;
+        overflow: hidden;
+      }
+
+      #favcolor::-webkit-color-swatch-wrapper {
+        padding: 0;
+        border-radius: 50%;
+      }
+
+      #favcolor::-webkit-color-swatch {
+        border: none;
+        border-radius: 50%;
+      }
+
+      #favcolor::-moz-color-swatch {
+        border: none;
+        border-radius: 50%;
+      }
+
+      /* ========================================
+   TEXT AND INSTRUCTIONS
+   ======================================== */
+      /* .textInstruction {
+    cursor: default;
+    width: 950px;
+    max-width: 100%;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+    margin: 10px 0;
+} */
+
+      .text {
+        cursor: default;
+        font-size: 14px;
+        color: #555;
+        text-align: center;
+        margin-bottom: 5px;
+      }
+
+      /* ========================================
+   SLIDER CONTROLS
+   ======================================== */
+      .flex-container {
+        width: 950px;
+        max-width: 100%;
+        display: flex;
+        gap: 20px;
+        margin-bottom: 15px;
+      }
+
+      .flex-child {
+        flex: 1;
+        min-height: 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .slider {
+        width: 100%;
+        cursor: pointer;
+      }
+
+      /* ========================================
+   CANVAS CONTAINER
+   ======================================== */
+      #boomloom {
+        margin: 20px 0;
+        display: flex;
+        justify-content: center;
+        position: relative;
+      }
+
+      #weftColorLabel {
+        position: absolute;
+        right: -100px;
+        top: 290px;
+        font-size: 20px;
+        font-weight: 400;
+        font-family: Poppins !important;
+        color: #000000;
+      }
+
+      #myCanvas {
+        background-color: #fefcff;
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* ========================================
+   PATTERN CHOOSER SECTION
+   ======================================== */
+      .PatternChooser {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .patternButtons {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+      }
+
+      .colorPicker {
+        width: max-content;
+        max-width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0;
+        gap: 30px;
+      }
+
+      /* Top area: left label + right column with pattern buttons (row1) and color picker (row2) */
+      .topArea {
+        width: 700px;
+        max-width: 100%;
+        margin: 0 auto 10px auto;
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        grid-template-rows: auto 137px;
+        align-items: center;
+        gap: 11px;
+      }
+
+      .leftLabel {
+        grid-column: 1 / 2;
+        grid-row: 2 / 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-left: 0px;
+      }
+
+      .rightStack {
+        grid-column: 2 / 3;
+        grid-row: 1 / 3;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+        justify-content: center;
+      }
+
+      .patternButtons {
+        justify-content: flex-start;
+      }
+
+      .colorPicker {
+        justify-content: flex-start;
+      }
+
+      .currentColorLabel {
+        margin: 0;
+        cursor: default;
+        font-size: 15px;
+        color: #000;
+        font-weight: 500;
+        line-height: 1.05;
+        text-align: center;
+      }
+
+      @media (max-width: 1000px) {
+        .topArea {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto auto;
+          gap: 12px 12px;
+        }
+        .leftLabel {
+          grid-column: 1 / 2;
+          grid-row: 1 / 2;
+          justify-content: center;
+        }
+        .rightStack {
+          grid-column: 1 / 2;
+          grid-row: 2 / 3;
+          align-items: center;
+        }
+      }
+
+      /* ========================================
+   COLOR PALETTE
+   ======================================== */
+      .colorPalette {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 10px;
+        justify-content: center;
+      }
+
+      .paletteColor {
+        width: 60px;
+        height: 60px;
+        border: 4px solid #ccc;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-sizing: border-box;
+      }
+
+      .paletteColor:hover {
+        border-color: #0f434f;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .paletteColor.selected {
+        border-color: #0f434f;
+        border-width: 4px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      /* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
+      /* ========================================
+   TREADLING SEQUENCE BOX
+   ======================================== */
+      #treadlingSequenceBox {
+        width: 950px;
+        max-width: 100%;
+        margin-top: 30px;
+        margin-bottom: 30px;
+        padding: 15px 20px;
+        background-color: #f8fdfe;
+        border-radius: 8px;
+        /* border: 2px solid #0F434F; */
+        text-align: center;
+        box-sizing: border-box;
+      }
+
+      #treadlingSequenceBox h3 {
+        margin: 0 0 10px 0;
+        color: #0f434f;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      #treadlingSequenceText {
+        margin: 0;
+        color: #0f434f;
+        font-size: 16px;
+        font-family: monospace;
+        letter-spacing: 2px;
+        word-spacing: 8px;
+        background-color: #e5f0ff;
+        padding: 10px;
+      }
+
+      .sequence-note {
+        margin: 10px 0 0 0;
+        color: #c4e9f2;
+        font-size: 12px;
+        font-style: italic;
+      }
+
+      @media (max-width: 1000px) {
+        body {
+          padding: 10px;
+        }
+
+        #mainContainer {
+          padding: 15px;
+        }
+
+        .patternButtons {
+          flex-wrap: wrap;
+        }
+      }
+
+      /* Mobile devices (phones) */
+      @media (max-width: 600px) {
+        body {
+          padding: 0px;
+        }
+
+        #mainContainer {
+          padding: 0px;
+        }
+
+        /* Scale down pattern buttons for mobile */
+        #headPlain,
+        #headTwill,
+        #headDiamond {
+          width: 80px;
+          height: 80px;
+          border-width: 4px;
+        }
+
+        /* Make canvas responsive */
+        #myCanvas {
+          max-width: 100%;
+          height: auto;
+        }
+
+        /* Adjust text sizes for mobile */
+        .textInstruction {
+          font-size: 14px;
+          line-height: 1.5;
+        }
+
+        /* Scale down color picker on mobile */
+        #favcolor {
+          width: 60px;
+          height: 60px;
+        }
+
+        #buttonClear {
+          width: 100%;
+        }
+
+        /* Keep color picker in row layout on mobile */
+        .colorPicker {
+          gap: 15px;
+        }
+
+        /* Reduce palette color size on mobile */
+        .paletteColor {
+          width: 40px;
+          height: 40px;
+        }
+
+        /* Hide weft color label on mobile - it's drawn on canvas */
+        #weftColorLabel {
+          position: static !important;
+          display: block;
+          /* margin: 10px auto 0 auto; */
+          writing-mode: vertical-lr;
+          transform: rotate(360deg);
+          font-size: 10px;
+          color: #000;
+          background: #fff;
+          /* padding: 2px 8px; */
+          border-radius: 6px;
+          z-index: 10;
+          width: fit-content;
+          text-align: center;
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+          max-width: none;
+          overflow: visible;
+          white-space: normal;
+          font-family: Poppins !important;
+        }
+
+        /* Adjust slider container for mobile */
+        .flex-container {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .flex-child {
+          width: 100%;
+        }
+
+        #treadlingSequenceBox {
+          width: 98vw;
+          max-width: 100%;
+          margin-top: 16px;
+          margin-bottom: 16px;
+          padding: 10px 4vw;
+          border-radius: 8px;
+          border-width: 1.5px;
+          font-size: 14px;
+        }
+
+        #treadlingSequenceBox h3 {
+          font-size: 10px;
+          line-height: 1.3;
+          word-break: break-word;
+        }
+
+        #treadlingSequenceText {
+          font-size: 14px;
+          padding: 7px 2vw;
+          letter-spacing: 1px;
+          word-spacing: 4px;
+          overflow-x: auto;
+          background-color: #e5f0ff;
+          border-radius: 6px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Main container wraps everything for responsive layout -->
+    <div id="mainContainer">
+      <!-- Top area: left label + right stacked pattern buttons and color picker -->
+      <div class="topArea">
+        <div class="leftLabel">
+          <p class="currentColorLabel">
+            current color<br />(click to customize)
+          </p>
+        </div>
+        <div class="rightStack">
+          <div class="PatternChooser">
+            <div class="patternButtons">
+              <!-- Pattern selector canvases - scaled from 90x90 to 100x100 (slightly larger) -->
+              <canvas
+                id="headPlain"
+                width="100"
+                height="100"
+                onclick="plainBarChosen()"
+              >
+                Sorry, your browser does not support canvas.
+              </canvas>
+              <canvas
+                id="headTwill"
+                width="100"
+                height="100"
+                onclick="twillBarChosen()"
+              >
+                Sorry, your browser does not support canvas.
+              </canvas>
+              <canvas
+                id="headDiamond"
+                width="100"
+                height="100"
+                onclick="diamondBarChosen()"
+              >
+                Sorry, your browser does not support canvas.
+              </canvas>
+            </div>
+          </div>
+
+          <!-- Color picker section -->
+          <div class="colorPicker">
+            <!-- Default color changed from red (#802215) to blue (#5170ff) per client request -->
+            <input
+              type="color"
+              id="favcolor"
+              name="favcolor"
+              value="#5170ff"
+              class="custom"
+            />
+
+            <!-- Preset color palette -->
+            <div class="colorPalette">
+              <div
+                class="paletteColor"
+                data-color="#5170ff"
+                style="background-color: #5170ff"
+                title="blue"
+              ></div>
+              <div
+                class="paletteColor"
+                data-color="#FA42AB"
+                style="background-color: #fa42ab"
+                title="pink"
+              ></div>
+              <div
+                class="paletteColor"
+                data-color="#00bf63"
+                style="background-color: #00bf63"
+                title="green"
+              ></div>
+              <div
+                class="paletteColor"
+                data-color="#FDFF89"
+                style="background-color: #fdff89"
+                title="yellow"
+              ></div>
+              <div
+                class="paletteColor"
+                data-color="#ffffff"
+                style="background-color: #ffffff"
+                title="white"
+              ></div>
+              <div
+                class="paletteColor"
+                data-color="#000000"
+                style="background-color: #000000"
+                title="black"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main canvas - scaled from 570x640 to 950x1066 (~1.67x) -->
+      <div id="boomloom">
+        <canvas id="myCanvas" width="950" height="1066">
+          Sorry, your browser does not support canvas.
+        </canvas>
+        <!-- <span id="weftColorLabel">weft color</span> -->
+      </div>
+
+      <!-- Slider controls for thread width adjustment -->
+      <p class="textInstruction">
+        Use the sliders to change the thickness of the warp and the weft.
+      </p>
+      <div class="flex-container">
+        <div class="flex-child">
+          <p class="text">warp thread width</p>
+          <!-- Slider range adjusted for new scale -->
+          <input
+            type="range"
+            min="5"
+            max="13"
+            value="8"
+            class="slider"
+            id="warpWidthSlider"
+          />
+        </div>
+        <div class="flex-child">
+          <p class="text">weft thread width</p>
+          <!-- Slider range adjusted for new scale -->
+          <input
+            type="range"
+            min="10"
+            max="17"
+            value="16"
+            class="slider"
+            id="weftWidthSlider"
+          />
+        </div>
+      </div>
+
+      <div id="treadlingSequenceBox">
+        <h3>
+          Order of bar positions (treadling sequence), starting from the bottom
+        </h3>
+        <p id="treadlingSequenceText"></p>
+        <!-- <p class="sequence-note">(Reading from bottom to top)</p> -->
+      </div>
+      <!-- Reset button -->
+      <div>
+        <input
+          type="button"
+          id="buttonClear"
+          onclick="reset()"
+          value="Reset Pattern"
+        />
+      </div>
+
+      <!-- Treadling Sequence Display -->
+    </div>
+
+    <!-- External JavaScript file -->
+    <script>
+      const canvas = document.getElementById("myCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // Pattern selector canvases (Plain, Twill, Diamond)
+      const canvasPlain = document.getElementById("headPlain");
+      const ctxPlain = canvasPlain.getContext("2d");
+      const canvasTwill = document.getElementById("headTwill");
+      const ctxTwill = canvasTwill.getContext("2d");
+      const canvasDiamond = document.getElementById("headDiamond");
+      const ctxDiamond = canvasDiamond.getContext("2d");
+
+      /* ========================================
+           EVENT LISTENERS
+           ======================================== */
+      // Listen for clicks on main canvas for color selection and treadling
+      canvas.addEventListener("click", clickedColor, false);
+      canvas.addEventListener("click", clickedSide, false);
+
+      // Slider controls for thread width adjustment
+      var sliderWarp = document.getElementById("warpWidthSlider");
+      var sliderWeft = document.getElementById("weftWidthSlider");
+
+      /* ========================================
+           COLOR CONSTANTS
+           ======================================== */
+      const treadlingColor = "#0F434F"; // Dark teal - active treadle
+      const treadlingColorBackground = "#C4E9F2"; // Light blue - inactive treadle
+      const gridColor = "#012B35"; // Dark blue-green - grid lines
+      const defaultWarpColor = "#cccccc"; // Light gray - default warp threads
+      const defaultWeftColor = "#2657ff"; // Blue - default weft threads (changed from red per client request)
+      const backgroundColor = "#FEFCFF"; // Off-white - canvas background
+      const loomColor = "#E5F0FF"; // Light blue - loom frame color
+
+      // Color schemes for each pattern type (background, text color)
+      const heddleColorPlain = ["#1f0d9", "#ffffff"]; // Plain weave - dark background, white text
+      const heddleColorTwill = ["#761616", "#ffffff"]; // Twill weave - dark red background, white text
+      const heddleColorDiamond = ["#9ba2dd", "#000000"]; // Diamond weave - light purple background, black text
+
+      /* ========================================
+           CANVAS DIMENSIONS & LAYOUT
+           All values scaled by ~1.67x from original
+           Original: 570x640, New: 950x1066
+           ======================================== */
+      const canW = 950; // Canvas width in pixels
+      const canH = 1066; // Canvas height in pixels
+      const patternStart = 140; // X-coordinate where pattern grid starts (was 85, now 85*1.67)
+      const weftTop = 240; // Top margin for weft area (aligned with bottom of heddle bar)
+      const weftBottom = 42; // Bottom margin for weft area (was 25, now 25*1.67)
+      const warpLength = canH - weftTop - weftBottom; // Vertical space for warp threads
+      const maxWarpLength = canH - 84; // Maximum warp thread length (was 50, now 50*1.67)
+      const rightSkip = 67; // Right margin before treadling grid (was 40, now 40*1.67)
+
+      /* ========================================
+           GRID AND THREAD SIZING
+           ======================================== */
+      const dh = 16.5; // Horizontal grid square size in pixels (was 10, now 16)
+      var hw = 8; // Width of warp threads (was 5, now 8)
+      var dv = 16; // Vertical grid square size in pixels (was 10, now 16)
+      var tr = 4; // Number of treadles (foot pedals)
+      const maxtcol = 4; // Maximum treadle columns
+
+      /* ========================================
+           THREAD COUNTS AND PATTERN STATE
+           ======================================== */
+      var floatingSalvageStart = false; // Salvage edge control (unused in current version)
+      const waNum = 40; // Number of warp threads (vertical)
+      var sNum = Math.floor(warpLength / dv); // Number of weft threads (horizontal) - calculated based on canvas height
+      const maxS = 100; // Maximum number of weft threads allowed
+      var currentPatternBar = 0; // Currently selected pattern: 0=plain, 1=twill, 2=diamond
+
+      /* ========================================
+           PATTERN METADATA
+           Format: [color array, label array]
+           ======================================== */
+      const patternBars = [
+        [["#FFFFF0", "#000000"], "PLAIN"], // Plain weave - dark green/black
+        [["#761616", "#ffffff"], "2/2 TWILL"], // Twill weave
+        [["#9ba2dd", "#000000"], "DIAMOND"], // Diamond weave
+      ];
+
+      /* ========================================
+           PATTERN ENCODING ARRAYS
+           Each pattern has 4 treadle configurations
+           0 = warp thread raised (weft goes under)
+           1 = warp thread lowered (weft goes over)
+           Each array has 38 values for 38 warp threads (excluding edges)
+           ======================================== */
+      var patternRows = [[], [], [], []];
+
+      // PLAIN WEAVE PATTERN - Simple alternating over/under
+      // Creates a balanced, stable fabric with maximum thread interlacement
+      patternRows[0] = [
+        [
+          0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
+          1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+        ], // Treadle 1: odd warps raised
+        [
+          1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+          0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
+        ], // Treadle 2: even warps raised
+        [
+          0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
+          1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+        ], // Treadle 3: same as 1
+        [
+          1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+          0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
+        ], // Treadle 4: same as 2
+      ];
+
+      // TWILL WEAVE PATTERN - 2x2 diagonal pattern
+      // Creates diagonal lines in the fabric, more drapeable than plain weave
+      patternRows[1] = [
+        [
+          0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,
+          1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1,
+        ], // Treadle 1
+        [
+          1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0,
+          0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0,
+        ], // Treadle 2
+        [
+          0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
+          0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1,
+        ], // Treadle 3
+        [
+          1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1,
+          1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0,
+        ], // Treadle 4
+      ];
+
+      // DIAMOND WEAVE PATTERN - Complex geometric pattern
+      // Creates diamond shapes with directional changes
+      patternRows[2] = [
+        [
+          0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1,
+          0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1,
+        ], // Treadle 1
+        [
+          1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0,
+          0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0,
+        ], // Treadle 2
+        [
+          0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0,
+          1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1,
+        ], // Treadle 3
+        [
+          1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1,
+          1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0,
+        ], // Treadle 4
+      ];
+
+      /* ========================================
+           STATE ARRAYS
+           These arrays hold the current state of the weaving design
+           ======================================== */
+      var colorWa = []; // Warp thread colors (40 elements)
+      var S = []; // Treadling state - which treadle is active for each weft row (100x4 boolean array)
+      var usedS = []; // Tracks which weft rows have been used (100 elements)
+      var colorS = []; // Weft thread colors (100 elements)
+      var pattern = []; // The actual weave pattern matrix (100x40) - what shows on/over what
+
+      /* ========================================
+           FUNCTION: drawPatternBarOptions
+           Draws the three pattern selector buttons (Plain, Twill, Diamond)
+           Canvases are 100x100px (slightly scaled from original 90x90)
+           ======================================== */
+      function drawPatternBarOptions() {
+        // PLAIN WEAVE BUTTON
+        ctxPlain.fillStyle = patternBars[0][0][0]; // Background color
+        ctxPlain.fillRect(0, 0, 100, 100);
+        ctxPlain.fillStyle = patternBars[0][0][1]; // Text color (white)
+        ctxPlain.font = "bold 18px Arial"; // Bold uppercase font
+        ctxPlain.textAlign = "center";
+        ctxPlain.textBaseline = "middle";
+        ctxPlain.fillText(patternBars[0][1], 50, 50); // "PLAIN"
+
+        // TWILL WEAVE BUTTON
+        ctxTwill.fillStyle = patternBars[1][0][0]; // Background color
+        ctxTwill.fillRect(0, 0, 100, 100);
+        ctxTwill.fillStyle = patternBars[1][0][1]; // Text color (white)
+        ctxTwill.font = "bold 14px Arial"; // Smaller font for longer text
+        ctxTwill.textAlign = "center";
+        ctxTwill.textBaseline = "middle";
+        ctxTwill.fillText(patternBars[1][1], 50, 50); // "2/2 TWILL"
+
+        // DIAMOND WEAVE BUTTON
+        ctxDiamond.fillStyle = patternBars[2][0][0]; // Background color
+        ctxDiamond.fillRect(0, 0, 100, 100);
+        ctxDiamond.fillStyle = patternBars[2][0][1]; // Text color (black)
+        ctxDiamond.font = "bold 16px Arial";
+        ctxDiamond.textAlign = "center";
+        ctxDiamond.textBaseline = "middle";
+        ctxDiamond.fillText(patternBars[2][1], 50, 50); // "DIAMOND"
+      }
+
+      /* ========================================
+           FUNCTION: init
+           Initializes all state arrays to default values
+           Called on page load and when reset button is clicked
+           ======================================== */
+      function init() {
+        // Set grid line color
+        ctx.strokeStyle = gridColor;
+
+        // Reset slider positions to default (scaled values)
+        document.getElementById("warpWidthSlider").value = "8"; // Was 5, now 8
+        document.getElementById("weftWidthSlider").value = "16"; // Was 10, now 16
+
+        // Reset variables to defaults
+        floatingSalvageStart = false;
+        hw = 8; // Warp thread width (scaled from 5)
+        dv = 16; // Vertical square size (scaled from 10)
+        tr = 4; // Number of treadles
+        sNum = Math.floor(warpLength / dv); // Calculate number of weft rows based on canvas size
+
+        var c, k, l;
+
+        // Initialize warp color array (40 threads, all default gray)
+        colorWa = [];
+        for (c = 0; c < waNum; c++) {
+          colorWa.push(defaultWarpColor);
+        }
+
+        // Initialize weft color array (100 threads, all default blue)
+        colorS = [];
+        for (c = 0; c < maxS; c++) {
+          colorS.push(defaultWeftColor);
+        }
+
+        // Initialize treadling state array (100 rows × 4 treadles, all false)
+        S = [];
+        for (k = 0; k < maxS; k++) {
+          S.push([]);
+          for (l = 0; l < tr; l++) {
+            S[k].push(false);
+          }
+        }
+
+        // Initialize used weft rows array (tracks which rows have treadles activated)
+        usedS = [];
+        for (c = 0; c < maxS; c++) {
+          usedS.push(false);
+        }
+
+        // Initialize pattern matrix (100 rows × 40 threads, all 1 = warp showing)
+        pattern = [];
+        for (k = 0; k < maxS; k++) {
+          pattern.push([]);
+          for (l = 0; l < waNum; l++) {
+            pattern[k].push(1);
+          }
+        }
+      }
+
+      /* ========================================
+           FUNCTION: reset
+           User-triggered reset with confirmation dialog
+           Clears all pattern data and returns to defaults
+           ======================================== */
+      function reset() {
+        if (confirm("Are you sure you want to clear the pattern?")) {
+          init();
+          draw();
+        }
+      }
+
+      /* ========================================
+           DRAWING FUNCTIONS
+           These functions handle all canvas drawing
+           ======================================== */
+
+      /* FUNCTION: draw
+           Master drawing function - calls all sub-drawing functions
+           This is the main function called whenever the display needs updating
+        */
+      function draw() {
+        ctx.clearRect(0, 0, canW, canH); // Clear entire canvas
+        loadLoomImage(); // Draw loom frame and heddle bar
+        // drawWaColor(); // Draw warp color selector (top row) - REMOVED
+        drawS(); // Draw treadling grid (right side)
+        drawPattern(); // Draw the actual weave pattern
+        updateTreadlingSequence(); // Update treadling sequence text display
+      }
+
+      /* FUNCTION: drawLoom
+           Draws the decorative loom frame around the pattern area
+           Uses bezier curves for realistic loom shape
+           All dimensions scaled by ~1.67x from original
+        */
+      function drawLoom() {
+        // Vertical spacing constants (all scaled)
+        const vert0 = 8; // Top margin (was 5)
+        const vert1 = 34; // Spike height (was 20, now 20*1.67)
+        const vert2 = 134; // Heddle bar height (was 80, now 80*1.67)
+        const vert3 = 84; // Frame curve depth (was 50, now 50*1.67)
+        const vert4 = 100; // Additional frame depth (was 60, now 60*1.67)
+        const vert5 = 159; // Heddle total height (was 95, now 95*1.67)
+        const vert6 = 251; // Vertical center spacing (was 150, now 150*1.67)
+
+        // Horizontal positioning - align with warp threads
+        const loomWidth = waNum * dh; // Loom width = warp threads width (40 * 16 = 640)
+        const loomStartX = patternStart; // Start at same position as warp threads
+        const loomEndX = loomStartX + loomWidth; // End position
+
+        // Curve widths (proportional to loom width)
+        const curveInset1 = 112; // Inset for outer curves
+        const curveInset2 = 195; // Inset for inner curves
+
+        // Spike details (scaled)
+        const spikeCount = 20; // Number of decorative spikes
+        const spikeWidth = 10; // Width of each spike (was 6, now 10)
+
+        var k;
+
+        ctx.fillStyle = loomColor;
+
+        for (k = 0; k < spikeCount; k++) {
+          ctx.roundRect(
+            loomStartX + 2 * k * dh + dh - spikeWidth / 2,
+            vert0,
+            spikeWidth,
+            vert1,
+            [spikeWidth / 2, spikeWidth / 2, 10, 0],
+          );
+          ctx.fill();
+        }
+        // Main loom body rectangle - aligned with warp threads
+        ctx.roundRect(loomStartX, vert0 + vert1, loomWidth, vert2 + vert3, [
+          spikeWidth / 2,
+          spikeWidth / 2,
+          0,
+          0,
+        ]);
+        ctx.fill();
+        ctx.beginPath();
+        // Left side curve
+        ctx.moveTo(loomStartX, vert0 + vert1 + vert2 + vert3);
+        ctx.bezierCurveTo(
+          loomStartX,
+          vert0 + vert1 + vert2 + vert3 + 25,
+          loomStartX + curveInset1,
+          vert0 + vert1 + vert2 + vert3 + vert4 - 25,
+          loomStartX + curveInset1,
+          vert0 + vert1 + vert2 + vert3 + vert4,
+        );
+        ctx.lineTo(
+          loomStartX + curveInset1,
+          canH - vert0 - vert1 - vert3 - vert4,
+        );
+        ctx.bezierCurveTo(
+          loomStartX + curveInset1,
+          canH - vert0 - vert1 - vert3 - vert4 + 25,
+          loomStartX,
+          canH - vert0 - vert1 - vert3 - 25,
+          loomStartX,
+          canH - vert0 - vert1 - vert3,
+        );
+        // Right side curve
+        ctx.lineTo(loomEndX, canH - vert0 - vert1 - vert3);
+        ctx.bezierCurveTo(
+          loomEndX,
+          canH - vert0 - vert1 - vert3 - 25,
+          loomEndX - curveInset1,
+          canH - vert0 - vert1 - vert3 - vert4 + 25,
+          loomEndX - curveInset1,
+          canH - vert0 - vert1 - vert3 - vert4,
+        );
+        ctx.lineTo(
+          loomEndX - curveInset1,
+          vert0 + vert1 + vert2 + vert3 + vert4,
+        );
+        ctx.bezierCurveTo(
+          loomEndX - curveInset1,
+          vert0 + vert1 + vert2 + vert3 + vert4 - 25,
+          loomEndX,
+          vert0 + vert1 + vert2 + vert3 + 25,
+          loomEndX,
+          vert0 + vert1 + vert2 + vert3,
+        );
+        ctx.closePath();
+        ctx.fill();
+        // Bottom rectangle
+        ctx.roundRect(
+          loomStartX,
+          canH - (vert0 + vert1 + vert3),
+          loomWidth,
+          vert3,
+          [0, 0, spikeWidth / 2, spikeWidth / 2],
+        );
+        ctx.fill();
+        // Bottom spikes
+        for (k = 0; k < spikeCount; k++) {
+          ctx.roundRect(
+            loomStartX + 2 * k * dh + dh - spikeWidth / 2,
+            canH - vert0 - vert1,
+            spikeWidth,
+            vert1,
+            [0, 0, spikeWidth / 2, spikeWidth / 2],
+          );
+          ctx.fill();
+        }
+        // Bottom bar
+        ctx.fillRect(
+          loomStartX - spikeWidth,
+          canH - vert0 - vert1,
+          loomWidth + 2 * spikeWidth,
+          -vert1 / 2,
+        );
+        // Left bottom bracket
+        ctx.beginPath();
+        ctx.moveTo(loomStartX - spikeWidth, canH - vert0 - vert1 + vert1 / 2);
+        ctx.bezierCurveTo(
+          loomStartX - spikeWidth - 20,
+          canH - vert0 - vert1 + vert1 / 2,
+          loomStartX - spikeWidth - 20,
+          canH - vert0 - 2 * vert1,
+          loomStartX - spikeWidth,
+          canH - vert0 - 2 * vert1,
+        );
+        ctx.closePath();
+        ctx.fill();
+        // Right bottom bracket
+        ctx.beginPath();
+        ctx.moveTo(loomEndX + spikeWidth, canH - vert0 - vert1 + vert1 / 2);
+        ctx.bezierCurveTo(
+          loomEndX + spikeWidth + 20,
+          canH - vert0 - vert1 + vert1 / 2,
+          loomEndX + spikeWidth + 20,
+          canH - vert0 - 2 * vert1,
+          loomEndX + spikeWidth,
+          canH - vert0 - 2 * vert1,
+        );
+        ctx.closePath();
+        ctx.fill();
+        // Oval cutouts (background color)
+        ctx.fillStyle = backgroundColor;
+        const loomCenterX = loomStartX + loomWidth / 2;
+        // Top oval
+        ctx.beginPath();
+        ctx.moveTo(
+          loomStartX + curveInset2,
+          vert0 + vert1 + vert2 + vert3 + vert4 / 2,
+        );
+        ctx.bezierCurveTo(
+          loomStartX + curveInset2,
+          vert0 + vert1 + vert2 + vert3 + vert4 / 2 - 50,
+          loomEndX - curveInset2,
+          vert0 + vert1 + vert2 + vert3 + vert4 / 2 - 50,
+          loomEndX - curveInset2,
+          vert0 + vert1 + vert2 + vert3 + vert4 / 2,
+        );
+        ctx.bezierCurveTo(
+          loomEndX - curveInset2,
+          vert0 + vert1 + vert2 + vert3 + vert4 / 2 + 75,
+          loomStartX + curveInset2,
+          vert0 + vert1 + vert2 + vert3 + vert4 / 2 + 75,
+          loomStartX + curveInset2,
+          vert0 + vert1 + vert2 + vert3 + vert4 / 2,
+        );
+        ctx.closePath();
+        ctx.fill();
+        // Bottom oval
+        ctx.beginPath();
+        ctx.moveTo(
+          loomStartX + curveInset2,
+          canH - (vert0 + vert1 + vert3 + vert4 / 2),
+        );
+        ctx.bezierCurveTo(
+          loomStartX + curveInset2,
+          canH - (vert0 + vert1 + vert3 + vert4 / 2) + 50,
+          loomEndX - curveInset2,
+          canH - (vert0 + vert1 + vert3 + vert4 / 2) + 50,
+          loomEndX - curveInset2,
+          canH - (vert0 + vert1 + vert3 + vert4 / 2),
+        );
+        ctx.bezierCurveTo(
+          loomEndX - curveInset2,
+          canH - (vert0 + vert1 + vert3 + vert4 / 2) - 75,
+          loomStartX + curveInset2,
+          canH - (vert0 + vert1 + vert3 + vert4 / 2) - 75,
+          loomStartX + curveInset2,
+          canH - (vert0 + vert1 + vert3 + vert4 / 2),
+        );
+        ctx.closePath();
+        ctx.fill();
+        // Center dots
+        ctx.beginPath();
+        ctx.arc(
+          loomCenterX,
+          canH - (canH - vert2) / 2 - vert6 / 2,
+          6,
+          0,
+          2 * Math.PI,
+        );
+        ctx.arc(
+          loomCenterX,
+          canH - (canH - vert2) / 2 + vert6 / 2,
+          6,
+          0,
+          2 * Math.PI,
+        );
+        ctx.fill();
+      }
+
+      /* FUNCTION: drawHeddle
+           Draws the heddle bar (the colored bar with vertical separators)
+           Shows which pattern is currently selected
+           All dimensions scaled by ~1.67x
+        */
+      function drawHeddle(color, text) {
+        // Vertical spacing (all scaled)
+        const vert0 = 8; // Top margin (was 5)
+        const vert1 = 34; // Spike height (was 20)
+        const vert2 = 134; // Heddle height (was 80)
+        const vert5 = 159; // Total heddle height (was 95)
+
+        // Horizontal spacing (scaled)
+        const hor1 = 668; // Loom width (was 400)
+        const separatorWidth = 7; // Separator thickness (was 4)
+        const separatorCount = 41; // Number of vertical separators
+
+        var k;
+
+        // Draw heddle bar background (light color)
+        ctx.fillStyle = color[0];
+        ctx.beginPath();
+        ctx.roundRect(
+          0,
+          vert0 + vert1 - (vert5 - vert2) / 2,
+          (canW - hor1) / 2,
+          vert5,
+          8,
+        );
+        ctx.roundRect(
+          canW,
+          vert0 + vert1 - (vert5 - vert2) / 2,
+          -(canW - hor1) / 2,
+          vert5,
+          8,
+        );
+        ctx.fill();
+
+        // Draw vertical separators
+        ctx.beginPath();
+        for (k = 0; k < separatorCount; k++) {
+          ctx.roundRect(
+            (canW - hor1) / 2 - separatorWidth / 2 + k * dh,
+            vert0 + vert1,
+            separatorWidth,
+            vert2,
+            separatorWidth / 2,
+          );
+        }
+        ctx.fill();
+
+        // Draw pattern name text (dark color)
+        ctx.fillStyle = color[1];
+        ctx.font = "24px Arial"; // Font size for single-line text
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, (canW - hor1) / 4, vert0 + vert1 + vert2 / 2);
+      }
+
+      /* FUNCTION: drawWarp
+           Draws the vertical warp threads
+           These extend from top to bottom of the canvas
+        */
+      function drawWarp() {
+        var l;
+        for (l = 0; l < waNum; l++) {
+          ctx.fillStyle = colorWa[l];
+          // Draw each warp thread as a vertical rectangle
+          ctx.fillRect(
+            patternStart + l * dh + (dh - hw) / 2,
+            canH - weftBottom,
+            hw,
+            -maxWarpLength,
+          );
+        }
+      }
+
+      /* FUNCTION: loadLoomImage
+           Combines loom frame, heddle bar, and warp threads
+           Called before drawing color selectors and pattern
+        */
+      function loadLoomImage() {
+        drawLoom(); // Draw decorative loom frame
+        drawHeddle(
+          patternBars[currentPatternBar][0],
+          patternBars[currentPatternBar][1],
+        ); // Draw heddle with current pattern colors
+        drawWarp(); // Draw warp threads
+      }
+
+      /* FUNCTION: drawWaColor
+           Draws the warp color selection row at the top
+           Users click these squares to set warp thread colors
+        */
+      function drawWaColor() {
+        var i;
+        for (i = 0; i < waNum; i++) {
+          ctx.fillStyle = colorWa[i];
+          // Draw filled square with current color
+          ctx.fillRect(patternStart + i * dh, dh / 2, dh, dh);
+          // Draw outline
+          ctx.strokeRect(patternStart + i * dh, dh / 2, dh, dh);
+        }
+
+        // Draw "warp color" label to the left of the color row
+        // ctx.fillStyle = "#000000";
+        // ctx.font = "20px Poppins";
+        // ctx.textAlign = "right";
+        // ctx.textBaseline = "middle";
+        // ctx.fillText("warp color", patternStart - 10, dh);
+      }
+
+      /* FUNCTION: drawScolor
+           Draws the weft color selection column on the right
+           Users click these squares to set weft thread colors
+        */
+      function drawScolor() {
+        var i;
+        for (i = 0; i < sNum; i++) {
+          ctx.fillStyle = colorS[i];
+          // Draw filled square with current color
+          ctx.fillRect(canW - 1.5 * dh, canH - weftBottom - dv * i, dh, -dv);
+          // Draw outline
+          ctx.strokeRect(canW - 1.5 * dh, canH - weftBottom - dv * i, dh, -dv);
+        }
+      }
+
+      /* FUNCTION: drawS
+           Draws the treadling grid (the 4-column grid on the right)
+           Shows which treadles are activated for each weft row
+           Dark teal = active, light blue = inactive
+        */
+      function drawS() {
+        var n, m, l, i, j;
+
+        // Draw column numbers (1-4) at top and bottom
+        ctx.font = "24px Arial"; // Scaled font (was 15px)
+        ctx.textAlign = "center";
+        ctx.fillStyle = gridColor;
+
+        for (l = 0; l < tr; l++) {
+          // For Plain weave (currentPatternBar === 0), show "1 2 1 2" instead of "1 2 3 4"
+          var displayNum = currentPatternBar === 0 ? (l % 2) + 1 : l + 1;
+          ctx.textBaseline = "bottom";
+          ctx.fillText(
+            displayNum,
+            canW - 6 * dh + l * dh + dh / 2,
+            weftTop - dh / 2,
+          );
+          ctx.textBaseline = "top";
+          ctx.fillText(
+            displayNum,
+            canW - 6 * dh + l * dh + dh / 2,
+            canH - weftBottom + dh / 2,
+          );
+        }
+
+        // Draw filled squares (active = weft color, inactive = light blue)
+        for (n = 0; n < sNum; n++) {
+          for (m = 0; m < tr; m++) {
+            if (S[n][m]) {
+              ctx.fillStyle = colorS[n]; // Use weft color for active cells
+            } else {
+              ctx.fillStyle = treadlingColorBackground; // Light blue - inactive
+            }
+            ctx.fillRect(
+              canW - 6 * dh + m * dh,
+              canH - weftBottom - dv * n,
+              dh,
+              -dv,
+            );
+          }
+        }
+
+        // Draw grid outlines
+        for (i = 0; i < sNum; i++) {
+          for (j = 0; j < tr; j++) {
+            ctx.strokeRect(
+              canW - 6 * dh + j * dh,
+              canH - weftBottom - dv * i,
+              dh,
+              -dv,
+            );
+          }
+        }
+      }
+
+      /* FUNCTION: drawPattern
+           Draws the actual weave pattern preview
+           Shows how warp and weft threads interlace
+           First draws all warp threads, then overlays weft where pattern[k][l] == 0
+        */
+      function drawPattern() {
+        var k, l;
+
+        // Draw warp threads in the pattern area
+        for (k = 0; k < sNum; k++) {
+          for (l = 0; l < waNum; l++) {
+            ctx.fillStyle = colorWa[l];
+            ctx.fillRect(
+              patternStart + l * dh + (dh - hw) / 2,
+              canH - weftBottom - dv * k,
+              hw,
+              -dv,
+            );
+          }
+        }
+
+        // Draw weft threads where they appear on top (pattern value == 0)
+        for (k = 0; k < sNum; k++) {
+          for (l = 0; l < waNum; l++) {
+            ctx.fillStyle = colorS[k];
+            if (pattern[k][l] == 0) {
+              // Weft shows on top - draw wider to cover adjacent warp threads
+              ctx.fillRect(
+                patternStart + l * dh - (dh - hw) / 2,
+                canH - weftBottom - dv * k,
+                2 * dh - hw,
+                -dv,
+              );
+            }
+          }
+        }
+      }
+
+      /* ========================================
+           PATTERN MANAGEMENT FUNCTIONS
+           ======================================== */
+
+      /* FUNCTION: recalculatePattern
+           Recalculates the entire pattern when pattern type is changed
+           Updates pattern matrix based on current treadling and new pattern type
+        */
+      function recalculatePattern() {
+        var n, k, l;
+        // Loop through all weft rows
+        for (n = 0; n < sNum; n++) {
+          // Check each treadle
+          for (k = 0; k < tr; k++) {
+            // If this treadle is active for this row
+            if (S[n][k]) {
+              // Apply the pattern for this treadle to all warp threads (excluding edges)
+              for (l = 1; l < waNum - 1; l++) {
+                pattern[n][l] = patternRows[currentPatternBar][k][l - 1];
+              }
+            }
+          }
+        }
+      }
+
+      /* ========================================
+           PATTERN SELECTION HANDLERS
+           These functions are called when user clicks pattern selector buttons
+           ======================================== */
+
+      /* FUNCTION: plainBarChosen
+           Switches to plain weave pattern
+        */
+      function plainBarChosen() {
+        // Update border colors to show which is selected
+        document.getElementById("headPlain").style.borderColor = "#0F434F"; // Dark = selected
+        document.getElementById("headTwill").style.borderColor = "#C4E9F2"; // Light = not selected
+        document.getElementById("headDiamond").style.borderColor = "#C4E9F2"; // Light = not selected
+        tr = 4; // Reset treadle count
+        currentPatternBar = 0; // Set to plain weave (index 0)
+        recalculatePattern(); // Update pattern with plain weave structure
+        draw(); // Redraw canvas
+      }
+
+      /* FUNCTION: twillBarChosen
+           Switches to twill weave pattern
+        */
+      function twillBarChosen() {
+        document.getElementById("headPlain").style.borderColor = "#C4E9F2";
+        document.getElementById("headTwill").style.borderColor = "#0F434F"; // Dark = selected
+        document.getElementById("headDiamond").style.borderColor = "#C4E9F2";
+        tr = 4;
+        currentPatternBar = 1; // Set to twill weave (index 1)
+        recalculatePattern();
+        draw();
+      }
+
+      /* FUNCTION: diamondBarChosen
+           Switches to diamond weave pattern
+        */
+      function diamondBarChosen() {
+        document.getElementById("headPlain").style.borderColor = "#C4E9F2";
+        document.getElementById("headTwill").style.borderColor = "#C4E9F2";
+        document.getElementById("headDiamond").style.borderColor = "#0F434F"; // Dark = selected
+        tr = 4;
+        currentPatternBar = 2; // Set to diamond weave (index 2)
+        recalculatePattern();
+        draw();
+      }
+
+      /* ========================================
+           MOUSE INTERACTION HANDLERS
+           ======================================== */
+
+      /* FUNCTION: getMousePos
+           Converts screen coordinates to canvas coordinates
+           Accounts for canvas scaling and positioning
+        */
+      function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x:
+            ((evt.clientX - rect.left) / (rect.right - rect.left)) *
+            canvas.width,
+          y:
+            ((evt.clientY - rect.top) / (rect.bottom - rect.top)) *
+            canvas.height,
+        };
+      }
+
+      /* FUNCTION: clickedColor
+           Handles clicks on warp lines (vertical threads) anywhere along their length
+           Applies the currently selected color to the clicked warp thread
+        */
+      function clickedColor(e) {
+        var pos = getMousePos(canvas, e);
+        var n;
+        var tempColor = favcolor.value; // Get current color from color picker
+
+        // Check if click is on any warp line along its entire vertical length
+        // Warp threads extend from top to bottom of canvas
+        // The Y position just needs to be anywhere the warp threads are visible
+        for (n = 0; n < waNum; n++) {
+          var threadStartX = patternStart + n * dh + (dh - hw) / 2;
+          var threadEndX = threadStartX + hw;
+
+          // Check if click is within the horizontal bounds of this warp thread
+          if (pos.x >= threadStartX && pos.x <= threadEndX) {
+            colorWa[n] = tempColor; // Set warp thread color
+            draw(); // Redraw to show change
+            break; // Exit loop once we've found the clicked thread
+          }
+        }
+      }
+
+      /* FUNCTION: clickedSide
+           Handles clicks on treadling grid (right side, 4 columns)
+           Activates/deactivates treadles, sets weft color, and updates pattern accordingly
+        */
+      function clickedSide(e) {
+        var pos = getMousePos(canvas, e);
+        var n, m, k, l;
+        var temp;
+        var tempColor = favcolor.value; // Get current color from color picker
+
+        // Check all cells in the treadling grid
+        for (n = 0; n < sNum; n++) {
+          for (m = 0; m < tr; m++) {
+            temp = S[n][m];
+            // Check if click is within this grid cell
+            if (
+              pos.x < canW - 6 * dh + m * dh + dh &&
+              pos.x > canW - 6 * dh + m * dh &&
+              pos.y < canH - weftBottom - dv * n &&
+              pos.y > canH - weftBottom - dv * n - dv
+            ) {
+              // Always set the weft color for this row when clicking
+              colorS[n] = tempColor;
+
+              if (!temp) {
+                // Cell was not active - activate it
+                usedS[n] = true;
+                // Only one treadle can be active per row
+                for (k = 0; k < tr; k++) {
+                  if (k == m) {
+                    S[n][k] = true; // Activate clicked treadle
+                    // Apply pattern for this treadle to this weft row
+                    for (l = 1; l < waNum - 1; l++) {
+                      pattern[n][l] = patternRows[currentPatternBar][m][l - 1];
+                    }
+                  } else {
+                    S[n][k] = false; // Deactivate other treadles
+                  }
+                }
+              } else {
+                // Cell was active - deactivate it
+                usedS[n] = false;
+                S[n][m] = false;
+                // Reset pattern for this row (all warp shows)
+                for (l = 0; l < waNum; l++) {
+                  pattern[n][l] = 1;
+                }
+              }
+            }
+          }
+        }
+        draw(); // Redraw to show changes
+      }
+
+      /* ========================================
+           SLIDER EVENT HANDLERS
+           ======================================== */
+
+      /* Weft width slider - adjusts vertical size of pattern squares */
+      sliderWeft.oninput = function () {
+        dv = this.value;
+        dv = parseInt(dv);
+        // Ensure minimum value to prevent layout issues
+        if (dv < 10) dv = 10;
+        sNum = Math.floor(warpLength / dv); // Recalculate number of visible weft rows
+        draw();
+      };
+
+      /* Warp width slider - adjusts horizontal width of warp threads */
+      sliderWarp.oninput = function () {
+        hw = this.value;
+        hw = parseInt(hw);
+        draw();
+      };
+
+      /* ========================================
+           COLOR PALETTE FUNCTIONALITY
+           ======================================== */
+
+      /* FUNCTION: setupColorPalette
+           Sets up event listeners for the preset color palette
+           Workflow:
+           1. User clicks a color container to select it
+           2. User uses color picker to choose a custom color
+           3. Selected container automatically updates with the new color
+        */
+      function setupColorPalette() {
+        const paletteColors = document.querySelectorAll(".paletteColor");
+        const colorPicker = document.getElementById("favcolor");
+        let selectedPaletteDiv = null;
+
+        // Add click event to each palette color
+        paletteColors.forEach((colorDiv) => {
+          colorDiv.addEventListener("click", function () {
+            // Remove 'selected' class from all palette colors
+            paletteColors.forEach((div) => div.classList.remove("selected"));
+
+            // Add 'selected' class to clicked color
+            this.classList.add("selected");
+
+            // Store reference to selected palette div
+            selectedPaletteDiv = this;
+
+            // Update color picker to show this color
+            const currentColor = this.getAttribute("data-color");
+            colorPicker.value = currentColor;
+          });
+        });
+
+        // Listen for color picker changes
+        colorPicker.addEventListener("input", function () {
+          // If a palette color is selected, update it with the new color
+          if (selectedPaletteDiv) {
+            const newColor = this.value;
+
+            // Update the selected palette color
+            selectedPaletteDiv.style.backgroundColor = newColor;
+            selectedPaletteDiv.setAttribute("data-color", newColor);
+          }
+        });
+
+        // Set the default selected color (blue)
+        paletteColors[0].classList.add("selected");
+        selectedPaletteDiv = paletteColors[0];
+      }
+
+      /* ========================================
+           TREADLING SEQUENCE DISPLAY
+           Updates the text box showing the sequence of treadles used
+           ======================================== */
+      function updateTreadlingSequence() {
+        var sequenceNumbers = [];
+
+        // Loop through weft rows from bottom to top (index 0 is bottom)
+        for (var n = 0; n < sNum; n++) {
+          var treadleFound = false;
+          // Check which treadle is active for this row
+          for (var m = 0; m < tr; m++) {
+            if (S[n][m]) {
+              // For Plain weave (currentPatternBar === 0), map treadles to 1-2-1-2
+              // Treadles 0,2 (columns 1,3) display as 1; Treadles 1,3 (columns 2,4) display as 2
+              var displayNum = currentPatternBar === 0 ? (m % 2) + 1 : m + 1;
+              sequenceNumbers.push(displayNum);
+              treadleFound = true;
+              break; // Only one treadle per row
+            }
+          }
+          // If no treadle is active, add a space/skip marker
+          if (!treadleFound) {
+            sequenceNumbers.push(" ");
+          }
+        }
+
+        // Display the sequence (reversed so it reads bottom to top, left to right)
+        var sequenceText = sequenceNumbers.join("  ");
+        document.getElementById("treadlingSequenceText").textContent =
+          sequenceText;
+      }
+
+      /* ========================================
+           INITIALIZATION - AUTO-RUNS ON PAGE LOAD
+           ======================================== */
+      init(); // Initialize all state arrays
+      drawPatternBarOptions(); // Draw the three pattern selector buttons
+      draw(); // Draw initial state of main canvas
+      setupColorPalette(); // Setup color palette click handlers
+      document.fonts.load("20px Poppins").then(draw);
+    </script>
+  </body>
+</html>

@@ -1,12 +1,12 @@
-import { useCallback, useMemo, useReducer } from 'react';
+import { useCallback, useEffect, useMemo, useReducer } from 'react';
 import {
-  WARP_COUNT,
-  MAX_WEFT,
-  TREADLE_COUNT,
-  LOOM_HEIGHT,
   DEFAULT_WARP_COLOR,
   DEFAULT_WEFT_COLOR,
+  LOOM_HEIGHT,
+  MAX_WEFT,
   PATTERN_ROWS,
+  TREADLE_COUNT,
+  WARP_COUNT,
   type PatternIndex,
 } from './weaving-data';
 
@@ -19,8 +19,12 @@ export interface WeavingState {
   usedS: boolean[];        // row-in-use flags     [MAX_WEFT]
   pattern: number[][];     // weave matrix          [MAX_WEFT][WARP_COUNT]
   selectedColor: string;
-  cellHeight: number;      // row height (weft slider)
-  cellWidth: number;       // col width  (warp slider)
+  cellHeight: number;      // fixed row height for grid layout
+  cellWidth: number;       // fixed col width for grid layout
+  warpThreadWidth: number; // visual warp thread thickness (slider)
+  weftThreadHeight: number; // visual weft thread thickness (slider)
+  selectedWarpIndex: number; // currently highlighted warp thread
+  gridHeight: number;      // fixed pixel height of the grid area (scales with cellWidth)
 }
 
 // ── Actions ────────────────────────────────────────────
@@ -31,6 +35,12 @@ type Action =
   | { type: 'SET_COLOR'; color: string }
   | { type: 'SET_CELL_HEIGHT'; value: number }
   | { type: 'SET_CELL_WIDTH'; value: number }
+  | { type: 'SET_WARP_THREAD_WIDTH'; value: number }
+  | { type: 'SET_WEFT_THREAD_HEIGHT'; value: number }
+  | { type: 'SET_GRID_HEIGHT'; value: number }
+  | { type: 'MOVE_WARP_LEFT' }
+  | { type: 'MOVE_WARP_RIGHT' }
+  | { type: 'SET_SELECTED_WARP'; index: number }
   | { type: 'RESET' };
 
 // ── Helpers ────────────────────────────────────────────
@@ -44,6 +54,7 @@ function createInitialState(): WeavingState {
   const pattern = Array.from({ length: MAX_WEFT }, () =>
     Array(WARP_COUNT).fill(1),
   );
+  console.log('Initial state created with pattern size:', pattern.length, pattern[0].length);
 
   return {
     currentPattern: 0,
@@ -53,8 +64,12 @@ function createInitialState(): WeavingState {
     usedS,
     pattern,
     selectedColor: '#5170ff',
-    cellHeight: 8,
-    cellWidth: 8,
+    cellHeight: 16,
+    cellWidth: 16,
+    warpThreadWidth: 8,
+    weftThreadHeight: 16,
+    selectedWarpIndex: -1,
+    gridHeight: LOOM_HEIGHT, // default; overridden by the hook via SET_GRID_HEIGHT
   };
 }
 
@@ -101,7 +116,7 @@ function recalcAll(
 function reducer(state: WeavingState, action: Action): WeavingState {
   switch (action.type) {
     case 'SELECT_PATTERN': {
-      const sNum = Math.floor(LOOM_HEIGHT / state.cellHeight);
+      const sNum = Math.floor(state.gridHeight / state.cellHeight);
       const newPattern = recalcAll(action.index, state.S, state.pattern, sNum);
       return { ...state, currentPattern: action.index, pattern: newPattern };
     }
@@ -164,6 +179,29 @@ function reducer(state: WeavingState, action: Action): WeavingState {
     case 'SET_CELL_WIDTH':
       return { ...state, cellWidth: action.value };
 
+    case 'SET_WARP_THREAD_WIDTH':
+      return { ...state, warpThreadWidth: action.value };
+
+    case 'SET_WEFT_THREAD_HEIGHT':
+      // Matches web behavior: weft slider controls both row height (dv) and visual thread height
+      return { ...state, weftThreadHeight: action.value, cellHeight: action.value };
+
+    case 'SET_GRID_HEIGHT':
+      return { ...state, gridHeight: action.value };
+
+    case 'MOVE_WARP_LEFT': {
+      const idx = state.selectedWarpIndex < 0 ? 0 : (state.selectedWarpIndex - 1 + WARP_COUNT) % WARP_COUNT;
+      return { ...state, selectedWarpIndex: idx };
+    }
+
+    case 'MOVE_WARP_RIGHT': {
+      const idx = state.selectedWarpIndex < 0 ? 0 : (state.selectedWarpIndex + 1) % WARP_COUNT;
+      return { ...state, selectedWarpIndex: idx };
+    }
+
+    case 'SET_SELECTED_WARP':
+      return { ...state, selectedWarpIndex: action.index };
+
     case 'RESET':
       return { ...createInitialState(), selectedColor: state.selectedColor };
 
@@ -173,12 +211,25 @@ function reducer(state: WeavingState, action: Action): WeavingState {
 }
 
 // ── Hook ───────────────────────────────────────────────
-export function useWeavingState() {
+/**
+ * @param gridHeight – the pixel height of the grid area on the current device.
+ *   Derived from cellWidth × PATTERN_ASPECT so mobile scales uniformly.
+ *   Falls back to LOOM_HEIGHT (784) when omitted (web parity).
+ */
+export function useWeavingState(gridHeight?: number) {
   const [state, dispatch] = useReducer(reducer, undefined, createInitialState);
 
+  // Keep reducer in sync with the externally-computed gridHeight
+  const effectiveHeight = gridHeight ?? LOOM_HEIGHT;
+  useEffect(() => {
+    if (state.gridHeight !== effectiveHeight) {
+      dispatch({ type: 'SET_GRID_HEIGHT', value: effectiveHeight });
+    }
+  }, [effectiveHeight, state.gridHeight]);
+
   const sNum = useMemo(
-    () => Math.floor(LOOM_HEIGHT / state.cellHeight),
-    [state.cellHeight],
+    () => Math.floor(effectiveHeight / state.cellHeight),
+    [effectiveHeight, state.cellHeight],
   );
 
   const treadlingSequence = useMemo(() => {
@@ -222,18 +273,84 @@ export function useWeavingState() {
     (v: number) => dispatch({ type: 'SET_CELL_WIDTH', value: v }),
     [],
   );
+  const setWarpThreadWidth = useCallback(
+    (v: number) => dispatch({ type: 'SET_WARP_THREAD_WIDTH', value: v }),
+    [],
+  );
+  const setWeftThreadHeight = useCallback(
+    (v: number) => dispatch({ type: 'SET_WEFT_THREAD_HEIGHT', value: v }),
+    [],
+  );
+  const moveWarpLeft = useCallback(
+    () => dispatch({ type: 'MOVE_WARP_LEFT' }),
+    [],
+  );
+  const moveWarpRight = useCallback(
+    () => dispatch({ type: 'MOVE_WARP_RIGHT' }),
+    [],
+  );
+  const setSelectedWarp = useCallback(
+    (idx: number) => dispatch({ type: 'SET_SELECTED_WARP', index: idx }),
+    [],
+  );
   const resetAll = useCallback(() => dispatch({ type: 'RESET' }), []);
 
-  return {
-    ...state,
+  // ── Memoized data slices ──────────────────────────────
+  // Each slice only creates a new object when its specific deps change,
+  // so child components wrapped in React.memo skip re-renders when
+  // unrelated state changes.
+
+  const loomData = useMemo(() => ({
+    currentPattern: state.currentPattern,
+    colorWa: state.colorWa,
+    colorS: state.colorS,
+    S: state.S,
+    pattern: state.pattern,
     sNum,
+    cellWidth: state.cellWidth,
+    cellHeight: state.cellHeight,
+    warpThreadWidth: state.warpThreadWidth,
+    weftThreadHeight: state.weftThreadHeight,
+    selectedWarpIndex: state.selectedWarpIndex,
+  }), [
+    state.currentPattern, state.colorWa, state.colorS,
+    state.S, state.pattern, sNum,
+    state.cellWidth, state.cellHeight,
+    state.warpThreadWidth, state.weftThreadHeight,
+    state.selectedWarpIndex,
+  ]);
+
+  const sliderData = useMemo(() => ({
+    warpThreadWidth: state.warpThreadWidth,
+    weftThreadHeight: state.weftThreadHeight,
+  }), [state.warpThreadWidth, state.weftThreadHeight]);
+
+  const navigatorData = useMemo(() => ({
+    selectedWarpIndex: state.selectedWarpIndex,
+    selectedColor: state.selectedColor,
+  }), [state.selectedWarpIndex, state.selectedColor]);
+
+  return {
+    // Individual values needed by PatternStudioScreen's own render
+    currentPattern: state.currentPattern,
+    selectedColor: state.selectedColor,
+    // Memoized data slices for child components
+    loomData,
+    sliderData,
+    navigatorData,
     treadlingSequence,
+    // Stable action creators
     selectPattern,
     colorWarp,
     toggleTreadle,
     setSelectedColor,
     setCellHeight,
     setCellWidth,
+    setWarpThreadWidth,
+    setWeftThreadHeight,
+    moveWarpLeft,
+    moveWarpRight,
+    setSelectedWarp,
     resetAll,
   };
 }

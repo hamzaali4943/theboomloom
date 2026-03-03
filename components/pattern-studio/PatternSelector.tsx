@@ -22,16 +22,15 @@ export const PatternSelector = React.memo(function PatternSelector({
             onPress={() => onSelect(idx as PatternIndex)}
             style={[
               styles.button,
-              {
-                backgroundColor: meta.bg,
-                borderColor: isActive ? '#0F434F' : '#C4E9F2',
-              },
+              isActive
+                ? { backgroundColor: '#0F434F' }
+                : { backgroundColor: '#E8F4F8', borderColor: '#C4E9F2', borderWidth: 1.5 },
             ]}
           >
             <ThemedText
               style={[
                 styles.label,
-                { color: meta.fg, fontSize: idx === 1 ? 11 : 13 },
+                { color: isActive ? '#ffffff' : '#0F434F' },
               ]}
             >
               {meta.label}
@@ -46,19 +45,20 @@ export const PatternSelector = React.memo(function PatternSelector({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
     justifyContent: 'center',
+    paddingHorizontal: 16,
   },
   button: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    borderWidth: 4,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
   label: {
-    fontWeight: '700',
+    fontWeight: '600',
+    fontSize: 13,
     textAlign: 'center',
   },
 });

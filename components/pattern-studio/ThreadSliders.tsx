@@ -6,17 +6,17 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 type Props = {
-  cellWidth: number;
-  cellHeight: number;
-  onCellWidthChange: (v: number) => void;
-  onCellHeightChange: (v: number) => void;
+  warpThreadWidth: number;
+  weftThreadHeight: number;
+  onWarpThreadWidthChange: (v: number) => void;
+  onWeftThreadHeightChange: (v: number) => void;
 };
 
 export const ThreadSliders = React.memo(function ThreadSliders({
-  cellWidth,
-  cellHeight,
-  onCellWidthChange,
-  onCellHeightChange,
+  warpThreadWidth,
+  weftThreadHeight,
+  onWarpThreadWidthChange,
+  onWeftThreadHeightChange,
 }: Props) {
   const scheme = useColorScheme() ?? 'light';
 
@@ -31,10 +31,10 @@ export const ThreadSliders = React.memo(function ThreadSliders({
         <Slider
           style={styles.slider}
           minimumValue={5}
-          maximumValue={12}
+          maximumValue={13}
           step={1}
-          value={cellWidth}
-          onValueChange={onCellWidthChange}
+          value={warpThreadWidth}
+          onValueChange={onWarpThreadWidthChange}
           minimumTrackTintColor="#0F434F"
           maximumTrackTintColor="#C4E9F2"
           thumbTintColor="#0F434F"
@@ -49,11 +49,11 @@ export const ThreadSliders = React.memo(function ThreadSliders({
         </ThemedText>
         <Slider
           style={styles.slider}
-          minimumValue={5}
-          maximumValue={12}
+          minimumValue={10}
+          maximumValue={17}
           step={1}
-          value={cellHeight}
-          onValueChange={onCellHeightChange}
+          value={weftThreadHeight}
+          onValueChange={onWeftThreadHeightChange}
           minimumTrackTintColor="#0F434F"
           maximumTrackTintColor="#C4E9F2"
           thumbTintColor="#0F434F"
