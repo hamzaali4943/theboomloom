@@ -15,6 +15,16 @@ type Props = {
   backgroundColor?: string;
 };
 
+// ── Exported vertical constants so WeavingLoom can compute matching offsets ──
+export const LOOM_VERT0 = 8;   // Top margin
+export const LOOM_VERT1 = 34;  // Spike height
+export const LOOM_VERT4 = 100; // Additional frame depth
+
+/** Top decoration height: margin + spikes (no extra gap) */
+export const LOOM_TOP_PAD = LOOM_VERT0 + LOOM_VERT1;  // 42
+/** Bottom decoration height: spikes + margin */
+export const LOOM_BOTTOM_PAD = LOOM_VERT1 + LOOM_VERT0; // 42
+
 // ── Component ──────────────────────────────────────────
 export const LoomFrame = React.memo(function LoomFrame({
   loomWidth,
@@ -25,12 +35,9 @@ export const LoomFrame = React.memo(function LoomFrame({
 }: Props) {
   const canH = canvasHeight;
 
-  // Vertical spacing constants (matching drawLoom)
-  const vert0 = 8;   // Top margin
-  const vert1 = 34;  // Spike height
-  const vert2 = 134; // Heddle bar height
-  const vert3 = 84;  // Frame curve depth
-  const vert4 = 100; // Additional frame depth
+  const vert0 = LOOM_VERT0;
+  const vert1 = LOOM_VERT1;
+  const vert4 = LOOM_VERT4;
 
   // Horizontal positioning — loom starts at x=0 within SVG
   const loomStartX = 0;
@@ -41,8 +48,8 @@ export const LoomFrame = React.memo(function LoomFrame({
   const curveInset2 = Math.min(195, loomWidth * 0.305);
 
   // Spike details
-  const spikeCount = Math.max(1, Math.floor(loomWidth / spikeSpacing / 2));
-  const spikeWidth = 10;
+  const spikeCount = Math.max(1, Math.floor(loomWidth / spikeSpacing));
+  const spikeWidth = 6;
 
   // Center X
   const centerX = loomWidth / 2;
@@ -85,18 +92,11 @@ export const LoomFrame = React.memo(function LoomFrame({
     );
   }
 
-  // Main body rectangle (top)
-  const bodyY = vert0 + vert1;
-  const bodyH = vert2 + vert3;
-
-  // Bottom rectangle
-  const bottomRectY = canH - (vert0 + vert1 + vert3);
-
-  // Side curves (hourglass shape connecting top body to bottom body)
-  const sideY1 = vert0 + vert1 + vert2 + vert3;
+  // Side curves (hourglass shape) — start right at spike bottom
+  const sideY1 = vert0 + vert1;
   const sideY2 = sideY1 + vert4;
-  const botSideY1 = canH - vert0 - vert1 - vert3;
-  const botSideY2 = canH - vert0 - vert1 - vert3 - vert4;
+  const botSideY1 = canH - vert0 - vert1;
+  const botSideY2 = canH - vert0 - vert1 - vert4;
 
   const sideCurvesD = [
     // Left side curve down
@@ -112,30 +112,8 @@ export const LoomFrame = React.memo(function LoomFrame({
     'Z',
   ].join(' ');
 
-  // Bottom bar
-  const barY = canH - vert0 - vert1 - vert1 / 2;
-  const barH = vert1 / 2;
-
-  // Left bottom bracket
-  const lbX = loomStartX - spikeWidth;
-  const lbY1 = canH - vert0 - vert1 + vert1 / 2;
-  const lbY2 = canH - vert0 - 2 * vert1;
-  const leftBracketD = [
-    `M ${lbX} ${lbY1}`,
-    `C ${lbX - 20} ${lbY1}, ${lbX - 20} ${lbY2}, ${lbX} ${lbY2}`,
-    'Z',
-  ].join(' ');
-
-  // Right bottom bracket
-  const rbX = loomEndX + spikeWidth;
-  const rightBracketD = [
-    `M ${rbX} ${lbY1}`,
-    `C ${rbX + 20} ${lbY1}, ${rbX + 20} ${lbY2}, ${rbX} ${lbY2}`,
-    'Z',
-  ].join(' ');
-
   // Top oval cutout
-  const ovalTopY = vert0 + vert1 + vert2 + vert3 + vert4 / 2;
+  const ovalTopY = vert0 + vert1 + vert4 / 2;
   const topOvalD = [
     `M ${loomStartX + curveInset2} ${ovalTopY}`,
     `C ${loomStartX + curveInset2} ${ovalTopY - 50}, ${loomEndX - curveInset2} ${ovalTopY - 50}, ${loomEndX - curveInset2} ${ovalTopY}`,
@@ -144,7 +122,7 @@ export const LoomFrame = React.memo(function LoomFrame({
   ].join(' ');
 
   // Bottom oval cutout
-  const ovalBotY = canH - (vert0 + vert1 + vert3 + vert4 / 2);
+  const ovalBotY = canH - (vert0 + vert1 + vert4 / 2);
   const bottomOvalD = [
     `M ${loomStartX + curveInset2} ${ovalBotY}`,
     `C ${loomStartX + curveInset2} ${ovalBotY + 50}, ${loomEndX - curveInset2} ${ovalBotY + 50}, ${loomEndX - curveInset2} ${ovalBotY}`,
@@ -153,65 +131,26 @@ export const LoomFrame = React.memo(function LoomFrame({
   ].join(' ');
 
   // Center dots
-  const vert6 = 251;
-  const dotY1 = canH - (canH - vert2) / 2 - vert6 / 2;
-  const dotY2 = canH - (canH - vert2) / 2 + vert6 / 2;
+  const dotY1 = canH / 2 - 125;
+  const dotY2 = canH / 2 + 125;
 
-  // SVG needs extra horizontal space for brackets
-  const bracketOverhang = spikeWidth + 20;
-  const svgWidth = loomWidth + bracketOverhang * 2;
+  // No brackets needed — just fit the loom width
+  const svgWidth = loomWidth;
 
   return (
     <Svg
       width={svgWidth}
       height={canH}
-      viewBox={`${-bracketOverhang} 0 ${svgWidth} ${canH}`}
+      viewBox={`0 0 ${svgWidth} ${canH}`}
     >
       {/* Top spikes */}
       {topSpikes}
 
-      {/* Main body rectangle */}
-      <Rect
-        x={loomStartX}
-        y={bodyY}
-        width={loomWidth}
-        height={bodyH}
-        rx={spikeWidth / 2}
-        ry={spikeWidth / 2}
-        fill={loomColor}
-      />
-
       {/* Side curves (hourglass connector) */}
       <Path d={sideCurvesD} fill={loomColor} />
 
-      {/* Bottom rectangle */}
-      <Rect
-        x={loomStartX}
-        y={bottomRectY}
-        width={loomWidth}
-        height={vert3}
-        rx={spikeWidth / 2}
-        ry={spikeWidth / 2}
-        fill={loomColor}
-      />
-
       {/* Bottom spikes */}
       {bottomSpikes}
-
-      {/* Bottom bar */}
-      <Rect
-        x={loomStartX - spikeWidth}
-        y={barY}
-        width={loomWidth + 2 * spikeWidth}
-        height={barH}
-        fill={loomColor}
-      />
-
-      {/* Left bottom bracket */}
-      <Path d={leftBracketD} fill={loomColor} />
-
-      {/* Right bottom bracket */}
-      <Path d={rightBracketD} fill={loomColor} />
 
       {/* Top oval cutout */}
       <Path d={topOvalD} fill={backgroundColor} />

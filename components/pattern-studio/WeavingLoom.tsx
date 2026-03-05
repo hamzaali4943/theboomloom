@@ -13,12 +13,11 @@ import {
   WARP_COUNT,
   TREADLE_COUNT,
   DH,
-  PATTERN_META,
   type PatternIndex,
 } from './weaving-data';
 
-const GRID_GAP = Math.round(1.4 * DH); // ~17px — reduced to give pattern grid more width
-import { LoomFrame } from '@/components/shared/LoomFrame';
+const GRID_GAP = Math.round(1.0 * DH); // ~12px — tighter gap to pull treadle grid left
+import { LoomFrame, LOOM_TOP_PAD, LOOM_BOTTOM_PAD } from '@/components/shared/LoomFrame';
 import { SkiaPatternGrid } from './SkiaPatternGrid';
 import { SkiaTreadleGrid } from './SkiaTreadleGrid';
 
@@ -40,29 +39,6 @@ type Props = {
   onColorWarp: (col: number) => void;
   onToggleTreadle: (row: number, col: number) => void;
 };
-
-// ── Heddle Bar ─────────────────────────────────────────
-const HeddleBar = React.memo(function HeddleBar({
-  patternIdx,
-  width,
-}: {
-  patternIdx: PatternIndex;
-  width: number;
-}) {
-  const meta = PATTERN_META[patternIdx];
-  return (
-    <View style={[styles.heddle, { backgroundColor: meta.bg, width },{ zIndex: 1 }]}>
-      <ThemedText
-        style={[
-          styles.heddleText,
-          { color: meta.fg, fontSize: patternIdx === 1 ? 11 : 13 },
-        ]}
-      >
-        {meta.label}
-      </ThemedText>
-    </View>
-  );
-});
 
 // ── Main Loom Component ────────────────────────────────
 export const WeavingLoom = React.memo(function WeavingLoom({
@@ -87,17 +63,10 @@ export const WeavingLoom = React.memo(function WeavingLoom({
   const treadleGridWidth = TREADLE_COUNT * DH;
   const totalWidth = patternGridWidth + GRID_GAP + treadleGridWidth;
 
-  // LoomFrame vertical constants (must match LoomFrame.tsx)
-  const loomVert0 = 8;   // top margin
-  const loomVert1 = 34;  // spike height
-  const loomVert2 = 134; // heddle bar height
-  const loomVert3 = 84;  // frame curve depth
-  const loomTopPad = loomVert0 + loomVert1 + loomVert2 + loomVert3; // 260
-  const loomBottomPad = loomVert3 + loomVert1 + loomVert0;          // 126
-  // gridHeight scales proportionally with cellWidth (web aspect ratio preserved).
-  // The container stays this fixed size regardless of slider changes.
+  // Use exported constants from LoomFrame
+  const loomTopPad = LOOM_TOP_PAD;       // 126
+  const loomBottomPad = LOOM_BOTTOM_PAD; // 126
   const loomCanvasHeight = loomTopPad + gridHeight + loomBottomPad;
-  const bracketOverhang = 30; // spikeWidth(10) + 20
 
   // Touch handler for treadling grid
   const handleTreadleTouch = useCallback(
@@ -141,9 +110,6 @@ export const WeavingLoom = React.memo(function WeavingLoom({
       contentContainerStyle={styles.outerScroll}
     >
       <View style={{ width: totalWidth }}>
-        {/* Heddle bar */}
-        <HeddleBar patternIdx={currentPattern} width={patternGridWidth} />
-
         {/* Treadle column numbers (top) */}
         <View style={styles.numbersRow}>
           <View style={{ width: patternGridWidth }} />
@@ -167,14 +133,14 @@ export const WeavingLoom = React.memo(function WeavingLoom({
           </View>
         </View>
 
-        {/* Loom frame + pattern grid area — fixed height preserving web aspect ratio */}
-        <View style={{ position: 'relative', height: gridHeight }}>
-          {/* LoomFrame SVG — behind the grid */}
+        {/* Loom frame + pattern grid area — full loom height with grid inset */}
+        <View style={{ position: 'relative', height: loomCanvasHeight }}>
+          {/* LoomFrame SVG — behind everything */}
           <View
             style={{
               position: 'absolute',
-              top: -loomTopPad,
-              left: -bracketOverhang,
+              top: 0,
+              left: 0,
               zIndex: 0,
             }}
             pointerEvents="none"
@@ -187,10 +153,13 @@ export const WeavingLoom = React.memo(function WeavingLoom({
           </View>
 
           {/* Grid area: pattern + gap + treadling.
-              Fixed height container with overflow hidden — content redraws
-              inside without affecting outer layout (matches web behavior). */}
+              Positioned inside the loom frame, below the top decoration. */}
           <View
             style={{
+              position: 'absolute',
+              top: loomTopPad,
+              left: 0,
+              right: 0,
               height: gridHeight,
               overflow: 'hidden',
               zIndex: 1,
@@ -261,16 +230,6 @@ export const WeavingLoom = React.memo(function WeavingLoom({
 const styles = StyleSheet.create({
   outerScroll: {
     paddingHorizontal: 8,
-  },
-  heddle: {
-    height: 80,
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  heddleText: {
-    fontWeight: '700',
   },
   numbersRow: {
     flexDirection: 'row',
