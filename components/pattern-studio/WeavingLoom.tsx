@@ -16,7 +16,7 @@ import {
   type PatternIndex,
 } from './weaving-data';
 
-const GRID_GAP = Math.round(1.0 * DH); // ~12px — tighter gap to pull treadle grid left
+const GRID_GAP = Math.round(1.0 * DH); // ~12px gap between pattern and treadle grid
 import { LoomFrame, LOOM_TOP_PAD, LOOM_BOTTOM_PAD } from '@/components/shared/LoomFrame';
 import { SkiaPatternGrid } from './SkiaPatternGrid';
 import { SkiaTreadleGrid } from './SkiaTreadleGrid';
@@ -31,7 +31,7 @@ type Props = {
   sNum: number;
   cellWidth: number;
   cellHeight: number;
-  /** Fixed pixel height for the grid area — scales with cellWidth to preserve web aspect ratio */
+  /** Fixed pixel height for the grid area — keeps layout stable during slider changes */
   gridHeight: number;
   warpThreadWidth: number;
   weftThreadHeight: number;
@@ -63,30 +63,29 @@ export const WeavingLoom = React.memo(function WeavingLoom({
   const treadleGridWidth = TREADLE_COUNT * DH;
   const totalWidth = patternGridWidth + GRID_GAP + treadleGridWidth;
 
-  // Use exported constants from LoomFrame
+  // Use fixed gridHeight for the outer container so layout doesn't shift
   const loomTopPad = LOOM_TOP_PAD;       // 126
   const loomBottomPad = LOOM_BOTTOM_PAD; // 126
   const loomCanvasHeight = loomTopPad + gridHeight + loomBottomPad;
 
-  // Touch handler for treadling grid
+  // Touch handler for treadling grid — content draws from bottom up
   const handleTreadleTouch = useCallback(
     (e: GestureResponderEvent) => {
       const x = e.nativeEvent.locationX;
       const y = e.nativeEvent.locationY;
       const col = Math.floor(x / DH);
-      const row = Math.floor(y / cellHeight);
-      // Rows render top-to-bottom as (sNum-1) → 0
-      const actualRow = sNum - 1 - row;
+      // Row n=0 is at the bottom of the canvas (y = gridHeight - cellHeight)
+      const row = Math.floor((gridHeight - y) / cellHeight);
       if (
         col >= 0 &&
         col < TREADLE_COUNT &&
-        actualRow >= 0 &&
-        actualRow < sNum
+        row >= 0 &&
+        row < sNum
       ) {
-        onToggleTreadle(actualRow, col);
+        onToggleTreadle(row, col);
       }
     },
-    [cellHeight, sNum, onToggleTreadle],
+    [cellHeight, gridHeight, sNum, onToggleTreadle],
   );
 
   // Treadle column numbers
@@ -97,12 +96,6 @@ export const WeavingLoom = React.memo(function WeavingLoom({
     [currentPattern],
   );
 
-  // Build row indices from top to bottom (high index at top = last weft row)
-  const rowIndices = useMemo(
-    () => Array.from({ length: sNum }, (_, i) => sNum - 1 - i),
-    [sNum],
-  );
-
   return (
     <ScrollView
       horizontal
@@ -110,29 +103,6 @@ export const WeavingLoom = React.memo(function WeavingLoom({
       contentContainerStyle={styles.outerScroll}
     >
       <View style={{ width: totalWidth }}>
-        {/* Treadle column numbers (top) */}
-        <View style={styles.numbersRow}>
-          <View style={{ width: patternGridWidth }} />
-          <View style={{ width: GRID_GAP }} />
-          <View style={{ flexDirection: 'row', width: treadleGridWidth }}>
-            {treadleNumbers.map((num, i) => (
-              <ThemedText
-                key={i}
-                style={[
-                  styles.treadleNum,
-                  {
-                    width: DH,
-                    color: Colors[scheme].textSecondary,
-                    fontSize: Math.max(DH - 1, 8),
-                  },
-                ]}
-              >
-                {num}
-              </ThemedText>
-            ))}
-          </View>
-        </View>
-
         {/* Loom frame + pattern grid area — full loom height with grid inset */}
         <View style={{ position: 'relative', height: loomCanvasHeight }}>
           {/* LoomFrame SVG — behind everything */}
@@ -152,8 +122,37 @@ export const WeavingLoom = React.memo(function WeavingLoom({
             />
           </View>
 
+          {/* Treadle column numbers (top) — positioned just above the grid */}
+          <View
+            style={[
+              styles.numbersRow,
+              {
+                position: 'absolute',
+                top: loomTopPad - 20,
+                left: patternGridWidth + GRID_GAP,
+                zIndex: 2,
+              },
+            ]}
+          >
+            {treadleNumbers.map((num, i) => (
+              <ThemedText
+                key={i}
+                style={[
+                  styles.treadleNum,
+                  {
+                    width: DH,
+                    color: Colors[scheme].textSecondary,
+                    fontSize: Math.max(DH - 1, 8),
+                  },
+                ]}
+              >
+                {num}
+              </ThemedText>
+            ))}
+          </View>
+
           {/* Grid area: pattern + gap + treadling.
-              Positioned inside the loom frame, below the top decoration. */}
+              Fixed-size canvases draw from bottom up (like web), no layout shift. */}
           <View
             style={{
               position: 'absolute',
@@ -165,46 +164,49 @@ export const WeavingLoom = React.memo(function WeavingLoom({
               zIndex: 1,
             }}
           >
-            {/* Align grid content to bottom so rows grow upward like the web */}
-            <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-              <View style={{ flexDirection: 'row' }}>
-                {/* Pattern grid — single Skia canvas */}
-                <SkiaPatternGrid
-                  pattern={pattern}
-                  colorWa={colorWa}
+            <View style={{ flexDirection: 'row' }}>
+              {/* Pattern grid — fixed-size Skia canvas */}
+              <SkiaPatternGrid
+                pattern={pattern}
+                colorWa={colorWa}
+                colorS={colorS}
+                sNum={sNum}
+                cellWidth={cellWidth}
+                cellHeight={cellHeight}
+                gridHeight={gridHeight}
+                warpThreadWidth={warpThreadWidth}
+                weftThreadHeight={weftThreadHeight}
+                selectedWarpIndex={selectedWarpIndex}
+              />
+
+              {/* Gap */}
+              <View style={{ width: GRID_GAP }} />
+
+              {/* Treadling grid (touch area) — fixed-size Skia canvas */}
+              <Pressable onPress={handleTreadleTouch}>
+                <SkiaTreadleGrid
+                  S={S}
                   colorS={colorS}
                   sNum={sNum}
-                  cellWidth={cellWidth}
                   cellHeight={cellHeight}
-                  warpThreadWidth={warpThreadWidth}
-                  weftThreadHeight={weftThreadHeight}
-                  selectedWarpIndex={selectedWarpIndex}
-                  rowIndices={rowIndices}
+                  gridHeight={gridHeight}
                 />
-
-                {/* Gap — matches web's ~3*dh between pattern end and treadle start */}
-                <View style={{ width: GRID_GAP }} />
-
-                {/* Treadling grid (touch area) — single Skia canvas */}
-                <Pressable onPress={handleTreadleTouch}>
-                  <SkiaTreadleGrid
-                    S={S}
-                    colorS={colorS}
-                    sNum={sNum}
-                    cellHeight={cellHeight}
-                    rowIndices={rowIndices}
-                  />
-                </Pressable>
-              </View>
+              </Pressable>
             </View>
           </View>
-        </View>
 
-        {/* Treadle column numbers (bottom) */}
-        <View style={styles.numbersRow}>
-          <View style={{ width: patternGridWidth }} />
-          <View style={{ width: GRID_GAP }} />
-          <View style={{ flexDirection: 'row', width: treadleGridWidth }}>
+          {/* Treadle column numbers (bottom) — positioned just below the grid */}
+          <View
+            style={[
+              styles.numbersRow,
+              {
+                position: 'absolute',
+                top: loomTopPad + gridHeight,
+                left: patternGridWidth + GRID_GAP,
+                zIndex: 2,
+              },
+            ]}
+          >
             {treadleNumbers.map((num, i) => (
               <ThemedText
                 key={i}
@@ -234,7 +236,6 @@ const styles = StyleSheet.create({
   numbersRow: {
     flexDirection: 'row',
     height: 16,
-    alignItems: 'center',
   },
   treadleNum: {
     textAlign: 'center',

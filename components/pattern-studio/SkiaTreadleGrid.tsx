@@ -7,23 +7,26 @@ type Props = {
   colorS: string[];
   sNum: number;
   cellHeight: number;
-  rowIndices: number[];
+  /** Fixed canvas height — canvas never resizes, content draws from bottom up */
+  gridHeight: number;
 };
 
 /**
  * Draws the treadling grid on a single Skia Canvas.
- * Uses a recorded Picture for GPU-accelerated rendering.
+ * Uses a fixed-size canvas (like the web) so the element never resizes.
+ * Content is drawn from the bottom up, matching web's drawS logic.
  */
 export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
   S,
   colorS,
   sNum,
   cellHeight,
-  rowIndices,
+  gridHeight,
 }: Props) {
   const cellWidth = DH;
   const width = TREADLE_COUNT * cellWidth;
-  const height = sNum * cellHeight;
+  // Canvas height is fixed — never changes with cellHeight
+  const height = gridHeight;
 
   const picture = useMemo(() => {
     return createPicture(
@@ -32,17 +35,19 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
         const borderColor = Skia.Color(GRID_BORDER);
         const bgColor = Skia.Color(TREADLING_BG);
 
+        // Draw from bottom up, matching web: y = height - cellHeight * (n + 1)
+        // Row index n=0 is the bottom-most row.
+
         // ── Draw cell fills ──
-        for (let screenRow = 0; screenRow < rowIndices.length; screenRow++) {
-          const ri = rowIndices[screenRow];
-          const sRow = S[ri];
-          const y = screenRow * cellHeight;
+        for (let n = 0; n < sNum; n++) {
+          const sRow = S[n];
+          const y = height - cellHeight * (n + 1);
 
           for (let col = 0; col < TREADLE_COUNT; col++) {
             const x = col * cellWidth;
 
             if (sRow[col]) {
-              paint.setColor(Skia.Color(colorS[ri]));
+              paint.setColor(Skia.Color(colorS[n]));
             } else {
               paint.setColor(bgColor);
             }
@@ -59,21 +64,22 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
         paint.setStrokeWidth(0.5);
         paint.setStyle(PaintStyle.Stroke);
 
-        // Horizontal lines
-        for (let row = 0; row <= rowIndices.length; row++) {
-          const y = row * cellHeight;
+        // Horizontal lines (only for the rows that have content)
+        for (let n = 0; n <= sNum; n++) {
+          const y = height - cellHeight * n;
           canvas.drawLine(0, y, width, y, paint);
         }
 
-        // Vertical lines
+        // Vertical lines (full height of content area)
+        const contentTop = height - cellHeight * sNum;
         for (let col = 0; col <= TREADLE_COUNT; col++) {
           const x = col * cellWidth;
-          canvas.drawLine(x, 0, x, height, paint);
+          canvas.drawLine(x, contentTop, x, height, paint);
         }
       },
       { x: 0, y: 0, width, height },
     );
-  }, [S, colorS, rowIndices, cellHeight, width, height]);
+  }, [S, colorS, sNum, cellHeight, width, height]);
 
   return (
     <Canvas style={{ width, height }}>
