@@ -14,20 +14,6 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 const TOOLS = [
   {
-    key: 'color-palette' as const,
-    icon: 'paintpalette.fill' as const,
-    label: 'Color Palette',
-    description: 'Explore curated palettes for textile design',
-    accent: '#7C3AED',
-  },
-  {
-    key: 'fabric-library' as const,
-    icon: 'books.vertical.fill' as const,
-    label: 'Fabric Explorer',
-    description: 'Study fabric types, weaves & properties',
-    accent: '#059669',
-  },
-  {
     key: 'pattern-studio' as const,
     icon: 'wand.and.stars' as const,
     label: 'Pattern Studio',

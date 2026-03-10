@@ -14,6 +14,8 @@ type Props = {
   warpThreadWidth: number;
   weftThreadHeight: number;
   selectedWarpIndex: number;
+  /** Row index to highlight with a ghost line (-1 = none) */
+  selectedRowIndex?: number;
 };
 
 /**
@@ -32,6 +34,7 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
   warpThreadWidth: rawWarpWidth,
   weftThreadHeight: _weftThreadHeight,
   selectedWarpIndex,
+  selectedRowIndex = -1,
 }: Props) {
   const width = WARP_COUNT * cellWidth;
   // Canvas height is fixed — never changes with cellHeight
@@ -113,13 +116,28 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
             paint,
           );
         }
+
+        // ── Selected row ghost line highlight ──
+        if (selectedRowIndex >= 0 && selectedRowIndex < sNum) {
+          const rowY = height - cellHeight * (selectedRowIndex + 1);
+
+          paint.setColor(Skia.Color('rgba(255, 200, 0, 0.25)'));
+          canvas.drawRect(
+            Skia.XYWHRect(0, rowY, width, cellHeight),
+            paint,
+          );
+
+          paint.setColor(Skia.Color('rgba(255, 160, 0, 0.8)'));
+          canvas.drawRect(Skia.XYWHRect(0, rowY, width, 1), paint);
+          canvas.drawRect(Skia.XYWHRect(0, rowY + cellHeight - 1, width, 1), paint);
+        }
       },
       { x: 0, y: 0, width, height },
     );
   }, [
     pattern, colorWa, colorS, sNum, cellWidth, cellHeight,
     warpMargin, warpThreadWidth, weftThreadHeight, selectedWarpIndex,
-    width, height,
+    selectedRowIndex, width, height,
   ]);
 
   return (

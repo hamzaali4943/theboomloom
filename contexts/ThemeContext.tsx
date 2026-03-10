@@ -17,25 +17,9 @@ const ThemeContext = createContext<ThemeContextType>({
 const STORAGE_KEY = '@boomloom_theme';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const systemScheme = (Appearance.getColorScheme() ?? 'light') as Scheme;
-  const [override, setOverride] = useState<Scheme | null>(null);
-
-  // Load persisted preference
-  useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then((val) => {
-      if (val === 'light' || val === 'dark') {
-        setOverride(val);
-      }
-    });
-  }, []);
-
-  const colorScheme: Scheme = override ?? systemScheme;
-
-  const toggleTheme = useCallback(() => {
-    const next: Scheme = colorScheme === 'light' ? 'dark' : 'light';
-    setOverride(next);
-    AsyncStorage.setItem(STORAGE_KEY, next);
-  }, [colorScheme]);
+  // Always use light mode
+  const colorScheme: Scheme = 'light';
+  const toggleTheme = useCallback(() => {}, []);
 
   return (
     <ThemeContext.Provider value={{ colorScheme, toggleTheme }}>

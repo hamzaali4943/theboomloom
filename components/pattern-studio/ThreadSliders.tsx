@@ -26,7 +26,7 @@ export const ThreadSliders = React.memo(function ThreadSliders({
         <ThemedText
           style={[styles.label, { color: Colors[scheme].textSecondary }]}
         >
-          Warp Width
+          warp thread width
         </ThemedText>
         <Slider
           style={styles.slider}
@@ -45,7 +45,7 @@ export const ThreadSliders = React.memo(function ThreadSliders({
         <ThemedText
           style={[styles.label, { color: Colors[scheme].textSecondary }]}
         >
-          Weft Height
+weft thread width
         </ThemedText>
         <Slider
           style={styles.slider}
@@ -72,15 +72,16 @@ const styles = StyleSheet.create({
   sliderWrap: {
     flex: 1,
     alignItems: 'center',
-    gap: 4,
+  
   },
   label: {
     fontSize: 12,
     fontWeight: '500',
     textAlign: 'center',
+    marginBottom: -6,
   },
   slider: {
     width: '100%',
-    height: 40,
+    height: 32,
   },
 });
