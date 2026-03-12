@@ -95,7 +95,6 @@ export function PatternStudioScreen() {
       <Header
         title="Pattern Studio"
         subtitle="Interactive weaving simulator"
-        showThemeToggle
       />
 
       <ScrollView

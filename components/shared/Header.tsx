@@ -3,11 +3,9 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { useThemeContext } from '@/contexts/ThemeContext';
 
-type IconName = 'bell.fill' | 'square.and.arrow.up' | 'info.circle' | 'magnifyingglass' | 'sun.max.fill' | 'moon.fill';
+type IconName = 'bell.fill' | 'square.and.arrow.up' | 'info.circle' | 'magnifyingglass';
 
 type RightAction = {
   icon: IconName;
@@ -17,32 +15,18 @@ type RightAction = {
 type Props = {
   title: string;
   subtitle?: string;
-  /** Legacy single-icon support */
   rightIcon?: IconName;
   onRightPress?: () => void;
-  /** Pass multiple right actions — rendered left to right */
   rightActions?: RightAction[];
-  /** Show the light/dark mode toggle button (auto-switches icon based on current theme) */
-  showThemeToggle?: boolean;
 };
 
-export function Header({ title, subtitle, rightIcon, onRightPress, rightActions, showThemeToggle }: Props) {
-  const scheme = useColorScheme() ?? 'light';
-  const { toggleTheme } = useThemeContext();
+export function Header({ title, subtitle, rightIcon, onRightPress, rightActions }: Props) {
   const surface = useThemeColor({}, 'surface');
   const border = useThemeColor({}, 'border');
-  const primary = Colors[scheme].primary;
-  const bgColor = Colors[scheme].background;
+  const primary = Colors.light.primary;
+  const bgColor = Colors.light.background;
 
-  // Build the full list of actions
   const actions: RightAction[] = [];
-
-  if (showThemeToggle) {
-    actions.push({
-      icon: scheme === 'dark' ? 'sun.max.fill' : 'moon.fill',
-      onPress: toggleTheme,
-    });
-  }
 
   if (rightActions) {
     actions.push(...rightActions);
@@ -55,7 +39,7 @@ export function Header({ title, subtitle, rightIcon, onRightPress, rightActions,
       <View style={styles.titleBlock}>
         <ThemedText style={styles.title}>{title}</ThemedText>
         {subtitle ? (
-          <ThemedText style={[styles.subtitle, { color: Colors[scheme].textSecondary }]}>
+          <ThemedText style={[styles.subtitle, { color: Colors.light.textSecondary }]}>
             {subtitle}
           </ThemedText>
         ) : null}

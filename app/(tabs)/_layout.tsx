@@ -40,20 +40,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="color-palette"
-        options={{
-          title: 'Colors',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="paintpalette.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="fabric-library"
-        options={{
-          title: 'Fabrics',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="books.vertical.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
         name="pattern-studio"
         options={{
           title: 'Patterns',

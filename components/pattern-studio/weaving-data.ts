@@ -36,12 +36,14 @@ export const PATTERN_META: { label: string; bg: string; fg: string }[] = [
   { label: 'DIAMOND',   bg: '#9ba2dd', fg: '#000000' },
 ];
 
-// ── Color Presets (for modal picker) ───────────────────
+// ── Color Palette (matches web version — 6 colors in 3×2 grid) ────────────
 export const COLOR_PRESETS: string[] = [
-  '#5170ff', '#FA42AB', '#00bf63',
-  '#FDFF89', '#ffffff', '#000000',
-  '#FF3B30', '#FF8C00', '#8B5CF6',
-  '#0F434F', '#8B4513', '#808080',
+  '#802215', // red
+  '#FA42AB', // pink
+  '#00bf63', // green
+  '#FDFF89', // yellow
+  '#ffffff', // white
+  '#000000', // black
 ];
 
 // ── Pattern Encoding Arrays ────────────────────────────

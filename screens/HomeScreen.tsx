@@ -32,7 +32,6 @@ export function HomeScreen() {
       <Header
         title="BoomLoom"
         subtitle="Textile Design Studio"
-        showThemeToggle
         rightActions={[{ icon: 'bell.fill', onPress: () => {} }]}
       />
       <ScrollView
@@ -62,14 +61,14 @@ export function HomeScreen() {
 
         {/* Today's Tip */}
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Today's Tip</ThemedText>
+          <ThemedText style={styles.sectionTitle}>{"Today's Tip"}</ThemedText>
           <TipCard tip={TEXTILE_TIPS[0]} />
         </View>
 
         {/* Inspiration banner */}
         <View style={[styles.inspirationCard, { backgroundColor: primary }]}>
           <ThemedText style={styles.quoteText}>
-            "Fashion is the armor to survive the reality of everyday life."
+            {'"Fashion is the armor to survive the reality of everyday life."'}
           </ThemedText>
           <ThemedText style={styles.quoteAuthor}>— Bill Cunningham</ThemedText>
         </View>

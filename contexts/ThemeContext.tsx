@@ -1,28 +1,14 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { Appearance } from 'react-native';
-
-type Scheme = 'light' | 'dark';
+import React, { createContext, useContext } from 'react';
 
 type ThemeContextType = {
-  colorScheme: Scheme;
-  toggleTheme: () => void;
+  colorScheme: 'light';
 };
 
-const ThemeContext = createContext<ThemeContextType>({
-  colorScheme: 'light',
-  toggleTheme: () => {},
-});
-
-const STORAGE_KEY = '@boomloom_theme';
+const ThemeContext = createContext<ThemeContextType>({ colorScheme: 'light' });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Always use light mode
-  const colorScheme: Scheme = 'light';
-  const toggleTheme = useCallback(() => {}, []);
-
   return (
-    <ThemeContext.Provider value={{ colorScheme, toggleTheme }}>
+    <ThemeContext.Provider value={{ colorScheme: 'light' }}>
       {children}
     </ThemeContext.Provider>
   );
