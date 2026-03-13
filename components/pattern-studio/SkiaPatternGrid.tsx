@@ -2,6 +2,10 @@ import React, { useMemo } from 'react';
 import { Canvas, Picture, Skia, createPicture } from '@shopify/react-native-skia';
 import { WARP_COUNT } from './weaving-data';
 
+// Web default ratio: hw=5, dh=16.5 — warp thread is ~30% of cell width
+const WEB_HW = 5;
+const WEB_DH = 16.5;
+
 type Props = {
   pattern: number[][];
   colorWa: string[];
@@ -11,8 +15,6 @@ type Props = {
   cellHeight: number;
   /** Fixed canvas height — canvas never resizes, content draws from bottom up */
   gridHeight: number;
-  warpThreadWidth: number;
-  weftThreadHeight: number;
   selectedWarpIndex: number;
   /** Row index to highlight with a ghost line (-1 = none) */
   selectedRowIndex?: number;
@@ -31,8 +33,6 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
   cellWidth,
   cellHeight,
   gridHeight,
-  warpThreadWidth: rawWarpWidth,
-  weftThreadHeight: _weftThreadHeight,
   selectedWarpIndex,
   selectedRowIndex = -1,
 }: Props) {
@@ -40,9 +40,8 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
   // Canvas height is fixed — never changes with cellHeight
   const height = gridHeight;
 
-  // Scale warp slider value proportionally to cellWidth.
-  const WEB_DH = 16.5;
-  const warpThreadWidth = Math.max(Math.round((rawWarpWidth / WEB_DH) * cellWidth), 1);
+  // Standard warp width: web default ratio hw=5/dh=16.5 scaled to current cellWidth
+  const warpThreadWidth = Math.max(Math.round((WEB_HW / WEB_DH) * cellWidth), 1);
   const weftThreadHeight = cellHeight;
   const warpMargin = (cellWidth - warpThreadWidth) / 2;
 
@@ -136,8 +135,8 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
     );
   }, [
     pattern, colorWa, colorS, sNum, cellWidth, cellHeight,
-    warpMargin, warpThreadWidth, weftThreadHeight, selectedWarpIndex,
-    selectedRowIndex, width, height,
+    warpMargin, warpThreadWidth, weftThreadHeight,
+    selectedWarpIndex, selectedRowIndex, width, height,
   ]);
 
   return (

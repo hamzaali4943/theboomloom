@@ -33,8 +33,6 @@ type Props = {
   cellHeight: number;
   /** Fixed pixel height for the grid area — keeps layout stable during slider changes */
   gridHeight: number;
-  warpThreadWidth: number;
-  weftThreadHeight: number;
   selectedWarpIndex: number;
   onColorWarp: (col: number) => void;
   onToggleTreadle: (row: number, col: number) => void;
@@ -51,8 +49,6 @@ export const WeavingLoom = React.memo(function WeavingLoom({
   cellWidth,
   cellHeight,
   gridHeight,
-  warpThreadWidth,
-  weftThreadHeight,
   selectedWarpIndex,
   onColorWarp,
   onToggleTreadle,
@@ -210,8 +206,6 @@ export const WeavingLoom = React.memo(function WeavingLoom({
                   cellWidth={cellWidth}
                   cellHeight={cellHeight}
                   gridHeight={gridHeight}
-                  warpThreadWidth={warpThreadWidth}
-                  weftThreadHeight={weftThreadHeight}
                   selectedWarpIndex={selectedWarpIndex}
                   selectedRowIndex={floaterRowIndex}
                 />
@@ -226,7 +220,6 @@ export const WeavingLoom = React.memo(function WeavingLoom({
                   S={S}
                   colorS={colorS}
                   sNum={sNum}
-                  cellHeight={cellHeight}
                   gridHeight={gridHeight}
                 />
               </Pressable>

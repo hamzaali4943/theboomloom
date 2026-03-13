@@ -12,7 +12,6 @@ import { WARP_COUNT, TREADLE_COUNT, DH, PATTERN_ASPECT } from '@/components/patt
 import { PatternSelector } from '@/components/pattern-studio/PatternSelector';
 import { ColorPickerModal } from '@/components/pattern-studio/ColorPickerModal';
 import { WeavingLoom } from '@/components/pattern-studio/WeavingLoom';
-import { ThreadSliders } from '@/components/pattern-studio/ThreadSliders';
 import { TreadlingSequence } from '@/components/pattern-studio/TreadlingSequence';
 import { WarpNavigator } from '@/components/shared/WarpNavigator';
 
@@ -43,15 +42,12 @@ export function PatternStudioScreen() {
     currentPattern,
     selectedColor,
     loomData,
-    sliderData,
     navigatorData,
     treadlingSequence,
     selectPattern,
     colorWarp,
     toggleTreadle,
     setSelectedColor,
-    setWarpThreadWidth,
-    setWeftThreadHeight,
     moveWarpLeft,
     moveWarpRight,
     setSelectedWarp,
@@ -140,24 +136,9 @@ export function PatternStudioScreen() {
           cellWidth={cellWidth}
           cellHeight={loomData.cellHeight}
           gridHeight={gridHeight}
-          warpThreadWidth={loomData.warpThreadWidth}
-          weftThreadHeight={loomData.weftThreadHeight}
           selectedWarpIndex={loomData.selectedWarpIndex}
           onColorWarp={colorWarp}
           onToggleTreadle={toggleTreadle}
-        />
-
-        {/* Thread width sliders */}
-        <ThemedText
-          style={[styles.sliderHint, { color: Colors[scheme].textSecondary }]}
-        >
-          Use the sliders to change the thickness of the warp and the weft.
-        </ThemedText>
-        <ThreadSliders
-          warpThreadWidth={sliderData.warpThreadWidth}
-          weftThreadHeight={sliderData.weftThreadHeight}
-          onWarpThreadWidthChange={setWarpThreadWidth}
-          onWeftThreadHeightChange={setWeftThreadHeight}
         />
 
         {/* Warp thread navigator — opens in a modal */}
@@ -236,10 +217,6 @@ const styles = StyleSheet.create({
   },
   colorHint: {
     fontSize: 12,
-  },
-  sliderHint: {
-    fontSize: 12,
-    textAlign: 'center',
   },
   resetBtn: {
     marginHorizontal: 16,

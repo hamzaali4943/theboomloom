@@ -2,11 +2,12 @@ import React, { useMemo } from 'react';
 import { Canvas, Picture, Skia, PaintStyle, createPicture } from '@shopify/react-native-skia';
 import { TREADLE_COUNT, DH, TREADLING_BG, GRID_BORDER } from './weaving-data';
 
+const CELL_HEIGHT = 16;
+
 type Props = {
   S: boolean[][];
   colorS: string[];
   sNum: number;
-  cellHeight: number;
   /** Fixed canvas height — canvas never resizes, content draws from bottom up */
   gridHeight: number;
 };
@@ -20,9 +21,9 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
   S,
   colorS,
   sNum,
-  cellHeight,
   gridHeight,
 }: Props) {
+  const cellHeight = CELL_HEIGHT;
   const cellWidth = DH;
   const width = TREADLE_COUNT * cellWidth;
   // Canvas height is fixed — never changes with cellHeight
@@ -79,7 +80,7 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
       },
       { x: 0, y: 0, width, height },
     );
-  }, [S, colorS, sNum, cellHeight, width, height]);
+  }, [S, colorS, sNum, cellHeight, cellWidth, width, height]);
 
   return (
     <Canvas style={{ width, height }}>
