@@ -17,7 +17,7 @@ type Props = {
 
 // ── Exported vertical constants so WeavingLoom can compute matching offsets ──
 export const LOOM_VERT0 = 8;   // Top margin
-export const LOOM_VERT1 = 34;  // Spike height
+export const LOOM_VERT1 = 18;  // Spike height
 export const LOOM_VERT4 = 100; // Additional frame depth
 
 /** Top decoration height: margin + spikes (no extra gap) */

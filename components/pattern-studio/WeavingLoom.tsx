@@ -136,7 +136,7 @@ export const WeavingLoom = React.memo(function WeavingLoom({
       <View style={{ width: totalWidth }}>
         {/* Loom frame + pattern grid area — full loom height with grid inset */}
         <View style={{ position: 'relative', height: loomCanvasHeight }}>
-          {/* LoomFrame SVG — behind everything */}
+          {/* LoomFrame SVG — spikes protrude above and below the grid, matching web */}
           <View
             style={{
               position: 'absolute',
