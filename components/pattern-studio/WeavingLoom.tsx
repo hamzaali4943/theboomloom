@@ -72,8 +72,8 @@ export const WeavingLoom = React.memo(function WeavingLoom({
       const x = e.nativeEvent.locationX;
       const y = e.nativeEvent.locationY;
       const col = Math.floor(x / DH);
-      // Row n=0 is at the bottom of the canvas (y = gridHeight - cellHeight)
-      const row = Math.floor((gridHeight - y) / cellHeight);
+      // Row n=0 is at the bottom of the content band; content starts at loomTopPad in canvas
+      const row = Math.floor((loomTopPad + gridHeight - y) / cellHeight);
       if (
         col >= 0 &&
         col < TREADLE_COUNT &&
@@ -83,7 +83,7 @@ export const WeavingLoom = React.memo(function WeavingLoom({
         onToggleTreadle(row, col);
       }
     },
-    [cellHeight, gridHeight, sNum, onToggleTreadle],
+    [cellHeight, loomTopPad, gridHeight, sNum, onToggleTreadle],
   );
 
   // Touch handler for pattern grid — open/close floater at the tapped row
@@ -91,13 +91,13 @@ export const WeavingLoom = React.memo(function WeavingLoom({
     (e: GestureResponderEvent) => {
       const x = e.nativeEvent.locationX;
       const y = e.nativeEvent.locationY;
-      const row = Math.floor((gridHeight - y) / cellHeight);
+      const row = Math.floor((loomTopPad + gridHeight - y) / cellHeight);
       if (row >= 0 && row < sNum) {
         setFloaterRowIndex((prev) => (prev === row ? -1 : row));
         setFloaterSide(x < patternGridWidth / 2 ? 'right' : 'left');
       }
     },
-    [cellHeight, gridHeight, sNum, patternGridWidth],
+    [cellHeight, loomTopPad, gridHeight, sNum, patternGridWidth],
   );
 
   // Floater button press — activate a treadle for the selected row, then close
@@ -183,15 +183,15 @@ export const WeavingLoom = React.memo(function WeavingLoom({
           </View>
 
           {/* Grid area: pattern + gap + treadling.
-              Fixed-size canvases draw from bottom up (like web), no layout shift. */}
+              Canvases span loomCanvasHeight (same as LoomFrame) so spikes
+              show through the transparent top/bottom bands. */}
           <View
             style={{
               position: 'absolute',
-              top: loomTopPad,
+              top: 0,
               left: 0,
               right: 0,
-              height: gridHeight,
-              overflow: 'hidden',
+              height: loomCanvasHeight,
               zIndex: 1,
             }}
           >
@@ -206,6 +206,7 @@ export const WeavingLoom = React.memo(function WeavingLoom({
                   cellWidth={cellWidth}
                   cellHeight={cellHeight}
                   gridHeight={gridHeight}
+                  topOffset={loomTopPad}
                   selectedWarpIndex={selectedWarpIndex}
                   selectedRowIndex={floaterRowIndex}
                 />
@@ -221,6 +222,7 @@ export const WeavingLoom = React.memo(function WeavingLoom({
                   colorS={colorS}
                   sNum={sNum}
                   gridHeight={gridHeight}
+                  topOffset={loomTopPad}
                 />
               </Pressable>
             </View>

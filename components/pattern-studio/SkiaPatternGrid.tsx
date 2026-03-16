@@ -13,8 +13,10 @@ type Props = {
   sNum: number;
   cellWidth: number;
   cellHeight: number;
-  /** Fixed canvas height — canvas never resizes, content draws from bottom up */
+  /** Content area height — used for bottom-up y calculations */
   gridHeight: number;
+  /** Pixels of empty canvas above (and below) the content; canvas height = gridHeight + 2*topOffset */
+  topOffset?: number;
   selectedWarpIndex: number;
   /** Row index to highlight with a ghost line (-1 = none) */
   selectedRowIndex?: number;
@@ -22,8 +24,8 @@ type Props = {
 
 /**
  * Draws the weave pattern grid on a single Skia Canvas.
- * Uses a fixed-size canvas (like the web) so the element never resizes.
- * Content is drawn from the bottom up, matching web's drawPattern logic.
+ * Canvas height = gridHeight + 2*topOffset so LoomFrame spikes show through
+ * the transparent top/bottom bands while content sits in the middle.
  */
 export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
   pattern,
@@ -33,12 +35,13 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
   cellWidth,
   cellHeight,
   gridHeight,
+  topOffset = 0,
   selectedWarpIndex,
   selectedRowIndex = -1,
 }: Props) {
   const width = WARP_COUNT * cellWidth;
-  // Canvas height is fixed — never changes with cellHeight
-  const height = gridHeight;
+  // Canvas is taller than the content area so top/bottom bands stay transparent
+  const height = gridHeight + 2 * topOffset;
 
   // Standard warp width: web default ratio hw=5/dh=16.5 scaled to current cellWidth
   const warpThreadWidth = Math.max(Math.round((WEB_HW / WEB_DH) * cellWidth), 1);
@@ -53,9 +56,10 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
         // Draw from bottom up, matching web: y = height - cellHeight * (n + 1)
         // Row index n=0 is the bottom-most row.
 
+        // Content draws from bottom up; row n bottom-edge = topOffset + gridHeight - n*cellHeight
         // ── Draw warp threads (base layer) ──
         for (let n = 0; n < sNum; n++) {
-          const y = height - cellHeight * (n + 1);
+          const y = topOffset + gridHeight - cellHeight * (n + 1);
 
           for (let col = 0; col < WARP_COUNT; col++) {
             paint.setColor(Skia.Color(colorWa[col]));
@@ -74,7 +78,7 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
         // ── Draw weft threads (on top where pattern === 0) ──
         for (let n = 0; n < sNum; n++) {
           const patternRow = pattern[n];
-          const y = height - cellHeight * (n + 1);
+          const y = topOffset + gridHeight - cellHeight * (n + 1);
 
           paint.setColor(Skia.Color(colorS[n]));
 
@@ -94,31 +98,31 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
           }
         }
 
-        // ── Selected warp highlight overlay ──
+        // ── Selected warp highlight overlay (content area only) ──
         if (selectedWarpIndex >= 0) {
           const highlightX = selectedWarpIndex * cellWidth;
 
           paint.setColor(Skia.Color('rgba(255, 200, 0, 0.35)'));
           canvas.drawRect(
-            Skia.XYWHRect(highlightX, 0, cellWidth, height),
+            Skia.XYWHRect(highlightX, topOffset, cellWidth, gridHeight),
             paint,
           );
 
           paint.setColor(Skia.Color('rgba(255, 160, 0, 0.8)'));
           canvas.drawRect(
-            Skia.XYWHRect(highlightX, 0, 1, height),
+            Skia.XYWHRect(highlightX, topOffset, 1, gridHeight),
             paint,
           );
 
           canvas.drawRect(
-            Skia.XYWHRect(highlightX + cellWidth - 1, 0, 1, height),
+            Skia.XYWHRect(highlightX + cellWidth - 1, topOffset, 1, gridHeight),
             paint,
           );
         }
 
         // ── Selected row ghost line highlight ──
         if (selectedRowIndex >= 0 && selectedRowIndex < sNum) {
-          const rowY = height - cellHeight * (selectedRowIndex + 1);
+          const rowY = topOffset + gridHeight - cellHeight * (selectedRowIndex + 1);
 
           paint.setColor(Skia.Color('rgba(255, 200, 0, 0.25)'));
           canvas.drawRect(
@@ -136,6 +140,7 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
   }, [
     pattern, colorWa, colorS, sNum, cellWidth, cellHeight,
     warpMargin, warpThreadWidth, weftThreadHeight,
+    topOffset, gridHeight,
     selectedWarpIndex, selectedRowIndex, width, height,
   ]);
 

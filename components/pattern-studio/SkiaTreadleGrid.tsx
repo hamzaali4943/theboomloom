@@ -8,26 +8,28 @@ type Props = {
   S: boolean[][];
   colorS: string[];
   sNum: number;
-  /** Fixed canvas height — canvas never resizes, content draws from bottom up */
+  /** Content area height — used for bottom-up y calculations */
   gridHeight: number;
+  /** Pixels of empty canvas above (and below) the content; canvas height = gridHeight + 2*topOffset */
+  topOffset?: number;
 };
 
 /**
  * Draws the treadling grid on a single Skia Canvas.
- * Uses a fixed-size canvas (like the web) so the element never resizes.
- * Content is drawn from the bottom up, matching web's drawS logic.
+ * Canvas height = gridHeight + 2*topOffset so LoomFrame spikes show through
+ * the transparent top/bottom bands while content sits in the middle.
  */
 export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
   S,
   colorS,
   sNum,
   gridHeight,
+  topOffset = 0,
 }: Props) {
   const cellHeight = CELL_HEIGHT;
   const cellWidth = DH;
   const width = TREADLE_COUNT * cellWidth;
-  // Canvas height is fixed — never changes with cellHeight
-  const height = gridHeight;
+  const height = gridHeight + 2 * topOffset;
 
   const picture = useMemo(() => {
     return createPicture(
@@ -39,10 +41,11 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
         // Draw from bottom up, matching web: y = height - cellHeight * (n + 1)
         // Row index n=0 is the bottom-most row.
 
+        // Content draws from bottom up inside the content band [topOffset, topOffset+gridHeight]
         // ── Draw cell fills ──
         for (let n = 0; n < sNum; n++) {
           const sRow = S[n];
-          const y = height - cellHeight * (n + 1);
+          const y = topOffset + gridHeight - cellHeight * (n + 1);
 
           for (let col = 0; col < TREADLE_COUNT; col++) {
             const x = col * cellWidth;
@@ -67,20 +70,20 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
 
         // Horizontal lines (only for the rows that have content)
         for (let n = 0; n <= sNum; n++) {
-          const y = height - cellHeight * n;
+          const y = topOffset + gridHeight - cellHeight * n;
           canvas.drawLine(0, y, width, y, paint);
         }
 
         // Vertical lines (full height of content area)
-        const contentTop = height - cellHeight * sNum;
+        const contentTop = topOffset + gridHeight - cellHeight * sNum;
         for (let col = 0; col <= TREADLE_COUNT; col++) {
           const x = col * cellWidth;
-          canvas.drawLine(x, contentTop, x, height, paint);
+          canvas.drawLine(x, contentTop, x, topOffset + gridHeight, paint);
         }
       },
       { x: 0, y: 0, width, height },
     );
-  }, [S, colorS, sNum, cellHeight, cellWidth, width, height]);
+  }, [S, colorS, sNum, cellHeight, cellWidth, topOffset, gridHeight, width, height]);
 
   return (
     <Canvas style={{ width, height }}>
