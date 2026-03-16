@@ -12,6 +12,8 @@ type Props = {
   gridHeight: number;
   /** Pixels of empty canvas above (and below) the content; canvas height = gridHeight + 2*topOffset */
   topOffset?: number;
+  /** Row index to highlight (-1 = none) — mirrors the pattern grid selection */
+  selectedRowIndex?: number;
 };
 
 /**
@@ -25,6 +27,7 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
   sNum,
   gridHeight,
   topOffset = 0,
+  selectedRowIndex = -1,
 }: Props) {
   const cellHeight = CELL_HEIGHT;
   const cellWidth = DH;
@@ -80,10 +83,21 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
           const x = col * cellWidth;
           canvas.drawLine(x, contentTop, x, topOffset + gridHeight, paint);
         }
+
+        // ── Selected row highlight (mirrors pattern grid selection) ──
+        if (selectedRowIndex >= 0 && selectedRowIndex < sNum) {
+          const rowY = topOffset + gridHeight - cellHeight * (selectedRowIndex + 1);
+          paint.setStyle(PaintStyle.Fill);
+          paint.setColor(Skia.Color('rgba(255, 200, 0, 0.25)'));
+          canvas.drawRect(Skia.XYWHRect(0, rowY, width, cellHeight), paint);
+          paint.setColor(Skia.Color('rgba(255, 160, 0, 0.8)'));
+          canvas.drawRect(Skia.XYWHRect(0, rowY, width, 1), paint);
+          canvas.drawRect(Skia.XYWHRect(0, rowY + cellHeight - 1, width, 1), paint);
+        }
       },
       { x: 0, y: 0, width, height },
     );
-  }, [S, colorS, sNum, cellHeight, cellWidth, topOffset, gridHeight, width, height]);
+  }, [S, colorS, sNum, cellHeight, cellWidth, topOffset, gridHeight, selectedRowIndex, width, height]);
 
   return (
     <Canvas style={{ width, height }}>

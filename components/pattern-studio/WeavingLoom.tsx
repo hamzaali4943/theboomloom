@@ -15,11 +15,11 @@ import {
   DH,
   type PatternIndex,
 } from './weaving-data';
-
-const GRID_GAP = Math.round(1.0 * DH); // ~12px gap between pattern and treadle grid
 import { LoomFrame, LOOM_TOP_PAD, LOOM_BOTTOM_PAD } from '@/components/shared/LoomFrame';
 import { SkiaPatternGrid } from './SkiaPatternGrid';
 import { SkiaTreadleGrid } from './SkiaTreadleGrid';
+
+const GRID_GAP = Math.round(1.0 * DH); // ~12px gap between pattern and treadle grid
 
 // ── Types ──────────────────────────────────────────────
 type Props = {
@@ -54,8 +54,7 @@ export const WeavingLoom = React.memo(function WeavingLoom({
   onToggleTreadle,
 }: Props) {
   const scheme = useColorScheme() ?? 'light';
-  const [floaterRowIndex, setFloaterRowIndex] = useState(-1);
-  const [floaterSide, setFloaterSide] = useState<'left' | 'right'>('right');
+  const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
 
   const patternGridWidth = WARP_COUNT * cellWidth;
   const treadleGridWidth = TREADLE_COUNT * DH;
@@ -86,37 +85,16 @@ export const WeavingLoom = React.memo(function WeavingLoom({
     [cellHeight, loomTopPad, gridHeight, sNum, onToggleTreadle],
   );
 
-  // Touch handler for pattern grid — open/close floater at the tapped row
+  // Touch handler for pattern grid — select/deselect a row (highlights both grids)
   const handlePatternTouch = useCallback(
     (e: GestureResponderEvent) => {
-      const x = e.nativeEvent.locationX;
       const y = e.nativeEvent.locationY;
       const row = Math.floor((loomTopPad + gridHeight - y) / cellHeight);
       if (row >= 0 && row < sNum) {
-        setFloaterRowIndex((prev) => (prev === row ? -1 : row));
-        setFloaterSide(x < patternGridWidth / 2 ? 'right' : 'left');
+        setSelectedRowIndex((prev) => (prev === row ? -1 : row));
       }
     },
-    [cellHeight, loomTopPad, gridHeight, sNum, patternGridWidth],
-  );
-
-  // Floater button press — activate a treadle for the selected row, then close
-  const handleFloaterTreadle = useCallback(
-    (col: number) => {
-      if (floaterRowIndex >= 0) {
-        onToggleTreadle(floaterRowIndex, col);
-        setFloaterRowIndex(-1);
-      }
-    },
-    [floaterRowIndex, onToggleTreadle],
-  );
-
-  // Treadle button labels for the floater
-  const floaterLabels = useMemo(
-    () => Array.from({ length: TREADLE_COUNT }, (_, i) =>
-      currentPattern === 0 ? (i % 2) + 1 : i + 1,
-    ),
-    [currentPattern],
+    [cellHeight, loomTopPad, gridHeight, sNum],
   );
 
   // Treadle column numbers
@@ -143,8 +121,8 @@ export const WeavingLoom = React.memo(function WeavingLoom({
               top: 0,
               left: 0,
               zIndex: 0,
+              pointerEvents: 'none',
             }}
-            pointerEvents="none"
           >
             <LoomFrame
               loomWidth={patternGridWidth}
@@ -208,7 +186,7 @@ export const WeavingLoom = React.memo(function WeavingLoom({
                   gridHeight={gridHeight}
                   topOffset={loomTopPad}
                   selectedWarpIndex={selectedWarpIndex}
-                  selectedRowIndex={floaterRowIndex}
+                  selectedRowIndex={selectedRowIndex}
                 />
               </Pressable>
 
@@ -223,72 +201,11 @@ export const WeavingLoom = React.memo(function WeavingLoom({
                   sNum={sNum}
                   gridHeight={gridHeight}
                   topOffset={loomTopPad}
+                  selectedRowIndex={selectedRowIndex}
                 />
               </Pressable>
             </View>
           </View>
-
-          {/* Floater treadle picker — appears at the selected row, opposite side of tap */}
-          {floaterRowIndex >= 0 && (
-            <View
-              style={{
-                position: 'absolute',
-                top:
-                  loomTopPad +
-                  gridHeight -
-                  cellHeight * (floaterRowIndex + 1) +
-                  (cellHeight - 24) / 2,
-                ...(floaterSide === 'left' ? { left: 4 } : { right: treadleGridWidth + GRID_GAP + 4 }),
-                zIndex: 10,
-                flexDirection: 'row',
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                borderRadius: 8,
-                paddingHorizontal: 2,
-                paddingVertical: 1,
-                gap: 2,
-                borderWidth: 1,
-                borderColor: 'rgba(15, 67, 79, 0.3)',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.15,
-                shadowRadius: 4,
-                elevation: 4,
-              }}
-            >
-              {floaterLabels.map((label, col) => {
-                const isActive = S[floaterRowIndex]?.[col] ?? false;
-                return (
-                  <Pressable
-                    key={col}
-                    onPress={() => handleFloaterTreadle(col)}
-                    style={{
-                      width: 20,
-                      height: 20,
-                      borderRadius: 4,
-                      backgroundColor: isActive ? '#0F434F' : '#E8F4F8',
-                      borderWidth: 1,
-                      borderColor: isActive ? '#0F434F' : '#C4E9F2',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <ThemedText
-                      style={{
-                        fontSize: 11,
-                        fontWeight: '700',
-                        color: isActive ? '#ffffff' : '#0F434F',
-                        textAlign: 'center',
-                        lineHeight: 20,
-                        includeFontPadding: false,
-                      }}
-                    >
-                      {label}
-                    </ThemedText>
-                  </Pressable>
-                );
-              })}
-            </View>
-          )}
 
           {/* Treadle column numbers (bottom) — positioned just below the grid */}
           <View

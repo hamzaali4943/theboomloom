@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.07,
     shadowRadius: 8,
     elevation: 2,
+    boxShadow: '0 2px 8px rgba(79,70,229,0.07)',
     gap: 14,
   },
   iconWrap: {

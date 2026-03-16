@@ -182,8 +182,7 @@ export function ColorPickerModal({ visible, selectedColor, onSelectColor, onClos
             </Canvas>
             {/* Cursor — above canvas, below touch overlay */}
             <View
-              pointerEvents="none"
-              style={[styles.svCursor, { left: svCursorX, top: svCursorY }]}
+              style={[styles.svCursor, { left: svCursorX, top: svCursorY, pointerEvents: 'none' }]}
             />
             {/* Transparent touch overlay — responder captures touches over Skia */}
             <View
@@ -206,8 +205,7 @@ export function ColorPickerModal({ visible, selectedColor, onSelectColor, onClos
               </Rect>
             </Canvas>
             <View
-              pointerEvents="none"
-              style={[styles.hueCursor, { left: hueCursorX }]}
+              style={[styles.hueCursor, { left: hueCursorX, pointerEvents: 'none' }]}
             />
             <View
               style={StyleSheet.absoluteFillObject}
@@ -300,6 +298,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 0 },
     elevation: 3,
+    boxShadow: '0 0 3px rgba(0,0,0,0.5)',
   },
   // Hue bar
   hueOuter: {
@@ -322,6 +321,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 0 },
     elevation: 3,
+    boxShadow: '0 0 2px rgba(0,0,0,0.5)',
   },
   // Presets
   paletteGrid: {

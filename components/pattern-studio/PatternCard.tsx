@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 10,
     elevation: 3,
+    boxShadow: '0 3px 10px rgba(79,70,229,0.08)',
     flex: 1,
   },
   preview: {
