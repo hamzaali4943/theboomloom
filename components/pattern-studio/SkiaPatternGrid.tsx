@@ -3,7 +3,7 @@ import { Canvas, Picture, Skia, createPicture } from '@shopify/react-native-skia
 import { WARP_COUNT } from './weaving-data';
 
 // Web default ratio: hw=5, dh=16.5 — warp thread is ~30% of cell width
-const WEB_HW = 5;
+const WEB_HW = 7;
 const WEB_DH = 16.5;
 
 type Props = {
@@ -17,7 +17,6 @@ type Props = {
   gridHeight: number;
   /** Pixels of empty canvas above (and below) the content; canvas height = gridHeight + 2*topOffset */
   topOffset?: number;
-  selectedWarpIndex: number;
   /** Row index to highlight with a ghost line (-1 = none) */
   selectedRowIndex?: number;
 };
@@ -36,7 +35,6 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
   cellHeight,
   gridHeight,
   topOffset = 0,
-  selectedWarpIndex,
   selectedRowIndex = -1,
 }: Props) {
   const width = WARP_COUNT * cellWidth;
@@ -98,28 +96,6 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
           }
         }
 
-        // ── Selected warp highlight overlay (content area only) ──
-        if (selectedWarpIndex >= 0) {
-          const highlightX = selectedWarpIndex * cellWidth;
-
-          paint.setColor(Skia.Color('rgba(255, 200, 0, 0.35)'));
-          canvas.drawRect(
-            Skia.XYWHRect(highlightX, topOffset, cellWidth, gridHeight),
-            paint,
-          );
-
-          paint.setColor(Skia.Color('rgba(255, 160, 0, 0.8)'));
-          canvas.drawRect(
-            Skia.XYWHRect(highlightX, topOffset, 1, gridHeight),
-            paint,
-          );
-
-          canvas.drawRect(
-            Skia.XYWHRect(highlightX + cellWidth - 1, topOffset, 1, gridHeight),
-            paint,
-          );
-        }
-
         // ── Selected row ghost line highlight ──
         if (selectedRowIndex >= 0 && selectedRowIndex < sNum) {
           const rowY = topOffset + gridHeight - cellHeight * (selectedRowIndex + 1);
@@ -141,7 +117,7 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
     pattern, colorWa, colorS, sNum, cellWidth, cellHeight,
     warpMargin, warpThreadWidth, weftThreadHeight,
     topOffset, gridHeight,
-    selectedWarpIndex, selectedRowIndex, width, height,
+    selectedRowIndex, width, height,
   ]);
 
   return (

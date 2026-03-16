@@ -29,6 +29,7 @@ export interface WeavingState {
 type Action =
   | { type: 'SELECT_PATTERN'; index: PatternIndex }
   | { type: 'COLOR_WARP'; column: number }
+  | { type: 'RESET_WARP'; column: number }
   | { type: 'TOGGLE_TREADLE'; row: number; col: number }
   | { type: 'SET_COLOR'; color: string }
   | { type: 'SET_CELL_HEIGHT'; value: number }
@@ -119,6 +120,12 @@ function reducer(state: WeavingState, action: Action): WeavingState {
       const newColorWa = [...state.colorWa];
       newColorWa[action.column] = state.selectedColor;
       return { ...state, colorWa: newColorWa };
+    }
+
+    case 'RESET_WARP': {
+      const newColorWa = [...state.colorWa];
+      newColorWa[action.column] = DEFAULT_WARP_COLOR;
+      return { ...state, colorWa: newColorWa, selectedWarpIndex: -1 };
     }
 
     case 'TOGGLE_TREADLE': {
@@ -243,6 +250,10 @@ export function useWeavingState(gridHeight?: number) {
     (col: number) => dispatch({ type: 'COLOR_WARP', column: col }),
     [],
   );
+  const resetWarp = useCallback(
+    (col: number) => dispatch({ type: 'RESET_WARP', column: col }),
+    [],
+  );
   const toggleTreadle = useCallback(
     (row: number, col: number) =>
       dispatch({ type: 'TOGGLE_TREADLE', row, col }),
@@ -312,6 +323,7 @@ export function useWeavingState(gridHeight?: number) {
     // Stable action creators
     selectPattern,
     colorWarp,
+    resetWarp,
     toggleTreadle,
     setSelectedColor,
     setCellHeight,

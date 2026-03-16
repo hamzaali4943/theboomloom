@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -11,6 +12,11 @@ export default function TabLayout() {
   const colorScheme = useColorScheme() ?? 'light';
   const tabBg = useThemeColor({}, 'surface');
   const border = useThemeColor({}, 'border');
+  const { bottom: bottomInset } = useSafeAreaInsets();
+
+  // Base tab bar height + device bottom inset (nav buttons / home indicator)
+  const TAB_HEIGHT = 60;
+  const tabBarHeight = TAB_HEIGHT + bottomInset;
 
   return (
     <Tabs
@@ -19,12 +25,17 @@ export default function TabLayout() {
         tabBarInactiveTintColor: Colors[colorScheme].tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
+        // Position absolutely so the bar is flush with screen bottom on mobile
         tabBarStyle: {
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
           backgroundColor: tabBg,
           borderTopColor: border,
           borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
+          height: tabBarHeight,
+          paddingBottom: 8 + bottomInset,
           paddingTop: 8,
         },
         tabBarLabelStyle: {

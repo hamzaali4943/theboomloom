@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   GestureResponderEvent,
   Pressable,
@@ -34,7 +34,10 @@ type Props = {
   /** Fixed pixel height for the grid area — keeps layout stable during slider changes */
   gridHeight: number;
   selectedWarpIndex: number;
+  tapMode: 'thread' | 'row';
   onColorWarp: (col: number) => void;
+  onResetWarp: (col: number) => void;
+  onSelectWarp: (col: number) => void;
   onToggleTreadle: (row: number, col: number) => void;
 };
 
@@ -50,11 +53,19 @@ export const WeavingLoom = React.memo(function WeavingLoom({
   cellHeight,
   gridHeight,
   selectedWarpIndex,
+  tapMode,
   onColorWarp,
+  onResetWarp,
+  onSelectWarp,
   onToggleTreadle,
 }: Props) {
   const scheme = useColorScheme() ?? 'light';
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
+
+  // Reset row highlight when switching to thread mode
+  useEffect(() => {
+    if (tapMode === 'thread') setSelectedRowIndex(-1);
+  }, [tapMode]);
 
   const patternGridWidth = WARP_COUNT * cellWidth;
   const treadleGridWidth = TREADLE_COUNT * DH;
@@ -85,16 +96,34 @@ export const WeavingLoom = React.memo(function WeavingLoom({
     [cellHeight, loomTopPad, gridHeight, sNum, onToggleTreadle],
   );
 
-  // Touch handler for pattern grid — select/deselect a row (highlights both grids)
+  // Touch handler for pattern grid — behaviour depends on tapMode
   const handlePatternTouch = useCallback(
     (e: GestureResponderEvent) => {
+      const x = e.nativeEvent.locationX;
       const y = e.nativeEvent.locationY;
-      const row = Math.floor((loomTopPad + gridHeight - y) / cellHeight);
-      if (row >= 0 && row < sNum) {
-        setSelectedRowIndex((prev) => (prev === row ? -1 : row));
+
+      if (tapMode === 'thread') {
+        // Thread mode: tap colors that warp column; tap same column again to deselect
+        const col = Math.floor(x / cellWidth);
+        if (col >= 0 && col < WARP_COUNT) {
+          if (col === selectedWarpIndex) {
+            // Same thread tapped again → reset color back to default
+            onResetWarp(col);
+          } else {
+            // New thread → apply current color and track selection (no visual highlight)
+            onColorWarp(col);
+            onSelectWarp(col);
+          }
+        }
+      } else {
+        // Row mode: tap selects/deselects a treadle row (highlights both grids)
+        const row = Math.floor((loomTopPad + gridHeight - y) / cellHeight);
+        if (row >= 0 && row < sNum) {
+          setSelectedRowIndex((prev) => (prev === row ? -1 : row));
+        }
       }
     },
-    [cellHeight, loomTopPad, gridHeight, sNum],
+    [tapMode, selectedWarpIndex, cellWidth, cellHeight, loomTopPad, gridHeight, sNum, onColorWarp, onResetWarp, onSelectWarp],
   );
 
   // Treadle column numbers
