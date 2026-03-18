@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Canvas, Picture, Skia, PaintStyle, createPicture } from '@shopify/react-native-skia';
 import { KB_TREADLE_COUNT } from './krokbragd-data';
 import { DH, TREADLING_BG, GRID_BORDER } from '@/components/shared/weaving-data';
+import { useSkiaResumeKey } from '@/hooks/use-skia-resume-key';
 
 const CELL_HEIGHT = 16;
 // Web: hshift=8.33 with dh=16.67 → ratio ≈ 0.5
@@ -31,6 +32,7 @@ export const SkiaKrokbragdTreadleGrid = React.memo(function SkiaKrokbragdTreadle
   topOffset = 0,
   selectedRowIndex = -1,
 }: Props) {
+  const resumeKey = useSkiaResumeKey();
   const cellHeight = CELL_HEIGHT;
   const cellWidth = DH;
   const hshift = HSHIFT_RATIO * cellWidth;
@@ -111,7 +113,7 @@ export const SkiaKrokbragdTreadleGrid = React.memo(function SkiaKrokbragdTreadle
   }, [S, colorCells, sNum, cellHeight, cellWidth, hshift, vshift, topOffset, gridHeight, selectedRowIndex, width, height]);
 
   return (
-    <Canvas style={{ width, height }}>
+    <Canvas key={resumeKey} style={{ width, height }}>
       <Picture picture={picture} />
     </Canvas>
   );

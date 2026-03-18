@@ -13,6 +13,8 @@ type Props = {
   loomColor?: string;
   /** Background color for oval cutouts */
   backgroundColor?: string;
+  /** Override spike height (default LOOM_VERT1 = 18) */
+  spikeHeight?: number;
 };
 
 // ── Exported vertical constants so WeavingLoom can compute matching offsets ──
@@ -32,11 +34,12 @@ export const LoomFrame = React.memo(function LoomFrame({
   spikeSpacing,
   loomColor = '#e5f0ff',
   backgroundColor = '#FFFFFF',
+  spikeHeight = LOOM_VERT1,
 }: Props) {
   const canH = canvasHeight;
 
   const vert0 = LOOM_VERT0;
-  const vert1 = LOOM_VERT1;
+  const vert1 = spikeHeight;
   const vert4 = LOOM_VERT4;
 
   // Horizontal positioning — loom starts at x=0 within SVG

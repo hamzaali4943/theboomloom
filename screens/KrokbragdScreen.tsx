@@ -58,8 +58,12 @@ export function KrokbragdScreen() {
   } = useKrokbragdState(gridHeight);
 
   // Loom frame dimensions
+  // KB_TOP_EXTEND matches the topExtend passed to SkiaKrokbragdGrid (default=5).
+  // Adding it to loomTopPad ensures warp threads start exactly at the spike base
+  // so top and bottom spikes appear the same visual height.
+  const KB_TOP_EXTEND = 5;
   const patternGridWidth = KB_WARP_COUNT * cellWidth;
-  const loomTopPad = LOOM_TOP_PAD;
+  const loomTopPad = LOOM_TOP_PAD + KB_TOP_EXTEND;
   const loomBottomPad = LOOM_BOTTOM_PAD;
   const loomCanvasHeight = loomTopPad + gridHeight + loomBottomPad;
   const totalWidth = patternGridWidth + GRID_GAP + treadleGridWidth;
@@ -155,6 +159,7 @@ export function KrokbragdScreen() {
                   loomWidth={patternGridWidth}
                   canvasHeight={loomCanvasHeight}
                   spikeSpacing={cellWidth * 2}
+                  spikeHeight={18}
                 />
               </View>
 
@@ -211,6 +216,7 @@ export function KrokbragdScreen() {
                       cellHeight={cellHeight}
                       gridHeight={gridHeight}
                       topOffset={loomTopPad}
+                      topExtend={KB_TOP_EXTEND}
                       selectedRowIndex={selectedRowIndex}
                     />
                   </Pressable>

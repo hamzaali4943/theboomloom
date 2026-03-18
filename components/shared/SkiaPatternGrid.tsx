@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Canvas, Picture, Skia, createPicture } from '@shopify/react-native-skia';
 import { WARP_COUNT as DEFAULT_WARP_COUNT } from './weaving-data';
+import { useSkiaResumeKey } from '@/hooks/use-skia-resume-key';
 
 // Web default ratio: hw=5, dh=16.5 — warp thread is ~30% of cell width
 const WEB_HW = 7;
@@ -46,6 +47,7 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
   warpCount = DEFAULT_WARP_COUNT,
   weftColorMatrix,
 }: Props) {
+  const resumeKey = useSkiaResumeKey();
   const width = warpCount * cellWidth;
   // Canvas is taller than the content area so top/bottom bands stay transparent
   const height = gridHeight + 2 * topOffset;
@@ -134,7 +136,7 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
   ]);
 
   return (
-    <Canvas style={{ width, height }}>
+    <Canvas key={resumeKey} style={{ width, height }}>
       <Picture picture={picture} />
     </Canvas>
   );

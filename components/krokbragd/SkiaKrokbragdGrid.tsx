@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Canvas, Picture, Skia, createPicture } from '@shopify/react-native-skia';
 import { KB_WARP_COUNT, KB_TREADLE_COUNT,KROKBRAGD_ROWS } from './krokbragd-data';
+import { useSkiaResumeKey } from '@/hooks/use-skia-resume-key';
 
 
 // Web default ratio: hw=6.67, dh=16.67 — warp thread is ~40% of cell width
@@ -21,6 +22,8 @@ type Props = {
   cellHeight: number;
   gridHeight: number;
   topOffset?: number;
+  /** Extra pixels the warp threads extend upward into the spike area */
+  topExtend?: number;
   selectedRowIndex?: number;
 };
 
@@ -38,8 +41,10 @@ export const SkiaKrokbragdGrid = React.memo(function SkiaKrokbragdGrid({
   cellHeight,
   gridHeight,
   topOffset = 0,
+  topExtend = 5,
   selectedRowIndex = -1,
 }: Props) {
+  const resumeKey = useSkiaResumeKey();
   const width = KB_WARP_COUNT * cellWidth;
   const height = gridHeight + 2 * topOffset;
 
@@ -53,20 +58,20 @@ export const SkiaKrokbragdGrid = React.memo(function SkiaKrokbragdGrid({
         const paint = Skia.Paint();
 
         // ── Draw warp threads (base layer) ──
-        for (let n = 0; n < sNum; n++) {
-          const y = topOffset + gridHeight - cellHeight * (n + 1);
-          for (let col = 0; col < KB_WARP_COUNT; col++) {
-            paint.setColor(Skia.Color(colorWa[col]));
-            canvas.drawRect(
-              Skia.XYWHRect(
-                col * cellWidth + warpMargin,
-                y,
-                warpThreadWidth,
-                cellHeight,
-              ),
-              paint,
-            );
-          }
+        // Each thread spans from (topOffset - topExtend) down through the full content area
+        const warpStartY = topOffset - topExtend;
+        const warpTotalHeight = gridHeight + topExtend;
+        for (let col = 0; col < KB_WARP_COUNT; col++) {
+          paint.setColor(Skia.Color(colorWa[col]));
+          canvas.drawRect(
+            Skia.XYWHRect(
+              col * cellWidth + warpMargin,
+              warpStartY,
+              warpThreadWidth,
+              warpTotalHeight,
+            ),
+            paint,
+          );
         }
 
         // ── Draw weft per active treadle (with vshift offset) ──
@@ -107,11 +112,11 @@ export const SkiaKrokbragdGrid = React.memo(function SkiaKrokbragdGrid({
   }, [
     S, colorCells, colorWa, sNum, cellWidth, cellHeight,
     warpMargin, warpThreadWidth, vshift,
-    topOffset, gridHeight, selectedRowIndex, width, height,
+    topOffset, topExtend, gridHeight, selectedRowIndex, width, height,
   ]);
 
   return (
-    <Canvas style={{ width, height }}>
+    <Canvas key={resumeKey} style={{ width, height }}>
       <Picture picture={picture} />
     </Canvas>
   );
