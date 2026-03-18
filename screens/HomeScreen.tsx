@@ -16,9 +16,23 @@ const TOOLS = [
   {
     key: 'pattern-studio' as const,
     icon: 'wand.and.stars' as const,
-    label: 'Pattern Picker',
+    label: 'Plain, Twill & Diamond',
     description: 'Plain, twill, and diamond bars',
     accent: '#D97706',
+  },
+  {
+    key: 'monks-belt' as const,
+    icon: 'square.grid.2x2' as const,
+    label: "Monk's Belt",
+    description: "Monk's belt bars",
+    accent: '#7C3AED',
+  },
+  {
+    key: 'krokbragd' as const,
+    icon: 'paintpalette.fill' as const,
+    label: 'Krokbragd',
+    description: 'Krokbragd bars',
+    accent: '#0F434F',
   },
 ];
 
@@ -32,7 +46,6 @@ export function HomeScreen() {
       <Header
         title="BoomLoom"
         subtitle="Textile Design Studio"
-        rightActions={[{ icon: 'bell.fill', onPress: () => {} }]}
       />
       <ScrollView
         style={styles.scroll}
@@ -53,7 +66,7 @@ export function HomeScreen() {
                 label={tool.label}
                 description={tool.description}
                 accent={tool.accent}
-                onPress={() => router.push(`/(tabs)/${tool.key}` as never)}
+                onPress={() => router.push(`/(tabs)/${tool.key}`)}
               />
             ))}
           </View>

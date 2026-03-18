@@ -6,7 +6,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 
 type Props = {
-  icon: 'paintpalette.fill' | 'books.vertical.fill' | 'wand.and.stars';
+  icon: 'paintpalette.fill' | 'books.vertical.fill' | 'wand.and.stars' | 'rectangle.grid.2x2' | 'square.grid.3x3' | 'square.grid.2x2';
   label: string;
   description: string;
   accent: string;
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.07,
     shadowRadius: 8,
     elevation: 2,
-    boxShadow: '0 2px 8px rgba(79,70,229,0.07)',
+    // web-only shadow string removed for RN compatibility
     gap: 14,
   },
   iconWrap: {

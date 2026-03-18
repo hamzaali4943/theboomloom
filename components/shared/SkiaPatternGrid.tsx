@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Canvas, Picture, Skia, createPicture } from '@shopify/react-native-skia';
-import { WARP_COUNT as DEFAULT_WARP_COUNT } from './weaving-data';
+import { WARP_COUNT } from './weaving-data';
 import { useSkiaResumeKey } from '@/hooks/use-skia-resume-key';
 
 // Web default ratio: hw=5, dh=16.5 — warp thread is ~30% of cell width
@@ -22,10 +22,6 @@ type Props = {
   selectedWarpIndex?: number;
   /** Row index to highlight with a ghost line (-1 = none) */
   selectedRowIndex?: number;
-  /** Override default warp count (40) — e.g. Krokbragd uses 38 */
-  warpCount?: number;
-  /** Per-cell weft colors [row][col] — when provided, used instead of colorS per-row */
-  weftColorMatrix?: string[][];
 };
 
 /**
@@ -44,11 +40,9 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
   topOffset = 0,
   selectedWarpIndex: _selectedWarpIndex = -1,
   selectedRowIndex = -1,
-  warpCount = DEFAULT_WARP_COUNT,
-  weftColorMatrix,
 }: Props) {
   const resumeKey = useSkiaResumeKey();
-  const width = warpCount * cellWidth;
+  const width = WARP_COUNT * cellWidth;
   // Canvas is taller than the content area so top/bottom bands stay transparent
   const height = gridHeight + 2 * topOffset;
 
@@ -70,7 +64,7 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
         for (let n = 0; n < sNum; n++) {
           const y = topOffset + gridHeight - cellHeight * (n + 1);
 
-          for (let col = 0; col < warpCount; col++) {
+          for (let col = 0; col < WARP_COUNT; col++) {
             paint.setColor(Skia.Color(colorWa[col]));
             canvas.drawRect(
               Skia.XYWHRect(
@@ -90,13 +84,9 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
           const y = topOffset + gridHeight - cellHeight * (n + 1);
 
           const weftWidth = 2 * cellWidth - warpThreadWidth;
-          for (let col = 0; col < warpCount; col++) {
+          for (let col = 0; col < WARP_COUNT; col++) {
             if (patternRow[col] === 0) {
-              // Use per-cell color if available, otherwise per-row color
-              const weftColor = weftColorMatrix
-                ? weftColorMatrix[n]?.[col] ?? colorS[n]
-                : colorS[n];
-              paint.setColor(Skia.Color(weftColor));
+              paint.setColor(Skia.Color(colorS[n]));
               canvas.drawRect(
                 Skia.XYWHRect(
                   col * cellWidth - warpMargin,
@@ -132,7 +122,6 @@ export const SkiaPatternGrid = React.memo(function SkiaPatternGrid({
     warpMargin, warpThreadWidth, weftThreadHeight,
     topOffset, gridHeight,
     selectedRowIndex, width, height,
-    warpCount, weftColorMatrix,
   ]);
 
   return (
