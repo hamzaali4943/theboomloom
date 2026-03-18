@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   emoji: {
-    fontSize: 32,
+    fontSize: 20,
   },
   meta: {
     flex: 1,
