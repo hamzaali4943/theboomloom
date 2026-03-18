@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Canvas, Picture, Skia, PaintStyle, createPicture } from '@shopify/react-native-skia';
-import { TREADLE_COUNT, DH, TREADLING_BG, GRID_BORDER } from './weaving-data';
+import { TREADLE_COUNT as DEFAULT_TREADLE_COUNT, DH, TREADLING_BG, GRID_BORDER } from './weaving-data';
 
 const CELL_HEIGHT = 16;
 
@@ -14,6 +14,10 @@ type Props = {
   topOffset?: number;
   /** Row index to highlight (-1 = none) — mirrors the pattern grid selection */
   selectedRowIndex?: number;
+  /** Override default treadle count (4) — e.g. Krokbragd uses 3 */
+  treadleCount?: number;
+  /** Per-cell colors [row][col] — when provided, used instead of colorS per-row */
+  colorCells?: string[][];
 };
 
 /**
@@ -28,10 +32,12 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
   gridHeight,
   topOffset = 0,
   selectedRowIndex = -1,
+  treadleCount = DEFAULT_TREADLE_COUNT,
+  colorCells,
 }: Props) {
   const cellHeight = CELL_HEIGHT;
   const cellWidth = DH;
-  const width = TREADLE_COUNT * cellWidth;
+  const width = treadleCount * cellWidth;
   const height = gridHeight + 2 * topOffset;
 
   const picture = useMemo(() => {
@@ -50,11 +56,12 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
           const sRow = S[n];
           const y = topOffset + gridHeight - cellHeight * (n + 1);
 
-          for (let col = 0; col < TREADLE_COUNT; col++) {
+          for (let col = 0; col < treadleCount; col++) {
             const x = col * cellWidth;
 
             if (sRow[col]) {
-              paint.setColor(Skia.Color(colorS[n]));
+              const cellColor = colorCells ? colorCells[n]?.[col] ?? colorS[n] : colorS[n];
+              paint.setColor(Skia.Color(cellColor));
             } else {
               paint.setColor(bgColor);
             }
@@ -79,7 +86,7 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
 
         // Vertical lines (full height of content area)
         const contentTop = topOffset + gridHeight - cellHeight * sNum;
-        for (let col = 0; col <= TREADLE_COUNT; col++) {
+        for (let col = 0; col <= treadleCount; col++) {
           const x = col * cellWidth;
           canvas.drawLine(x, contentTop, x, topOffset + gridHeight, paint);
         }
@@ -97,7 +104,7 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
       },
       { x: 0, y: 0, width, height },
     );
-  }, [S, colorS, sNum, cellHeight, cellWidth, topOffset, gridHeight, selectedRowIndex, width, height]);
+  }, [S, colorS, sNum, cellHeight, cellWidth, topOffset, gridHeight, selectedRowIndex, width, height, treadleCount, colorCells]);
 
   return (
     <Canvas style={{ width, height }}>

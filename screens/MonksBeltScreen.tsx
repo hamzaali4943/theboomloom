@@ -7,18 +7,16 @@ import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-import { useWeavingState } from '@/components/pattern-studio/useWeavingState';
-import { WARP_COUNT, TREADLE_COUNT, DH, PATTERN_ASPECT } from '@/components/shared/weaving-data';
-import { PatternSelector } from '@/components/pattern-studio/PatternSelector';
+import { useMonksBeltState } from '@/components/monks-belt/useMonksBeltState';
+import { WARP_COUNT, TREADLE_COUNT, DH, PATTERN_ASPECT } from '@/components/monks-belt/monks-belt-data';
 import { ColorPickerModal } from '@/components/shared/ColorPickerModal';
 import { WeavingLoom } from '@/components/shared/WeavingLoom';
 import { TreadlingSequence } from '@/components/shared/TreadlingSequence';
 
-// Treadle grid width + gap are fixed (match web), pattern grid fills remaining space
 const TREADLE_WIDTH = TREADLE_COUNT * DH;
 const GRID_GAP = Math.round(1.5 * DH);
 
-export function PatternStudioScreen() {
+export function MonksBeltScreen() {
   const scheme = useColorScheme() ?? 'light';
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [tapMode, setTapMode] = useState<'thread' | 'row'>('row');
@@ -34,18 +32,16 @@ export function PatternStudioScreen() {
   );
 
   const {
-    currentPattern,
     selectedColor,
     loomData,
     treadlingSequence,
-    selectPattern,
     colorWarp,
     resetWarp,
     toggleTreadle,
     setSelectedColor,
     setSelectedWarp,
     resetAll,
-  } = useWeavingState(gridHeight);
+  } = useMonksBeltState(gridHeight);
 
   const handleReset = useCallback(() => {
     Alert.alert(
@@ -67,7 +63,6 @@ export function PatternStudioScreen() {
 
   const handleTapModeChange = useCallback((mode: 'thread' | 'row') => {
     setTapMode(mode);
-    // Clear warp highlight when switching to row mode
     if (mode === 'row') setSelectedWarp(-1);
   }, [setSelectedWarp]);
 
@@ -75,7 +70,7 @@ export function PatternStudioScreen() {
     <SafeScreen>
       <Header
         title="Pattern Picker"
-        subtitle="Plain, twill, and diamond bars"
+        subtitle="Monk's belt bars"
       />
 
       <ScrollView
@@ -83,14 +78,8 @@ export function PatternStudioScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        {/* Pattern type selector */}
-        <PatternSelector current={currentPattern} onSelect={selectPattern} />
-
         {/* Current color button → opens modal */}
-        <Pressable
-          onPress={openColorPicker}
-          style={styles.colorBtnRow}
-        >
+        <Pressable onPress={openColorPicker} style={styles.colorBtnRow}>
           <View
             style={[
               styles.colorCircle,
@@ -100,17 +89,14 @@ export function PatternStudioScreen() {
           <View>
             <ThemedText style={styles.colorLabel}>Current Color</ThemedText>
             <ThemedText
-              style={[
-                styles.colorHint,
-                { color: Colors[scheme].textSecondary },
-              ]}
+              style={[styles.colorHint, { color: Colors[scheme].textSecondary }]}
             >
               Tap to customize
             </ThemedText>
           </View>
         </Pressable>
 
-        {/* Tap mode toggle — Thread colors warp columns, Row highlights treadle rows */}
+        {/* Tap mode toggle */}
         <View style={styles.modeToggle}>
           <Pressable
             style={[styles.modeBtn, tapMode === 'thread' && styles.modeBtnActive]}
@@ -153,10 +139,7 @@ export function PatternStudioScreen() {
         <TreadlingSequence sequence={treadlingSequence} />
 
         {/* Reset button */}
-        <Pressable
-          onPress={handleReset}
-          style={styles.resetBtn}
-        >
+        <Pressable onPress={handleReset} style={styles.resetBtn}>
           <ThemedText style={styles.resetText}>Reset Pattern</ThemedText>
         </Pressable>
       </ScrollView>

@@ -16,8 +16,8 @@ const TOOLS = [
   {
     key: 'pattern-studio' as const,
     icon: 'wand.and.stars' as const,
-    label: 'Pattern Studio',
-    description: 'Discover global textile patterns & motifs',
+    label: 'Pattern Picker',
+    description: 'Plain, twill, and diamond bars',
     accent: '#D97706',
   },
 ];

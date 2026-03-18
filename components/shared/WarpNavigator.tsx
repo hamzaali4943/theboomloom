@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
-import { WARP_COUNT } from '@/components/pattern-studio/weaving-data';
+import { WARP_COUNT } from '@/components/shared/weaving-data';
 
 type Props = {
   selectedWarpIndex: number;

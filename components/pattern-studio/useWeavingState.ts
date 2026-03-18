@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useMemo, useReducer } from 'react';
 import {
-  DEFAULT_WARP_COLOR,
-  DEFAULT_WEFT_COLOR,
   LOOM_HEIGHT,
   MAX_WEFT,
-  PATTERN_ROWS,
   TREADLE_COUNT,
   WARP_COUNT,
+} from '@/components/shared/weaving-data';
+import {
+  DEFAULT_WARP_COLOR,
+  DEFAULT_WEFT_COLOR,
+  PATTERN_ROWS,
   type PatternIndex,
-} from './weaving-data';
+} from './pattern-data';
 
 // ── State Shape ────────────────────────────────────────
 export interface WeavingState {
@@ -51,7 +53,7 @@ function createInitialState(): WeavingState {
   const pattern = Array.from({ length: MAX_WEFT }, () =>
     Array(WARP_COUNT).fill(1),
   );
-  console.log('Initial state created with pattern size:', pattern.length, pattern[0].length);
+
 
   return {
     currentPattern: 0,

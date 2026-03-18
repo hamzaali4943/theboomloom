@@ -10,10 +10,9 @@ import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import {
-  WARP_COUNT,
-  TREADLE_COUNT,
+  WARP_COUNT as DEFAULT_WARP_COUNT,
+  TREADLE_COUNT as DEFAULT_TREADLE_COUNT,
   DH,
-  type PatternIndex,
 } from './weaving-data';
 import { LoomFrame, LOOM_TOP_PAD, LOOM_BOTTOM_PAD } from '@/components/shared/LoomFrame';
 import { SkiaPatternGrid } from './SkiaPatternGrid';
@@ -23,7 +22,7 @@ const GRID_GAP = Math.round(1.0 * DH); // ~12px gap between pattern and treadle 
 
 // ── Types ──────────────────────────────────────────────
 type Props = {
-  currentPattern: PatternIndex;
+  currentPattern: number;
   colorWa: string[];
   colorS: string[];
   S: boolean[][];
@@ -39,6 +38,14 @@ type Props = {
   onResetWarp: (col: number) => void;
   onSelectWarp: (col: number) => void;
   onToggleTreadle: (row: number, col: number) => void;
+  /** Override default warp count (40) */
+  warpCount?: number;
+  /** Override default treadle count (4) */
+  treadleCount?: number;
+  /** Per-cell weft colors for SkiaPatternGrid [row][col] */
+  weftColorMatrix?: string[][];
+  /** Per-cell treadle colors for SkiaTreadleGrid [row][col] */
+  colorCells?: string[][];
 };
 
 // ── Main Loom Component ────────────────────────────────
@@ -58,6 +65,10 @@ export const WeavingLoom = React.memo(function WeavingLoom({
   onResetWarp,
   onSelectWarp,
   onToggleTreadle,
+  warpCount = DEFAULT_WARP_COUNT,
+  treadleCount = DEFAULT_TREADLE_COUNT,
+  weftColorMatrix,
+  colorCells,
 }: Props) {
   const scheme = useColorScheme() ?? 'light';
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
@@ -67,8 +78,8 @@ export const WeavingLoom = React.memo(function WeavingLoom({
     if (tapMode === 'thread') setSelectedRowIndex(-1);
   }, [tapMode]);
 
-  const patternGridWidth = WARP_COUNT * cellWidth;
-  const treadleGridWidth = TREADLE_COUNT * DH;
+  const patternGridWidth = warpCount * cellWidth;
+  const treadleGridWidth = treadleCount * DH;
   const totalWidth = patternGridWidth + GRID_GAP + treadleGridWidth;
 
   // Use fixed gridHeight for the outer container so layout doesn't shift
@@ -86,14 +97,14 @@ export const WeavingLoom = React.memo(function WeavingLoom({
       const row = Math.floor((loomTopPad + gridHeight - y) / cellHeight);
       if (
         col >= 0 &&
-        col < TREADLE_COUNT &&
+        col < treadleCount &&
         row >= 0 &&
         row < sNum
       ) {
         onToggleTreadle(row, col);
       }
     },
-    [cellHeight, loomTopPad, gridHeight, sNum, onToggleTreadle],
+    [cellHeight, loomTopPad, gridHeight, sNum, treadleCount, onToggleTreadle],
   );
 
   // Touch handler for pattern grid — behaviour depends on tapMode
@@ -105,7 +116,7 @@ export const WeavingLoom = React.memo(function WeavingLoom({
       if (tapMode === 'thread') {
         // Thread mode: tap colors that warp column; tap same column again to deselect
         const col = Math.floor(x / cellWidth);
-        if (col >= 0 && col < WARP_COUNT) {
+        if (col >= 0 && col < warpCount) {
           if (col === selectedWarpIndex) {
             // Same thread tapped again → reset color back to default
             onResetWarp(col);
@@ -123,15 +134,15 @@ export const WeavingLoom = React.memo(function WeavingLoom({
         }
       }
     },
-    [tapMode, selectedWarpIndex, cellWidth, cellHeight, loomTopPad, gridHeight, sNum, onColorWarp, onResetWarp, onSelectWarp],
+    [tapMode, selectedWarpIndex, cellWidth, cellHeight, loomTopPad, gridHeight, sNum, warpCount, onColorWarp, onResetWarp, onSelectWarp],
   );
 
   // Treadle column numbers
   const treadleNumbers = useMemo(
-    () => Array.from({ length: TREADLE_COUNT }, (_, i) =>
+    () => Array.from({ length: treadleCount }, (_, i) =>
       currentPattern === 0 ? (i % 2) + 1 : i + 1,
     ),
-    [currentPattern],
+    [currentPattern, treadleCount],
   );
 
   return (
@@ -216,6 +227,8 @@ export const WeavingLoom = React.memo(function WeavingLoom({
                   topOffset={loomTopPad}
                   selectedWarpIndex={selectedWarpIndex}
                   selectedRowIndex={selectedRowIndex}
+                  warpCount={warpCount}
+                  weftColorMatrix={weftColorMatrix}
                 />
               </Pressable>
 
@@ -231,6 +244,8 @@ export const WeavingLoom = React.memo(function WeavingLoom({
                   gridHeight={gridHeight}
                   topOffset={loomTopPad}
                   selectedRowIndex={selectedRowIndex}
+                  treadleCount={treadleCount}
+                  colorCells={colorCells}
                 />
               </Pressable>
             </View>

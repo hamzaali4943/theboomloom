@@ -36,10 +36,10 @@ export default function TabLayout() {
           borderTopWidth: 1,
           height: tabBarHeight,
           paddingBottom: 8 + bottomInset,
-          paddingTop: 8,
+          paddingTop: 4,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: '600',
         },
       }}>
@@ -47,14 +47,28 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={22} name="house.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="pattern-studio"
         options={{
-          title: 'Patterns',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="wand.and.stars" color={color} />,
+          title: 'Plain, Twill & Diamond',
+          tabBarIcon: ({ color }) => <IconSymbol size={22} name="wand.and.stars" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="monks-belt"
+        options={{
+          title: "Monk's Belt",
+          tabBarIcon: ({ color }) => <IconSymbol size={22} name="square.grid.2x2" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="krokbragd"
+        options={{
+          title: 'Krokbragd',
+          tabBarIcon: ({ color }) => <IconSymbol size={22} name="paintpalette.fill" color={color} />,
         }}
       />
     </Tabs>

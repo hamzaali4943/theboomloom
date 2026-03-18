@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
-import { PATTERN_META, type PatternIndex } from './weaving-data';
+import { PATTERN_META, type PatternIndex } from './pattern-data';
 
 type Props = {
   current: PatternIndex;
