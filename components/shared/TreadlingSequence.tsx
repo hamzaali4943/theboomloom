@@ -18,13 +18,13 @@ export const TreadlingSequence = React.memo(function TreadlingSequence({
       style={[styles.container, { backgroundColor: Colors[scheme].surface }]}
     >
       <ThemedText style={styles.heading}>
-        Treadling Sequence (bottom → top)
+        Bar positions, from bottom to top
       </ThemedText>
       <View style={[styles.seqBox, { backgroundColor: '#e5f0ff' }]}>
         <ThemedText style={styles.seqText}>
           {sequence.length > 0
             ? sequence.join('  ')
-            : 'Tap the treadling grid to start weaving'}
+            : 'To begin, choose warp or weft'}
         </ThemedText>
       </View>
     </View>
