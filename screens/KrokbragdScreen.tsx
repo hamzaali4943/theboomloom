@@ -274,7 +274,7 @@ export function KrokbragdScreen() {
         {/* Color sequence display */}
         <View style={[styles.seqContainer, { backgroundColor: Colors[scheme].surface }]}>
           <ThemedText style={styles.seqHeading}>
-            Color sequence (bar positions), starting from the bottom
+            Bar positions, from bottom to top
           </ThemedText>
           <View style={styles.seqBox}>
             {colorSequence.length > 0 ? (
@@ -296,7 +296,7 @@ export function KrokbragdScreen() {
               </View>
             ) : (
               <ThemedText style={styles.seqEmpty}>
-                Tap the treadling grid to start weaving
+                Tap the treadle grid to start weaving
               </ThemedText>
             )}
           </View>
