@@ -15,21 +15,21 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 const TOOLS = [
   {
     key: 'pattern-studio' as const,
-    icon: 'wand.and.stars' as const,
+    image: require('@/assets/images/plain_twill.png'),
     label: 'Plain, Twill & Diamond',
     description: 'Plain, twill, and diamond bars',
     accent: '#D97706',
   },
   {
     key: 'monks-belt' as const,
-    icon: 'square.grid.2x2' as const,
+    image: require('@/assets/images/monk_belt.png'),
     label: "Monk's Belt",
     description: "Monk's belt bars",
     accent: '#7C3AED',
   },
   {
     key: 'krokbragd' as const,
-    icon: 'paintpalette.fill' as const,
+    image: require('@/assets/images/krokbragd.png'),
     label: 'Krokbragd',
     description: 'Krokbragd bars',
     accent: '#0F434F',
@@ -62,7 +62,7 @@ export function HomeScreen() {
             {TOOLS.map((tool) => (
               <QuickToolCard
                 key={tool.key}
-                icon={tool.icon}
+                image={tool.image}
                 label={tool.label}
                 description={tool.description}
                 accent={tool.accent}

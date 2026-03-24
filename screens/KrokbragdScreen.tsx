@@ -167,7 +167,7 @@ export function KrokbragdScreen() {
               <View
                 style={{
                   position: 'absolute',
-                  top: loomTopPad - 20,
+                  top: loomTopPad - 26,
                   left: patternGridWidth + GRID_GAP,
                   width: treadleGridWidth,
                   height: 16,

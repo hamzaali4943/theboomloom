@@ -1,19 +1,19 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, ImageSourcePropType, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 
 type Props = {
-  icon: 'paintpalette.fill' | 'books.vertical.fill' | 'wand.and.stars' | 'rectangle.grid.2x2' | 'square.grid.3x3' | 'square.grid.2x2';
+  image: ImageSourcePropType;
   label: string;
   description: string;
   accent: string;
   onPress: () => void;
 };
 
-export function QuickToolCard({ icon, label, description, accent, onPress }: Props) {
+export function QuickToolCard({ image, label, description, accent, onPress }: Props) {
   const scheme = useColorScheme() ?? 'light';
   const surface = Colors[scheme].surface;
   const border = Colors[scheme].border;
@@ -25,9 +25,9 @@ export function QuickToolCard({ icon, label, description, accent, onPress }: Pro
       onPress={onPress}
       activeOpacity={0.85}
     >
-      {/* Coloured icon circle */}
-      <View style={[styles.iconWrap, { backgroundColor: accent + '18' }]}>
-        <IconSymbol name={icon} size={26} color={accent} />
+      {/* Product image or icon */}
+      <View style={[styles.imageWrap, { backgroundColor: accent + '12' }]}>
+        <Image source={image} style={styles.productImage} resizeMode="contain" />
       </View>
 
       {/* Text */}
@@ -58,16 +58,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.07,
     shadowRadius: 8,
     elevation: 2,
-    // web-only shadow string removed for RN compatibility
     gap: 14,
   },
-  iconWrap: {
-    width: 52,
-    height: 52,
+  imageWrap: {
+    width: 72,
+    height: 72,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
+    overflow: 'hidden',
+  },
+  productImage: {
+    width: 72,
+    height: 72,
   },
   textBlock: {
     flex: 1,
