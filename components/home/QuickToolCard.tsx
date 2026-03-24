@@ -1,19 +1,19 @@
 import React from 'react';
-import { Image, ImageSourcePropType, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 
 type Props = {
-  image: ImageSourcePropType;
+  letter: string;
   label: string;
   description: string;
   accent: string;
   onPress: () => void;
 };
 
-export function QuickToolCard({ image, label, description, accent, onPress }: Props) {
+export function QuickToolCard({ letter, label, description, accent, onPress }: Props) {
   const scheme = useColorScheme() ?? 'light';
   const surface = Colors[scheme].surface;
   const border = Colors[scheme].border;
@@ -25,9 +25,9 @@ export function QuickToolCard({ image, label, description, accent, onPress }: Pr
       onPress={onPress}
       activeOpacity={0.85}
     >
-      {/* Product image or icon */}
-      <View style={[styles.imageWrap, { backgroundColor: accent + '12' }]}>
-        <Image source={image} style={styles.productImage} resizeMode="contain" />
+      {/* Letter badge */}
+      <View style={[styles.imageWrap, { backgroundColor: accent + '18' }]}>
+        <Text style={[styles.letter, { color: accent }]}>{letter}</Text>
       </View>
 
       {/* Text */}
@@ -67,11 +67,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    overflow: 'hidden',
   },
-  productImage: {
-    width: 72,
-    height: 72,
+  letter: {
+    fontSize: 32,
+    fontWeight: '800',
+    letterSpacing: -1,
   },
   textBlock: {
     flex: 1,

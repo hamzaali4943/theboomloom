@@ -4,7 +4,7 @@ import { WARP_COUNT } from './weaving-data';
 import { useSkiaResumeKey } from '@/hooks/use-skia-resume-key';
 
 // Web default ratio: hw=5, dh=16.5 — warp thread is ~30% of cell width
-const WEB_HW = 7;
+const WEB_HW = 10;
 const WEB_DH = 16.5;
 
 type Props = {

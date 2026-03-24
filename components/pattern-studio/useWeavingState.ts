@@ -29,7 +29,6 @@ export interface WeavingState {
 
 // ── Actions ────────────────────────────────────────────
 type Action =
-  | { type: 'SELECT_PATTERN'; index: PatternIndex }
   | { type: 'COLOR_WARP'; column: number }
   | { type: 'RESET_WARP'; column: number }
   | { type: 'TOGGLE_TREADLE'; row: number; col: number }
@@ -85,39 +84,9 @@ function applyPatternForRow(
   return newPattern;
 }
 
-/** Recalculate entire pattern matrix after pattern type change. */
-function recalcAll(
-  patternIdx: PatternIndex,
-  S: boolean[][],
-  oldPattern: number[][],
-  sNum: number,
-): number[][] {
-  // Start from a fresh matrix
-  const newPattern = Array.from({ length: MAX_WEFT }, () =>
-    Array(WARP_COUNT).fill(1),
-  );
-  for (let n = 0; n < sNum; n++) {
-    for (let k = 0; k < TREADLE_COUNT; k++) {
-      if (S[n][k]) {
-        const encoding = PATTERN_ROWS[patternIdx][k];
-        for (let l = 1; l < WARP_COUNT - 1; l++) {
-          newPattern[n][l] = encoding[l - 1];
-        }
-      }
-    }
-  }
-  return newPattern;
-}
-
 // ── Reducer ────────────────────────────────────────────
 function reducer(state: WeavingState, action: Action): WeavingState {
   switch (action.type) {
-    case 'SELECT_PATTERN': {
-      const sNum = Math.floor(state.gridHeight / state.cellHeight);
-      const newPattern = recalcAll(action.index, state.S, state.pattern, sNum);
-      return { ...state, currentPattern: action.index, pattern: newPattern };
-    }
-
     case 'COLOR_WARP': {
       const newColorWa = [...state.colorWa];
       newColorWa[action.column] = state.selectedColor;
@@ -199,7 +168,7 @@ function reducer(state: WeavingState, action: Action): WeavingState {
       return { ...state, selectedWarpIndex: action.index };
 
     case 'RESET':
-      return { ...createInitialState(), selectedColor: state.selectedColor };
+      return { ...createInitialState(), currentPattern: state.currentPattern, selectedColor: state.selectedColor };
 
     default:
       return state;
@@ -212,8 +181,12 @@ function reducer(state: WeavingState, action: Action): WeavingState {
  *   Derived from cellWidth × PATTERN_ASPECT so mobile scales uniformly.
  *   Falls back to LOOM_HEIGHT (784) when omitted (web parity).
  */
-export function useWeavingState(gridHeight?: number) {
-  const [state, dispatch] = useReducer(reducer, undefined, createInitialState);
+export function useWeavingState(gridHeight?: number, initialPattern: PatternIndex = 0) {
+  const [state, dispatch] = useReducer(reducer, undefined, () => {
+    const s = createInitialState();
+    s.currentPattern = initialPattern;
+    return s;
+  });
 
   // Keep reducer in sync with the externally-computed gridHeight
   const effectiveHeight = gridHeight ?? LOOM_HEIGHT;
@@ -244,10 +217,6 @@ export function useWeavingState(gridHeight?: number) {
   }, [state.S, sNum, state.currentPattern]);
 
   // Stable action creators
-  const selectPattern = useCallback(
-    (idx: PatternIndex) => dispatch({ type: 'SELECT_PATTERN', index: idx }),
-    [],
-  );
   const colorWarp = useCallback(
     (col: number) => dispatch({ type: 'COLOR_WARP', column: col }),
     [],
@@ -315,15 +284,13 @@ export function useWeavingState(gridHeight?: number) {
   }), [state.selectedWarpIndex, state.selectedColor]);
 
   return {
-    // Individual values needed by PatternStudioScreen's own render
-    currentPattern: state.currentPattern,
+    // Individual values needed by screens' own render
     selectedColor: state.selectedColor,
     // Memoized data slices for child components
     loomData,
     navigatorData,
     treadlingSequence,
     // Stable action creators
-    selectPattern,
     colorWarp,
     resetWarp,
     toggleTreadle,

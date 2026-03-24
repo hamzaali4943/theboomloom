@@ -14,22 +14,36 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 const TOOLS = [
   {
-    key: 'pattern-studio' as const,
-    image: require('@/assets/images/plain_twill.png'),
-    label: 'Plain, Twill & Diamond',
-    description: 'Plain, twill, and diamond bars',
+    key: 'plain' as const,
+    letter: 'P',
+    label: 'Plain Weave',
+    description: 'Classic over-under pattern',
     accent: '#D97706',
   },
   {
+    key: 'twill' as const,
+    letter: 'T',
+    label: '2/2 Twill',
+    description: 'Diagonal weave pattern',
+    accent: '#B45309',
+  },
+  {
+    key: 'diamond' as const,
+    letter: 'D',
+    label: 'Diamond',
+    description: 'Diamond weave pattern',
+    accent: '#9BA2DD',
+  },
+  {
     key: 'monks-belt' as const,
-    image: require('@/assets/images/monk_belt.png'),
+    letter: 'M',
     label: "Monk's Belt",
     description: "Monk's belt bars",
     accent: '#7C3AED',
   },
   {
     key: 'krokbragd' as const,
-    image: require('@/assets/images/krokbragd.png'),
+    letter: 'K',
     label: 'Krokbragd',
     description: 'Krokbragd bars',
     accent: '#0F434F',
@@ -62,7 +76,7 @@ export function HomeScreen() {
             {TOOLS.map((tool) => (
               <QuickToolCard
                 key={tool.key}
-                image={tool.image}
+                letter={tool.letter}
                 label={tool.label}
                 description={tool.description}
                 accent={tool.accent}
