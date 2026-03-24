@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer } from 'react';
 import {
   LOOM_HEIGHT,
   MAX_WEFT,
+  ROW_HEIGHT,
   TREADLE_COUNT,
   WARP_COUNT,
 } from '@/components/shared/weaving-data';
@@ -62,7 +63,7 @@ function createInitialState(): WeavingState {
     usedS,
     pattern,
     selectedColor: '#5170ff',
-    cellHeight: 16,
+    cellHeight: ROW_HEIGHT,
     cellWidth: 16,
     selectedWarpIndex: -1,
     gridHeight: LOOM_HEIGHT, // default; overridden by the hook via SET_GRID_HEIGHT

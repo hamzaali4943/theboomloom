@@ -8,7 +8,7 @@ import {
   MB_DEFAULT_SELECTED_COLOR,
   MONKS_BELT_ROWS,
 } from './monks-belt-data';
-import { LOOM_HEIGHT } from '@/components/shared/weaving-data';
+import { LOOM_HEIGHT, ROW_HEIGHT } from '@/components/shared/weaving-data';
 
 // ── State Shape ────────────────────────────────────────
 export interface MonksBeltState {
@@ -43,7 +43,7 @@ function createInitialState(): MonksBeltState {
     usedS: Array(MAX_WEFT).fill(false),
     pattern: Array.from({ length: MAX_WEFT }, () => Array(WARP_COUNT).fill(1)),
     selectedColor: MB_DEFAULT_SELECTED_COLOR,
-    cellHeight: 16,
+    cellHeight: ROW_HEIGHT,
     cellWidth: 16,
     selectedWarpIndex: -1,
     gridHeight: LOOM_HEIGHT,

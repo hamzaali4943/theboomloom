@@ -8,6 +8,7 @@ export const WARP_COUNT = 40;        // number of vertical warp threads
 export const MAX_WEFT = 100;         // max weft rows in state arrays
 export const TREADLE_COUNT = 4;      // number of treadles (foot pedals)
 export const DH = 11.5;              // horizontal grid square size — matches web's dh
+export const ROW_HEIGHT = 10;        // height of each treadle/pattern row in pixels
 
 // ── Web Canvas Reference Dimensions ───────────────────
 // Web canvas: 950 × 1066, patternStart = 140, weftTop = 240, weftBottom = 42
@@ -22,7 +23,7 @@ export const LOOM_HEIGHT = 784;
 
 // ── Shared Colors ─────────────────────────────────────
 export const TREADLING_BG = '#C4E9F2';     // inactive treadle cell
-export const GRID_BORDER = '#012B35';       // grid line color
+export const GRID_BORDER = '#012B35';       // grid line colorkr
 
 // ── Color Palette (matches web version — 6 colors in 3×2 grid) ────────────
 export const COLOR_PRESETS: string[] = [

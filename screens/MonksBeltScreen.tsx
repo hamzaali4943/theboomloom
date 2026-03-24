@@ -103,7 +103,7 @@ export function MonksBeltScreen() {
             onPress={() => handleTapModeChange('thread')}
           >
             <ThemedText style={[styles.modeBtnText, tapMode === 'thread' && styles.modeBtnTextActive]}>
-              Color Thread
+              Warp
             </ThemedText>
           </Pressable>
           <Pressable
@@ -111,7 +111,7 @@ export function MonksBeltScreen() {
             onPress={() => handleTapModeChange('row')}
           >
             <ThemedText style={[styles.modeBtnText, tapMode === 'row' && styles.modeBtnTextActive]}>
-              Select Row
+              Weft
             </ThemedText>
           </Pressable>
         </View>

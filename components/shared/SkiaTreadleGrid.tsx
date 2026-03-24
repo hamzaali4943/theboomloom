@@ -1,9 +1,7 @@
 import React, { useMemo } from 'react';
 import { Canvas, Picture, Skia, PaintStyle, createPicture } from '@shopify/react-native-skia';
-import { TREADLE_COUNT, DH, TREADLING_BG, GRID_BORDER } from './weaving-data';
+import { TREADLE_COUNT, DH, ROW_HEIGHT, TREADLING_BG, GRID_BORDER } from './weaving-data';
 import { useSkiaResumeKey } from '@/hooks/use-skia-resume-key';
-
-const CELL_HEIGHT = 16;
 
 type Props = {
   S: boolean[][];
@@ -31,7 +29,7 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
   selectedRowIndex = -1,
 }: Props) {
   const resumeKey = useSkiaResumeKey();
-  const cellHeight = CELL_HEIGHT;
+  const cellHeight = ROW_HEIGHT;
   const cellWidth = DH;
   const width = TREADLE_COUNT * cellWidth;
   const height = gridHeight + 2 * topOffset;
