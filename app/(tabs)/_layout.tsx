@@ -8,6 +8,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { DesignLoadProvider } from '@/context/DesignLoadContext';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme() ?? 'light';
@@ -20,6 +21,7 @@ export default function TabLayout() {
   const tabBarHeight = TAB_HEIGHT + bottomInset;
 
   return (
+    <DesignLoadProvider>
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].primary,
@@ -86,6 +88,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>K</Text>,
         }}
       />
+      <Tabs.Screen
+        name="saved"
+        options={{
+          title: 'Saved',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>S</Text>,
+        }}
+      />
     </Tabs>
+    </DesignLoadProvider>
   );
 }

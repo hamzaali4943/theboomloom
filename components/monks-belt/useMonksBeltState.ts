@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import {
   WARP_COUNT,
   MAX_WEFT,
@@ -9,6 +9,7 @@ import {
   MONKS_BELT_ROWS,
 } from './monks-belt-data';
 import { LOOM_HEIGHT, ROW_HEIGHT } from '@/components/shared/weaving-data';
+import type { MonksBeltSnapshot } from '@/types/saved-design';
 
 // ── State Shape ────────────────────────────────────────
 export interface MonksBeltState {
@@ -32,6 +33,7 @@ type Action =
   | { type: 'SET_COLOR'; color: string }
   | { type: 'SET_GRID_HEIGHT'; value: number }
   | { type: 'SET_SELECTED_WARP'; index: number }
+  | { type: 'LOAD_DESIGN'; snapshot: MonksBeltSnapshot }
   | { type: 'RESET' };
 
 // ── Helpers ────────────────────────────────────────────
@@ -115,6 +117,18 @@ function reducer(state: MonksBeltState, action: Action): MonksBeltState {
     case 'SET_SELECTED_WARP':
       return { ...state, selectedWarpIndex: action.index };
 
+    // Restore a saved design — device-computed fields are preserved
+    case 'LOAD_DESIGN':
+      return {
+        ...state,
+        colorWa: action.snapshot.colorWa,
+        colorS: action.snapshot.colorS,
+        S: action.snapshot.S,
+        usedS: action.snapshot.usedS,
+        pattern: action.snapshot.pattern,
+        selectedColor: action.snapshot.selectedColor,
+      };
+
     case 'RESET':
       return { ...createInitialState(), selectedColor: state.selectedColor };
 
@@ -126,6 +140,9 @@ function reducer(state: MonksBeltState, action: Action): MonksBeltState {
 // ── Hook ───────────────────────────────────────────────
 export function useMonksBeltState(gridHeight?: number) {
   const [state, dispatch] = useReducer(reducer, undefined, createInitialState);
+
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   const effectiveHeight = gridHeight ?? LOOM_HEIGHT;
   useEffect(() => {
@@ -139,7 +156,6 @@ export function useMonksBeltState(gridHeight?: number) {
     [effectiveHeight, state.cellHeight],
   );
 
-  // Treadling sequence — always 1-indexed (1,2,3,4)
   const treadlingSequence = useMemo(() => {
     const seq: number[] = [];
     for (let n = 0; n < sNum; n++) {
@@ -153,7 +169,6 @@ export function useMonksBeltState(gridHeight?: number) {
     return seq;
   }, [state.S, sNum]);
 
-  // Stable action creators
   const colorWarp = useCallback(
     (col: number) => dispatch({ type: 'COLOR_WARP', column: col }),
     [],
@@ -176,9 +191,26 @@ export function useMonksBeltState(gridHeight?: number) {
   );
   const resetAll = useCallback(() => dispatch({ type: 'RESET' }), []);
 
-  // Memoized data slice for WeavingLoom
+  const loadDesign = useCallback(
+    (snapshot: MonksBeltSnapshot) =>
+      dispatch({ type: 'LOAD_DESIGN', snapshot }),
+    [],
+  );
+
+  const getSnapshot = useCallback((): MonksBeltSnapshot => {
+    const s = stateRef.current;
+    return {
+      colorWa: s.colorWa,
+      colorS: s.colorS,
+      S: s.S,
+      usedS: s.usedS,
+      pattern: s.pattern,
+      selectedColor: s.selectedColor,
+    };
+  }, []);
+
   const loomData = useMemo(() => ({
-    currentPattern: 1 as 0 | 1 | 2,  // non-zero → treadle numbers show 1,2,3,4
+    currentPattern: 1 as 0 | 1 | 2,
     colorWa: state.colorWa,
     colorS: state.colorS,
     S: state.S,
@@ -202,5 +234,7 @@ export function useMonksBeltState(gridHeight?: number) {
     setSelectedColor,
     setSelectedWarp,
     resetAll,
+    loadDesign,
+    getSnapshot,
   };
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import {
   KB_WARP_COUNT,
   KB_TREADLE_COUNT,
@@ -7,7 +7,8 @@ import {
   KB_DEFAULT_WEFT_COLOR,
   KB_DEFAULT_SELECTED_COLOR,
 } from './krokbragd-data';
-import { LOOM_HEIGHT } from '@/components/shared/weaving-data';
+import { LOOM_HEIGHT, ROW_HEIGHT } from '@/components/shared/weaving-data';
+import type { KrokbragdSnapshot } from '@/types/saved-design';
 
 // ── State Shape ────────────────────────────────────────
 export interface KrokbragdState {
@@ -24,6 +25,7 @@ type Action =
   | { type: 'TOGGLE_TREADLE'; row: number; col: number }
   | { type: 'SET_COLOR'; color: string }
   | { type: 'SET_GRID_HEIGHT'; value: number }
+  | { type: 'LOAD_DESIGN'; snapshot: KrokbragdSnapshot }
   | { type: 'RESET' };
 
 // ── Helpers ────────────────────────────────────────────
@@ -35,7 +37,7 @@ function createInitialState(): KrokbragdState {
       Array(KB_TREADLE_COUNT).fill(KB_DEFAULT_WEFT_COLOR),
     ),
     selectedColor: KB_DEFAULT_SELECTED_COLOR,
-    cellHeight: 16,
+    cellHeight: ROW_HEIGHT,
     gridHeight: LOOM_HEIGHT,
   };
 }
@@ -67,6 +69,15 @@ function reducer(state: KrokbragdState, action: Action): KrokbragdState {
     case 'SET_GRID_HEIGHT':
       return { ...state, gridHeight: action.value };
 
+    // Restore a saved design — colorWa and device fields are preserved
+    case 'LOAD_DESIGN':
+      return {
+        ...state,
+        S: action.snapshot.S,
+        colorCells: action.snapshot.colorCells,
+        selectedColor: action.snapshot.selectedColor,
+      };
+
     case 'RESET':
       return { ...createInitialState(), selectedColor: state.selectedColor };
 
@@ -78,6 +89,9 @@ function reducer(state: KrokbragdState, action: Action): KrokbragdState {
 // ── Hook ───────────────────────────────────────────────
 export function useKrokbragdState(gridHeight?: number) {
   const [state, dispatch] = useReducer(reducer, undefined, createInitialState);
+
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   const effectiveHeight = gridHeight ?? LOOM_HEIGHT;
   useEffect(() => {
@@ -91,7 +105,6 @@ export function useKrokbragdState(gridHeight?: number) {
     [effectiveHeight, state.cellHeight],
   );
 
-  // Color sequence — groups of active treadle numbers per row, from bottom up
   const colorSequence = useMemo(() => {
     const seq: { treadle: number; color: string }[][] = [];
     for (let n = 0; n < sNum; n++) {
@@ -108,7 +121,6 @@ export function useKrokbragdState(gridHeight?: number) {
     return seq;
   }, [state.S, state.colorCells, sNum]);
 
-  // Stable action creators
   const toggleTreadle = useCallback(
     (row: number, col: number) => dispatch({ type: 'TOGGLE_TREADLE', row, col }),
     [],
@@ -118,6 +130,21 @@ export function useKrokbragdState(gridHeight?: number) {
     [],
   );
   const resetAll = useCallback(() => dispatch({ type: 'RESET' }), []);
+
+  const loadDesign = useCallback(
+    (snapshot: KrokbragdSnapshot) =>
+      dispatch({ type: 'LOAD_DESIGN', snapshot }),
+    [],
+  );
+
+  const getSnapshot = useCallback((): KrokbragdSnapshot => {
+    const s = stateRef.current;
+    return {
+      S: s.S,
+      colorCells: s.colorCells,
+      selectedColor: s.selectedColor,
+    };
+  }, []);
 
   return {
     selectedColor: state.selectedColor,
@@ -130,5 +157,7 @@ export function useKrokbragdState(gridHeight?: number) {
     toggleTreadle,
     setSelectedColor,
     resetAll,
+    loadDesign,
+    getSnapshot,
   };
 }

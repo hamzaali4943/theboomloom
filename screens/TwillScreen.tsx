@@ -1,3 +1,4 @@
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
@@ -12,6 +13,9 @@ import { WARP_COUNT, TREADLE_COUNT, DH, PATTERN_ASPECT } from '@/components/shar
 import { ColorPickerModal } from '@/components/shared/ColorPickerModal';
 import { WeavingLoom } from '@/components/shared/WeavingLoom';
 import { TreadlingSequence } from '@/components/shared/TreadlingSequence';
+import { useDesignLoad } from '@/context/DesignLoadContext';
+import { saveDesign } from '@/utils/saveDesign';
+import type { WeavingSnapshot } from '@/types/saved-design';
 
 const TREADLE_WIDTH = TREADLE_COUNT * DH;
 const GRID_GAP = Math.round(1.5 * DH);
@@ -20,6 +24,7 @@ export function TwillScreen() {
   const scheme = useColorScheme() ?? 'light';
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [tapMode, setTapMode] = useState<'thread' | 'row'>('row');
+  const { pendingLoad, clearPendingLoad } = useDesignLoad();
 
   const screenWidth = Dimensions.get('window').width;
   const cellWidth = useMemo(
@@ -41,7 +46,24 @@ export function TwillScreen() {
     setSelectedColor,
     setSelectedWarp,
     resetAll,
+    loadDesign,
+    getSnapshot,
   } = useWeavingState(gridHeight, 1);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (pendingLoad?.patternType === 'twill') {
+        loadDesign(pendingLoad.snapshot as WeavingSnapshot);
+        clearPendingLoad();
+      }
+    }, [pendingLoad, loadDesign, clearPendingLoad]),
+  );
+
+  const handleSave = useCallback(() => {
+    saveDesign('twill', getSnapshot())
+      .then(() => Alert.alert('Saved', 'Design saved to your collection.'))
+      .catch(() => Alert.alert('Error', 'Could not save the design.'));
+  }, [getSnapshot]);
 
   const handleReset = useCallback(() => {
     Alert.alert(
@@ -140,12 +162,14 @@ export function TwillScreen() {
 
         <TreadlingSequence sequence={treadlingSequence} />
 
-        <Pressable
-          onPress={handleReset}
-          style={styles.resetBtn}
-        >
-          <ThemedText style={styles.resetText}>Reset Pattern</ThemedText>
-        </Pressable>
+        <View style={styles.actionRow}>
+          <Pressable onPress={handleSave} style={[styles.actionBtn, styles.saveBtn]}>
+            <ThemedText style={styles.saveBtnText}>Save Design</ThemedText>
+          </Pressable>
+          <Pressable onPress={handleReset} style={[styles.actionBtn, styles.resetBtn]}>
+            <ThemedText style={styles.resetText}>Reset</ThemedText>
+          </Pressable>
+        </View>
       </ScrollView>
 
       <ColorPickerModal
@@ -184,17 +208,33 @@ const styles = StyleSheet.create({
   colorHint: {
     fontSize: 12,
   },
-  resetBtn: {
+  actionRow: {
+    flexDirection: 'row',
     marginHorizontal: 16,
+    gap: 10,
+  },
+  actionBtn: {
+    flex: 1,
     height: 48,
-    backgroundColor: '#0F434F',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  saveBtn: {
+    borderWidth: 2,
+    borderColor: '#0F434F',
+  },
+  saveBtnText: {
+    color: '#0F434F',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  resetBtn: {
+    backgroundColor: '#0F434F',
+  },
   resetText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
   },
   modeToggle: {

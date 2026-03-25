@@ -1,3 +1,4 @@
+import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   Alert,
@@ -17,6 +18,9 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 import { useKrokbragdState } from '@/components/krokbragd/useKrokbragdState';
 import { KB_WARP_COUNT, DH, PATTERN_ASPECT } from '@/components/krokbragd/krokbragd-data';
+import { useDesignLoad } from '@/context/DesignLoadContext';
+import { saveDesign } from '@/utils/saveDesign';
+import type { KrokbragdSnapshot } from '@/types/saved-design';
 import { SkiaKrokbragdGrid } from '@/components/krokbragd/SkiaKrokbragdGrid';
 import {
   SkiaKrokbragdTreadleGrid,
@@ -32,6 +36,7 @@ export function KrokbragdScreen() {
   const scheme = useColorScheme() ?? 'light';
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
+  const { pendingLoad, clearPendingLoad } = useDesignLoad();
 
   const screenWidth = Dimensions.get('window').width;
   const treadleGridWidth = getKrokbragdTreadleGridWidth();
@@ -55,7 +60,24 @@ export function KrokbragdScreen() {
     toggleTreadle,
     setSelectedColor,
     resetAll,
+    loadDesign,
+    getSnapshot,
   } = useKrokbragdState(gridHeight);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (pendingLoad?.patternType === 'krokbragd') {
+        loadDesign(pendingLoad.snapshot as KrokbragdSnapshot);
+        clearPendingLoad();
+      }
+    }, [pendingLoad, loadDesign, clearPendingLoad]),
+  );
+
+  const handleSave = useCallback(() => {
+    saveDesign('krokbragd', getSnapshot())
+      .then(() => Alert.alert('Saved', 'Design saved to your collection.'))
+      .catch(() => Alert.alert('Error', 'Could not save the design.'));
+  }, [getSnapshot]);
 
   // Loom frame dimensions
   // KB_TOP_EXTEND matches the topExtend passed to SkiaKrokbragdGrid (default=5).
@@ -302,10 +324,14 @@ export function KrokbragdScreen() {
           </View>
         </View>
 
-        {/* Reset button */}
-        <Pressable onPress={handleReset} style={styles.resetBtn}>
-          <ThemedText style={styles.resetText}>Reset Pattern</ThemedText>
-        </Pressable>
+        <View style={styles.actionRow}>
+          <Pressable onPress={handleSave} style={[styles.actionBtn, styles.saveBtn]}>
+            <ThemedText style={styles.saveBtnText}>Save Design</ThemedText>
+          </Pressable>
+          <Pressable onPress={handleReset} style={[styles.actionBtn, styles.resetBtn]}>
+            <ThemedText style={styles.resetText}>Reset</ThemedText>
+          </Pressable>
+        </View>
       </ScrollView>
 
       {/* Color picker modal */}
@@ -405,17 +431,33 @@ const styles = StyleSheet.create({
     color: '#0F434F',
     textAlign: 'center',
   },
-  resetBtn: {
+  actionRow: {
+    flexDirection: 'row',
     marginHorizontal: 16,
+    gap: 10,
+  },
+  actionBtn: {
+    flex: 1,
     height: 48,
-    backgroundColor: '#0F434F',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  saveBtn: {
+    borderWidth: 2,
+    borderColor: '#0F434F',
+  },
+  saveBtnText: {
+    color: '#0F434F',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  resetBtn: {
+    backgroundColor: '#0F434F',
+  },
   resetText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
   },
 });

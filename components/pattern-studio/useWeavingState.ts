@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import {
   LOOM_HEIGHT,
   MAX_WEFT,
@@ -12,6 +12,7 @@ import {
   PATTERN_ROWS,
   type PatternIndex,
 } from './pattern-data';
+import type { WeavingSnapshot } from '@/types/saved-design';
 
 // ── State Shape ────────────────────────────────────────
 export interface WeavingState {
@@ -40,6 +41,7 @@ type Action =
   | { type: 'MOVE_WARP_LEFT' }
   | { type: 'MOVE_WARP_RIGHT' }
   | { type: 'SET_SELECTED_WARP'; index: number }
+  | { type: 'LOAD_DESIGN'; snapshot: WeavingSnapshot }
   | { type: 'RESET' };
 
 // ── Helpers ────────────────────────────────────────────
@@ -54,7 +56,6 @@ function createInitialState(): WeavingState {
     Array(WARP_COUNT).fill(1),
   );
 
-
   return {
     currentPattern: 0,
     colorWa,
@@ -66,7 +67,7 @@ function createInitialState(): WeavingState {
     cellHeight: ROW_HEIGHT,
     cellWidth: 16,
     selectedWarpIndex: -1,
-    gridHeight: LOOM_HEIGHT, // default; overridden by the hook via SET_GRID_HEIGHT
+    gridHeight: LOOM_HEIGHT,
   };
 }
 
@@ -104,7 +105,6 @@ function reducer(state: WeavingState, action: Action): WeavingState {
       const { row, col } = action;
       const wasActive = state.S[row][col];
 
-      // Clone only the changed row
       const newS = state.S.map((r, i) => (i === row ? [...r] : r));
       const newUsedS = [...state.usedS];
       const newColorS = [...state.colorS];
@@ -113,7 +113,6 @@ function reducer(state: WeavingState, action: Action): WeavingState {
       newColorS[row] = state.selectedColor;
 
       if (!wasActive) {
-        // Activate this treadle, deactivate others in the same row
         newUsedS[row] = true;
         for (let k = 0; k < TREADLE_COUNT; k++) {
           newS[row][k] = k === col;
@@ -125,10 +124,8 @@ function reducer(state: WeavingState, action: Action): WeavingState {
           state.pattern,
         );
       } else {
-        // Deactivate
         newS[row][col] = false;
         newUsedS[row] = false;
-        // Reset pattern row to default (all warp showing)
         newPattern = state.pattern.map((r, i) =>
           i === row ? Array(WARP_COUNT).fill(1) : r,
         );
@@ -168,6 +165,22 @@ function reducer(state: WeavingState, action: Action): WeavingState {
     case 'SET_SELECTED_WARP':
       return { ...state, selectedWarpIndex: action.index };
 
+    // Restore a previously saved design.
+    // Device-computed fields (cellHeight, cellWidth, gridHeight, selectedWarpIndex)
+    // are intentionally preserved — they are re-derived from screen dimensions,
+    // not stored in the snapshot.
+    case 'LOAD_DESIGN':
+      return {
+        ...state,
+        currentPattern: action.snapshot.currentPattern,
+        colorWa: action.snapshot.colorWa,
+        colorS: action.snapshot.colorS,
+        S: action.snapshot.S,
+        usedS: action.snapshot.usedS,
+        pattern: action.snapshot.pattern,
+        selectedColor: action.snapshot.selectedColor,
+      };
+
     case 'RESET':
       return { ...createInitialState(), currentPattern: state.currentPattern, selectedColor: state.selectedColor };
 
@@ -177,11 +190,6 @@ function reducer(state: WeavingState, action: Action): WeavingState {
 }
 
 // ── Hook ───────────────────────────────────────────────
-/**
- * @param gridHeight – the pixel height of the grid area on the current device.
- *   Derived from cellWidth × PATTERN_ASPECT so mobile scales uniformly.
- *   Falls back to LOOM_HEIGHT (784) when omitted (web parity).
- */
 export function useWeavingState(gridHeight?: number, initialPattern: PatternIndex = 0) {
   const [state, dispatch] = useReducer(reducer, undefined, () => {
     const s = createInitialState();
@@ -189,7 +197,10 @@ export function useWeavingState(gridHeight?: number, initialPattern: PatternInde
     return s;
   });
 
-  // Keep reducer in sync with the externally-computed gridHeight
+  // Keep a ref to current state so getSnapshot() is always stable (no deps)
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
   const effectiveHeight = gridHeight ?? LOOM_HEIGHT;
   useEffect(() => {
     if (state.gridHeight !== effectiveHeight) {
@@ -257,11 +268,30 @@ export function useWeavingState(gridHeight?: number, initialPattern: PatternInde
   );
   const resetAll = useCallback(() => dispatch({ type: 'RESET' }), []);
 
-  // ── Memoized data slices ──────────────────────────────
-  // Each slice only creates a new object when its specific deps change,
-  // so child components wrapped in React.memo skip re-renders when
-  // unrelated state changes.
+  // Restores a saved snapshot into the reducer.
+  // Uses dispatch directly — always stable.
+  const loadDesign = useCallback(
+    (snapshot: WeavingSnapshot) =>
+      dispatch({ type: 'LOAD_DESIGN', snapshot }),
+    [],
+  );
 
+  // Returns a plain object snapshot of saveable state.
+  // Uses stateRef so this callback is always stable (no deps array needed).
+  const getSnapshot = useCallback((): WeavingSnapshot => {
+    const s = stateRef.current;
+    return {
+      currentPattern: s.currentPattern,
+      colorWa: s.colorWa,
+      colorS: s.colorS,
+      S: s.S,
+      usedS: s.usedS,
+      pattern: s.pattern,
+      selectedColor: s.selectedColor,
+    };
+  }, []);
+
+  // ── Memoized data slices ──────────────────────────────
   const loomData = useMemo(() => ({
     currentPattern: state.currentPattern,
     colorWa: state.colorWa,
@@ -285,13 +315,10 @@ export function useWeavingState(gridHeight?: number, initialPattern: PatternInde
   }), [state.selectedWarpIndex, state.selectedColor]);
 
   return {
-    // Individual values needed by screens' own render
     selectedColor: state.selectedColor,
-    // Memoized data slices for child components
     loomData,
     navigatorData,
     treadlingSequence,
-    // Stable action creators
     colorWarp,
     resetWarp,
     toggleTreadle,
@@ -302,5 +329,7 @@ export function useWeavingState(gridHeight?: number, initialPattern: PatternInde
     moveWarpRight,
     setSelectedWarp,
     resetAll,
+    loadDesign,
+    getSnapshot,
   };
 }
