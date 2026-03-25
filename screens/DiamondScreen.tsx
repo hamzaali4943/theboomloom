@@ -62,7 +62,7 @@ export function DiamondScreen() {
   const handleSave = useCallback(() => {
     saveDesign('diamond', getSnapshot())
       .then(() => Alert.alert('Saved', 'Design saved to your collection.'))
-      .catch(() => Alert.alert('Error', 'Could not save the design.'));
+      .catch((err) => Alert.alert('Cannot Save', err?.message ?? 'Could not save the design.'));
   }, [getSnapshot]);
 
   const handleReset = useCallback(() => {

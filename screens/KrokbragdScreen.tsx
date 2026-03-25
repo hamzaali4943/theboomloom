@@ -76,7 +76,7 @@ export function KrokbragdScreen() {
   const handleSave = useCallback(() => {
     saveDesign('krokbragd', getSnapshot())
       .then(() => Alert.alert('Saved', 'Design saved to your collection.'))
-      .catch(() => Alert.alert('Error', 'Could not save the design.'));
+      .catch((err) => Alert.alert('Cannot Save', err?.message ?? 'Could not save the design.'));
   }, [getSnapshot]);
 
   // Loom frame dimensions

@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { PatternType, DesignSnapshot, SavedDesign } from '@/types/saved-design';
 
 export const DESIGNS_STORAGE_KEY = '@boomloom_designs';
+export const DESIGNS_PER_PATTERN_LIMIT = 5;
 
 const PATTERN_LABELS: Record<PatternType, string> = {
   plain: 'Plain Weave',
@@ -35,6 +36,12 @@ export async function saveDesign(
   const existing: SavedDesign[] = raw ? JSON.parse(raw) : [];
 
   const count = existing.filter((d) => d.patternType === patternType).length;
+
+  if (count >= DESIGNS_PER_PATTERN_LIMIT) {
+    throw new Error(
+      `You can save up to ${DESIGNS_PER_PATTERN_LIMIT} ${PATTERN_LABELS[patternType]} designs. Delete one to save a new design.`,
+    );
+  }
   const newDesign: SavedDesign = {
     id: `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     name: `${PATTERN_LABELS[patternType]} #${count + 1}`,
@@ -44,10 +51,19 @@ export async function saveDesign(
   };
 
   // Newest design at the top of the list
-  await AsyncStorage.setItem(
-    DESIGNS_STORAGE_KEY,
-    JSON.stringify([newDesign, ...existing]),
-  );
+  const updatedList = [newDesign, ...existing];
+  await AsyncStorage.setItem(DESIGNS_STORAGE_KEY, JSON.stringify(updatedList));
+
+  console.log('──────────────────────────────────────────');
+  console.log('[saveDesign] Design saved successfully');
+  console.log('  Name       :', newDesign.name);
+  console.log('  ID         :', newDesign.id);
+  console.log('  Pattern    :', newDesign.patternType);
+  console.log('  Saved at   :', new Date(newDesign.savedAt).toLocaleString());
+  console.log('  Snapshot   :', JSON.stringify(newDesign.snapshot, null, 2));
+  console.log('  Total saved (this type):', updatedList.filter(d => d.patternType === patternType).length, '/', DESIGNS_PER_PATTERN_LIMIT);
+  console.log('  Total saved (all types):', updatedList.length);
+  console.log('──────────────────────────────────────────');
 
   return newDesign;
 }
