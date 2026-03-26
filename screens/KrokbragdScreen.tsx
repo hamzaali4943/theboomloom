@@ -83,7 +83,7 @@ export function KrokbragdScreen() {
   // KB_TOP_EXTEND matches the topExtend passed to SkiaKrokbragdGrid (default=5).
   // Adding it to loomTopPad ensures warp threads start exactly at the spike base
   // so top and bottom spikes appear the same visual height.
-  const KB_TOP_EXTEND = 5;
+  const KB_TOP_EXTEND = 0;
   const patternGridWidth = KB_WARP_COUNT * cellWidth;
   const loomTopPad = LOOM_TOP_PAD + KB_TOP_EXTEND;
   const loomBottomPad = LOOM_BOTTOM_PAD;

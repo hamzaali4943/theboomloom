@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import { Canvas, Picture, Skia, PaintStyle, createPicture } from '@shopify/react-native-skia';
 import { KB_TREADLE_COUNT } from './krokbragd-data';
-import { DH, TREADLING_BG, GRID_BORDER } from '@/components/shared/weaving-data';
+import { DH, TREADLING_BG, GRID_BORDER, ROW_HEIGHT } from '@/components/shared/weaving-data';
 import { useSkiaResumeKey } from '@/hooks/use-skia-resume-key';
 
-const CELL_HEIGHT = 16;
+const CELL_HEIGHT = ROW_HEIGHT;
 // Web: hshift=8.33 with dh=16.67 → ratio ≈ 0.5
 const HSHIFT_RATIO = 8.33 / 16.67;
 // Web: vshift=3.33 with dv=16.67 → ratio ≈ 0.2

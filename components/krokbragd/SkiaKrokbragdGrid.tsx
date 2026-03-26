@@ -41,7 +41,7 @@ export const SkiaKrokbragdGrid = React.memo(function SkiaKrokbragdGrid({
   cellHeight,
   gridHeight,
   topOffset = 0,
-  topExtend = 5,
+  topExtend = 0,
   selectedRowIndex = -1,
 }: Props) {
   const resumeKey = useSkiaResumeKey();
