@@ -35,7 +35,22 @@ export async function saveDesign(
   const raw = await AsyncStorage.getItem(DESIGNS_STORAGE_KEY);
   const existing: SavedDesign[] = raw ? JSON.parse(raw) : [];
 
-  const count = existing.filter((d) => d.patternType === patternType).length;
+  const sameType = existing.filter((d) => d.patternType === patternType);
+
+  // Block exact duplicates within the same pattern type — covers the
+  // "load → save again without edits" case where users accidentally fill
+  // their per-pattern slot with identical entries.
+  const snapshotJSON = JSON.stringify(snapshot);
+  const duplicate = sameType.find(
+    (d) => JSON.stringify(d.snapshot) === snapshotJSON,
+  );
+  if (duplicate) {
+    throw new Error(
+      `This design is already saved as "${duplicate.name}". Make changes before saving again.`,
+    );
+  }
+
+  const count = sameType.length;
 
   if (count >= DESIGNS_PER_PATTERN_LIMIT) {
     throw new Error(

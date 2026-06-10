@@ -207,6 +207,7 @@ export function KrokbragdScreen() {
                         width: DH,
                         color: Colors[scheme].textSecondary,
                         fontSize: Math.max(DH - 1, 8),
+                        lineHeight: 14,
                       },
                     ]}
                   >
@@ -282,6 +283,7 @@ export function KrokbragdScreen() {
                         width: DH,
                         color: Colors[scheme].textSecondary,
                         fontSize: Math.max(DH - 1, 8),
+                        lineHeight: 14,
                       },
                     ]}
                   >

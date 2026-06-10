@@ -159,13 +159,14 @@ export const WeavingLoom = React.memo(function WeavingLoom({
             />
           </View>
 
-          {/* Treadle column numbers (top) — positioned just above the grid */}
+          {/* Treadle column numbers (top) — positioned in the clean space
+              between loom spikes (end at y=26) and grid top (y=loomTopPad). */}
           <View
             style={[
               styles.numbersRow,
               {
                 position: 'absolute',
-                top: loomTopPad - 20,
+                top: loomTopPad - 16,
                 left: patternGridWidth + GRID_GAP,
                 zIndex: 2,
               },
@@ -180,6 +181,7 @@ export const WeavingLoom = React.memo(function WeavingLoom({
                     width: DH,
                     color: Colors[scheme].textSecondary,
                     fontSize: Math.max(DH - 1, 8),
+                    lineHeight: 14,
                   },
                 ]}
               >
@@ -256,6 +258,7 @@ export const WeavingLoom = React.memo(function WeavingLoom({
                     width: DH,
                     color: Colors[scheme].textSecondary,
                     fontSize: Math.max(DH - 1, 8),
+                    lineHeight: 14,
                   },
                 ]}
               >
