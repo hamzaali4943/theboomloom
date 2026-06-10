@@ -31,6 +31,16 @@ export async function saveDesign(
   patternType: PatternType,
   snapshot: DesignSnapshot,
 ): Promise<SavedDesign> {
+  // All three snapshot shapes carry an `S: boolean[][]` of treadle activations.
+  // An empty design (zero treadles toggled) has nothing woven to look at later,
+  // so block saving it before consuming a per-pattern slot.
+  const hasAnyTreadle = snapshot.S.some((row) => row.some((cell) => cell));
+  if (!hasAnyTreadle) {
+    throw new Error(
+      'This design is empty. Tap at least one treadle before saving.',
+    );
+  }
+
   // Always read fresh from disk so auto-numbering is accurate even across screens
   const raw = await AsyncStorage.getItem(DESIGNS_STORAGE_KEY);
   const existing: SavedDesign[] = raw ? JSON.parse(raw) : [];
