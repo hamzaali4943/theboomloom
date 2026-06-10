@@ -315,5 +315,4 @@ rating, data safety, privacy policy URL. Let us know if you'd like changes
 before publishing.
 
 Best,
-[Your name]
-```
+

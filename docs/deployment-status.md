@@ -24,12 +24,16 @@
 
 ### 1. Project & EAS setup
 - [x] Migrated EAS project from previous developer (mubeenmoosani) → lead's account `hamzaali4942-2`
-  - New project ID: `ed95d18b-522c-4770-89a3-625928e8068f`
   - Old orphaned project under `mubeenmoosani` is unused, can be ignored
-- [x] Changed app identifiers to brand-aligned names:
-  - Android package: `com.theboomloom.app` (was `com.mubeenmoosani.theboomloom`)
-  - iOS bundle ID: `com.theboomloom.app`
+- [x] Changed app identifiers to brand-aligned names (per client request, 2026-06-10):
+  - Android package: `com.boomloom.app` (was `com.mubeenmoosani.theboomloom`, then briefly `com.theboomloom.app`)
+  - iOS bundle ID: `com.boomloom.app`
+  - Display name: `BoomLoom`
+  - EAS slug: `boomloom` (was `theboomloom`)
   - **Locked permanently once first AAB is uploaded — do not change**
+- [x] Deleted the old `theboomloom` EAS project (slug was immutable, had to recreate)
+  - Safe to delete: no AAB had been uploaded to Play Console yet, so no Play App Signing key conflict
+  - New EAS project pending — will be created via `eas init` and pick up a fresh project ID
 - [x] Configured `eas.json` production profile to output AAB:
   - `production.android.buildType = "app-bundle"`
   - `autoIncrement = true` (EAS manages versionCode automatically)
@@ -49,10 +53,10 @@
 
 ### 3. Production build
 - [x] Logged into EAS CLI as `hamzaali4942-2` (lead's account, `hamzaali4942@gmail.com`)
-- [x] Generated fresh Android signing keystore (stored on EAS, owned by lead's account)
-- [x] Ran `eas build --platform android --profile production` successfully
-- [x] Downloaded the AAB to local machine
-- [x] AAB is also stored on EAS cloud: https://expo.dev/accounts/hamzaali4942-2/projects/theboomloom/builds
+- [x] Earlier production build under old `theboomloom` slug succeeded but is now expired (commit `c983575`); never uploaded to Play Console
+- [ ] **TODO** — re-run `eas build --platform android --profile production` under new `boomloom` slug
+  - Will generate a fresh Android signing keystore (old one was deleted with the project)
+  - Build URL after success will be at https://expo.dev/accounts/hamzaali4942-2/projects/boomloom/builds
 
 ### 4. Store listing copy
 - [x] Drafted all Play Store listing text in [play-store-listing.md](./play-store-listing.md):
@@ -97,7 +101,7 @@ These three are the **only things** stopping us from completing the draft. Alrea
 2. Click the blue **Create app** button on the home screen
 3. Fill these exact values:
    - App name: `BoomLoom`
-   - Package name: `com.theboomloom.app` (must be exact, locked permanently)
+   - Package name: `com.boomloom.app` (must be exact, locked permanently)
    - Default language: English (United States) – en-US
    - App or game: App
    - Free or paid: Free
