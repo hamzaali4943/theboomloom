@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "theboomloom",
-    "slug": "theboomloom",
+    "name": "BoomLoom",
+    "slug": "boomloom",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "theboomloom",
+    "scheme": "boomloom",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.theboomloom.app",
+      "bundleIdentifier": "com.boomloom.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -24,7 +24,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.theboomloom.app"
+      "package": "com.boomloom.app"
     },
     "web": {
       "output": "static",
@@ -50,10 +50,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "ed95d18b-522c-4770-89a3-625928e8068f"
-      }
+      "router": {}
     },
     "owner": "hamzaali4942-2"
   }
