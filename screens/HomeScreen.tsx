@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+import { HowTosSection } from '@/components/home/HowTosSection';
 import { QuickToolCard } from '@/components/home/QuickToolCard';
 import { WelcomeBanner } from '@/components/home/WelcomeBanner';
 import { Header } from '@/components/shared/Header';
@@ -72,6 +73,7 @@ export function HomeScreen() {
             />
           ))}
         </View>
+        <HowTosSection />
       </ScrollView>
     </SafeScreen>
   );
