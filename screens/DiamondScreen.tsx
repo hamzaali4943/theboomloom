@@ -91,8 +91,8 @@ export function DiamondScreen() {
   return (
     <SafeScreen>
       <Header
-        title="Diamond"
-        subtitle="Diamond weave pattern"
+        title="diamond"
+        subtitle="diamond weave pattern"
       />
 
       <ScrollView

@@ -91,8 +91,8 @@ export function TwillScreen() {
   return (
     <SafeScreen>
       <Header
-        title="2/2 Twill"
-        subtitle="Diagonal weave pattern"
+        title="2/2 twill"
+        subtitle="diagonal rib"
       />
 
       <ScrollView
@@ -111,14 +111,14 @@ export function TwillScreen() {
             ]}
           />
           <View>
-            <ThemedText style={styles.colorLabel}>Current Color</ThemedText>
+            <ThemedText style={styles.colorLabel}>current color</ThemedText>
             <ThemedText
               style={[
                 styles.colorHint,
                 { color: Colors[scheme].textSecondary },
               ]}
             >
-              Tap to customize
+              tap to customize
             </ThemedText>
           </View>
         </Pressable>
@@ -129,7 +129,7 @@ export function TwillScreen() {
             onPress={() => handleTapModeChange('thread')}
           >
             <ThemedText style={[styles.modeBtnText, tapMode === 'thread' && styles.modeBtnTextActive]}>
-              Warp
+              warp
             </ThemedText>
           </Pressable>
           <Pressable
@@ -137,7 +137,7 @@ export function TwillScreen() {
             onPress={() => handleTapModeChange('row')}
           >
             <ThemedText style={[styles.modeBtnText, tapMode === 'row' && styles.modeBtnTextActive]}>
-              Weft
+              weft
             </ThemedText>
           </Pressable>
         </View>

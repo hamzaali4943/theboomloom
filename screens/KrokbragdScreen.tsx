@@ -10,25 +10,25 @@ import {
   View,
 } from 'react-native';
 
-import { SafeScreen } from '@/components/shared/SafeScreen';
 import { Header } from '@/components/shared/Header';
+import { SafeScreen } from '@/components/shared/SafeScreen';
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-import { useKrokbragdState } from '@/components/krokbragd/useKrokbragdState';
-import { KB_WARP_COUNT, DH, PATTERN_ASPECT } from '@/components/krokbragd/krokbragd-data';
-import { useDesignLoad } from '@/context/DesignLoadContext';
-import { saveDesign } from '@/utils/saveDesign';
-import type { KrokbragdSnapshot } from '@/types/saved-design';
+import { DH, KB_WARP_COUNT, PATTERN_ASPECT } from '@/components/krokbragd/krokbragd-data';
 import { SkiaKrokbragdGrid } from '@/components/krokbragd/SkiaKrokbragdGrid';
 import {
   SkiaKrokbragdTreadleGrid,
   getKrokbragdTreadleGridWidth,
   getKrokbragdTreadleHitTest,
 } from '@/components/krokbragd/SkiaKrokbragdTreadleGrid';
-import { LoomFrame, LOOM_TOP_PAD, LOOM_BOTTOM_PAD } from '@/components/shared/LoomFrame';
+import { useKrokbragdState } from '@/components/krokbragd/useKrokbragdState';
 import { ColorPickerModal } from '@/components/shared/ColorPickerModal';
+import { LOOM_BOTTOM_PAD, LOOM_TOP_PAD, LoomFrame } from '@/components/shared/LoomFrame';
+import { useDesignLoad } from '@/context/DesignLoadContext';
+import type { KrokbragdSnapshot } from '@/types/saved-design';
+import { saveDesign } from '@/utils/saveDesign';
 
 const GRID_GAP = Math.round(1.0 * DH);
 
@@ -140,8 +140,8 @@ export function KrokbragdScreen() {
   return (
     <SafeScreen>
       <Header
-        title="Pattern Picker"
-        subtitle="Krokbragd bars"
+        title="krokbragd"
+        subtitle="Scandinavian rug weave"
       />
 
       <ScrollView
@@ -158,11 +158,11 @@ export function KrokbragdScreen() {
             ]}
           />
           <View>
-            <ThemedText style={styles.colorLabel}>Current Color</ThemedText>
+            <ThemedText style={styles.colorLabel}>current color</ThemedText>
             <ThemedText
               style={[styles.colorHint, { color: Colors[scheme].textSecondary }]}
             >
-              Tap to customize
+              tap to customize
             </ThemedText>
           </View>
         </Pressable>

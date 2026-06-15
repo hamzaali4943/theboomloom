@@ -92,8 +92,8 @@ export function PlainScreen() {
   return (
     <SafeScreen>
       <Header
-        title="Plain Weave"
-        subtitle="Classic over-under pattern"
+        title="plain weave"
+        subtitle="classic over-under"
       />
 
       <ScrollView
@@ -112,14 +112,14 @@ export function PlainScreen() {
             ]}
           />
           <View>
-            <ThemedText style={styles.colorLabel}>Current Color</ThemedText>
+            <ThemedText style={styles.colorLabel}>current color</ThemedText>
             <ThemedText
               style={[
                 styles.colorHint,
                 { color: Colors[scheme].textSecondary },
               ]}
             >
-              Tap to customize
+              tap to customize
             </ThemedText>
           </View>
         </Pressable>
@@ -130,7 +130,7 @@ export function PlainScreen() {
             onPress={() => handleTapModeChange('thread')}
           >
             <ThemedText style={[styles.modeBtnText, tapMode === 'thread' && styles.modeBtnTextActive]}>
-              Warp
+              warp
             </ThemedText>
           </Pressable>
           <Pressable
@@ -138,7 +138,7 @@ export function PlainScreen() {
             onPress={() => handleTapModeChange('row')}
           >
             <ThemedText style={[styles.modeBtnText, tapMode === 'row' && styles.modeBtnTextActive]}>
-              Weft
+              weft
             </ThemedText>
           </Pressable>
         </View>
@@ -165,10 +165,10 @@ export function PlainScreen() {
 
         <View style={styles.actionRow}>
           <Pressable onPress={handleSave} style={[styles.actionBtn, styles.saveBtn]}>
-            <ThemedText style={styles.saveBtnText}>Save Design</ThemedText>
+            <ThemedText style={styles.saveBtnText}>save design</ThemedText>
           </Pressable>
           <Pressable onPress={handleReset} style={[styles.actionBtn, styles.resetBtn]}>
-            <ThemedText style={styles.resetText}>Reset</ThemedText>
+            <ThemedText style={styles.resetText}>reset</ThemedText>
           </Pressable>
         </View>
       </ScrollView>

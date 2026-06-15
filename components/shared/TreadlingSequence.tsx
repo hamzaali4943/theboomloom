@@ -13,18 +13,21 @@ export const TreadlingSequence = React.memo(function TreadlingSequence({
 }: Props) {
   const scheme = useColorScheme() ?? 'light';
 
+  // Keep the numbering box hidden until a pattern has been drawn.
+  if (sequence.length === 0) {
+    return null;
+  }
+
   return (
     <View
       style={[styles.container, { backgroundColor: Colors[scheme].surface }]}
     >
       <ThemedText style={styles.heading}>
-        Bar positions, from bottom to top
+        bar positions, from bottom to top
       </ThemedText>
       <View style={[styles.seqBox, { backgroundColor: '#e5f0ff' }]}>
         <ThemedText style={styles.seqText}>
-          {sequence.length > 0
-            ? sequence.join('  ')
-            : 'To begin, choose warp or weft'}
+          {sequence.join('  ')}
         </ThemedText>
       </View>
     </View>

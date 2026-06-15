@@ -110,7 +110,7 @@ export function SavedDesignsScreen() {
 
   return (
     <SafeScreen>
-      <Header title="Saved Designs" subtitle="Your weaving collection" />
+      <Header title="saved" subtitle="Your designs" />
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}

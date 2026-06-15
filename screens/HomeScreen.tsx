@@ -11,36 +11,36 @@ const TOOLS = [
   {
     key: 'plain' as const,
     letter: 'P',
-    label: 'Plain Weave',
+    label: 'plain weave',
     description: 'Classic over-under pattern',
     accent: '#D97706',
   },
   {
     key: 'twill' as const,
     letter: 'T',
-    label: '2/2 Twill',
-    description: 'Diagonal weave pattern',
+    label: '2/2 twill',
+    description: 'diagonal rib',
     accent: '#B45309',
   },
   {
     key: 'diamond' as const,
     letter: 'D',
-    label: 'Diamond',
-    description: 'Diamond weave pattern',
+    label: 'diamond',
+    description: 'diamond twill',
     accent: '#9BA2DD',
   },
   {
     key: 'monks-belt' as const,
     letter: 'M',
-    label: "Monk's Belt",
-    description: "Monk's belt bars",
+    label: "monk's belt",
+    description: "grid of floats on plain weave",
     accent: '#7C3AED',
   },
   {
     key: 'krokbragd' as const,
     letter: 'K',
-    label: 'Krokbragd',
-    description: 'Krokbragd bars',
+    label: 'krokbragd',
+    description: 'Scandinavian rug weave',
     accent: '#0F434F',
   },
 ];
@@ -52,7 +52,7 @@ export function HomeScreen() {
     <SafeScreen>
       <Header
         title="BoomLoom"
-        subtitle="Textile Design Studio"
+        subtitle="design studio"
       />
       <ScrollView
         style={styles.scroll}
