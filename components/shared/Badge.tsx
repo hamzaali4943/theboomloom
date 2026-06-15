@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 type Variant = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'neutral' | 'info';
 
 const VARIANT_COLORS: Record<Variant, { bg: string; text: string }> = {
-  primary: { bg: '#EEF2FF', text: '#4F46E5' },
+  primary: { bg: '#EEF2FF', text: '#708df4' },
   secondary: { bg: '#FEF3C7', text: '#D97706' },
   success: { bg: '#D1FAE5', text: '#065F46' },
   warning: { bg: '#FEF3C7', text: '#92400E' },

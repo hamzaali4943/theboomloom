@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0F434F',
+    color: '#708df4',
     textAlign: 'center',
   },
   seqBox: {
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   seqText: {
     fontFamily: 'monospace',
     fontSize: 15,
-    color: '#0F434F',
+    color: '#708df4',
     letterSpacing: 2,
     textAlign: 'center',
   },

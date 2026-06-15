@@ -156,7 +156,7 @@ export function ColorPickerModal({ visible, selectedColor, onSelectColor, onClos
           </Pressable>
 
           {/* Live preview circle */}
-          <View style={[styles.preview, { backgroundColor: previewColor, borderColor: '#0F434F' }]} />
+          <View style={[styles.preview, { backgroundColor: previewColor, borderColor: '#708df4' }]} />
 
           {/* ── Saturation-Value picker ── */}
           {/*
@@ -225,7 +225,7 @@ export function ColorPickerModal({ visible, selectedColor, onSelectColor, onClos
                   styles.swatch,
                   {
                     backgroundColor: color,
-                    borderColor: selectedColor === color ? '#0F434F' : Colors[scheme].border,
+                    borderColor: selectedColor === color ? '#708df4' : Colors[scheme].border,
                     borderWidth: selectedColor === color ? 4 : 1,
                   },
                 ]}

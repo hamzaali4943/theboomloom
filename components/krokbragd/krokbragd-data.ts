@@ -26,7 +26,7 @@ export const KB_WEAVE_LENGTH = 48; // fixed number of rows
 // ── Default Colors ───────────────────────────────────
 export const KB_DEFAULT_WARP_COLOR = '#cccccc';
 export const KB_DEFAULT_WEFT_COLOR = '#cccccc';
-export const KB_DEFAULT_SELECTED_COLOR = '#802215';
+export const KB_DEFAULT_SELECTED_COLOR = '#708df4';
 
 // ── Pattern Encoding Arrays ──────────────────────────
 // 3 treadles × 38 values (all warp columns, no edge skipping)

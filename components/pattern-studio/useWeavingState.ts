@@ -63,7 +63,7 @@ function createInitialState(): WeavingState {
     S,
     usedS,
     pattern,
-    selectedColor: '#5170ff',
+    selectedColor: '#708df4',
     cellHeight: ROW_HEIGHT,
     cellWidth: 16,
     selectedWarpIndex: -1,

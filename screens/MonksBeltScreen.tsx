@@ -105,7 +105,7 @@ export function MonksBeltScreen() {
           <View
             style={[
               styles.colorCircle,
-              { backgroundColor: selectedColor, borderColor: '#0F434F' },
+              { backgroundColor: selectedColor, borderColor: '#708df4' },
             ]}
           />
           <View>
@@ -221,15 +221,15 @@ const styles = StyleSheet.create({
   },
   saveBtn: {
     borderWidth: 2,
-    borderColor: '#0F434F',
+    borderColor: '#708df4',
   },
   saveBtnText: {
-    color: '#0F434F',
+    color: '#708df4',
     fontSize: 15,
     fontWeight: '700',
   },
   resetBtn: {
-    backgroundColor: '#0F434F',
+    backgroundColor: '#ff3130',
   },
   resetText: {
     color: '#ffffff',
@@ -254,12 +254,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modeBtnActive: {
-    backgroundColor: '#0F434F',
+    backgroundColor: '#708df4',
   },
   modeBtnText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0F434F',
+    color: '#708df4',
   },
   modeBtnTextActive: {
     color: '#ffffff',

@@ -19,7 +19,7 @@ export {
 // ── Monk's Belt Defaults ──────────────────────────────
 export const MB_DEFAULT_WARP_COLOR = '#cccccc';
 export const MB_DEFAULT_WEFT_COLOR = '#cccccc';
-export const MB_DEFAULT_SELECTED_COLOR = '#802215';
+export const MB_DEFAULT_SELECTED_COLOR = '#708df4';
 
 // ── Monk's Belt Pattern Encoding ──────────────────────
 // 4 treadles × 38 values (excluding the 2 edge warps)

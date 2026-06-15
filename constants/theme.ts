@@ -1,11 +1,11 @@
 import { Platform } from 'react-native';
 
 // ─── Brand palette ────────────────────────────────────────────────────────────
-const PRIMARY = '#4F46E5';
-const PRIMARY_DARK = '#3730A3';
-const PRIMARY_LIGHT = '#818CF8';
-const SECONDARY = '#F59E0B';
-const SECONDARY_DARK = '#D97706';
+const PRIMARY = '#708df4';       // brand blue
+const PRIMARY_DARK = '#4a6ae0';
+const PRIMARY_LIGHT = '#9db1f8';
+const SECONDARY = '#ff3130';     // brand red
+const SECONDARY_DARK = '#d61f1e';
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
 export const Colors = {
@@ -29,9 +29,9 @@ export const Colors = {
     tabIconSelected: PRIMARY,
     success: '#10B981',
     warning: '#F59E0B',
-    error: '#EF4444',
-    info: '#3B82F6',
-    shadow: '#4F46E5',
+    error: SECONDARY,
+    info: PRIMARY,
+    shadow: PRIMARY,
   },
   dark: {
     text: '#F9FAFB',
