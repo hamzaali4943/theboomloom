@@ -110,7 +110,7 @@ export function SavedDesignsScreen() {
 
   return (
     <SafeScreen>
-      <Header title="saved" subtitle="Your designs" />
+      <Header title="saved" subtitle="your designs" />
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -166,7 +166,7 @@ export function SavedDesignsScreen() {
                       <View style={styles.cardActions}>
                         <Pressable
                           onPress={() => handleLoad(design)}
-                          style={[styles.cardBtn, { borderColor: accent }]}
+                          style={styles.cardBtn}
                         >
                           <ThemedText style={[styles.cardBtnText, { color: accent }]}>load</ThemedText>
                         </Pressable>
@@ -259,6 +259,7 @@ const styles = StyleSheet.create({
     height: 38,
     borderRadius: 8,
     borderWidth: 2,
+    borderColor: '#ff3130',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -270,6 +271,8 @@ const styles = StyleSheet.create({
     height: 38,
     paddingHorizontal: 16,
     borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#ff3130',
     backgroundColor: '#FEE2E2',
     justifyContent: 'center',
     alignItems: 'center',

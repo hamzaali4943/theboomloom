@@ -36,6 +36,8 @@ type Props = {
   gridHeight: number;
   selectedWarpIndex: number;
   tapMode: 'thread' | 'row';
+  /** Bumped by the parent on reset to force the treadle grid back to collapsed. */
+  resetKey?: number;
   onColorWarp: (col: number) => void;
   onResetWarp: (col: number) => void;
   onSelectWarp: (col: number) => void;
@@ -55,6 +57,7 @@ export const WeavingLoom = React.memo(function WeavingLoom({
   gridHeight,
   selectedWarpIndex,
   tapMode,
+  resetKey = 0,
   onColorWarp,
   onResetWarp,
   onSelectWarp,
@@ -62,14 +65,23 @@ export const WeavingLoom = React.memo(function WeavingLoom({
 }: Props) {
   const scheme = useColorScheme() ?? 'light';
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
-  // Weft mode widens the treadling grid to ~1/3 of the screen (and compresses
-  // the pattern grid) so the treadle cells are comfortable to tap.
-  const expanded = tapMode === 'row';
+  // The treadling grid can widen to ~1/3 of the screen (and compress the pattern
+  // grid) so its cells are comfortable to tap. Tapping the treadle grid expands
+  // it in either mode; tapping the pattern workspace collapses it. Weft mode
+  // starts expanded by default.
+  const [expanded, setExpanded] = useState(tapMode === 'row');
 
-  // Reset row highlight when switching to thread mode
+  // Switching mode resets the layout: weft starts expanded, warp starts collapsed.
   useEffect(() => {
     if (tapMode === 'thread') setSelectedRowIndex(-1);
+    setExpanded(tapMode === 'row');
   }, [tapMode]);
+
+  // Reset always collapses the treadle grid, even if the mode didn't change
+  // (e.g. reset pressed while already in warp mode).
+  useEffect(() => {
+    if (resetKey > 0) setExpanded(false);
+  }, [resetKey]);
 
   // ── Treadle column width: normal vs. expanded ──────────
   // Expanded width makes the 4 treadle columns span ~1/3 of the screen so the
@@ -97,15 +109,16 @@ export const WeavingLoom = React.memo(function WeavingLoom({
   const patternGridWidth = WARP_COUNT * patternCellWidth;
   const totalWidth = patternGridWidth + GRID_GAP + treadleGridWidth;
 
-  // Animate the treadle band width when toggling expand so it grows/collapses smoothly.
-  const widthAnim = useRef(new Animated.Value(TREADLE_COUNT * DH)).current;
+  // The Skia canvas can't resize smoothly (its dimensions are discrete props),
+  // so animating the wrapper width clips the canvas mid-transition. Instead the
+  // band snaps to its new width while a quick opacity crossfade hides the jump.
+  const fadeAnim = useRef(new Animated.Value(1)).current;
   useEffect(() => {
-    Animated.timing(widthAnim, {
-      toValue: treadleGridWidth,
-      duration: 180,
-      useNativeDriver: false,
-    }).start();
-  }, [treadleGridWidth, widthAnim]);
+    Animated.sequence([
+      Animated.timing(fadeAnim, { toValue: 0.25, duration: 90, useNativeDriver: true }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 150, useNativeDriver: true }),
+    ]).start();
+  }, [treadleGridWidth, fadeAnim]);
 
   // Use fixed gridHeight for the outer container so layout doesn't shift
   const loomTopPad = LOOM_TOP_PAD;
@@ -126,6 +139,8 @@ export const WeavingLoom = React.memo(function WeavingLoom({
         row >= 0 &&
         row < sNum
       ) {
+        // Interacting with the treadle cells expands the grid for easier tapping.
+        setExpanded(true);
         onToggleTreadle(row, col);
       }
     },
@@ -137,6 +152,9 @@ export const WeavingLoom = React.memo(function WeavingLoom({
     (e: GestureResponderEvent) => {
       const x = e.nativeEvent.locationX;
       const y = e.nativeEvent.locationY;
+
+      // Tapping back on the main workspace collapses the expanded treadle grid.
+      setExpanded(false);
 
       if (tapMode === 'thread') {
         // Thread mode: tap colors that warp column; tap same column again to deselect
@@ -240,7 +258,9 @@ export const WeavingLoom = React.memo(function WeavingLoom({
               zIndex: 1,
             }}
           >
-            <View style={{ flexDirection: 'row' }}>
+            {/* Pattern + treadle resize together on expand; fade the whole
+                row as one unit so the Skia canvas resize is hidden. */}
+            <Animated.View style={{ flexDirection: 'row', opacity: fadeAnim }}>
               {/* Pattern grid — tap to open floater */}
               <Pressable onPress={handlePatternTouch}>
                 <SkiaPatternGrid
@@ -261,7 +281,7 @@ export const WeavingLoom = React.memo(function WeavingLoom({
               <View style={{ width: GRID_GAP }} />
 
               {/* Treadling grid (touch area) — widens when expanded for easier tapping */}
-              <Animated.View style={{ width: widthAnim, overflow: 'hidden' }}>
+              <View style={{ width: treadleGridWidth }}>
                 <Pressable onPress={handleTreadleTouch}>
                   <SkiaTreadleGrid
                     S={S}
@@ -273,8 +293,8 @@ export const WeavingLoom = React.memo(function WeavingLoom({
                     cellWidth={treadleCellWidth}
                   />
                 </Pressable>
-              </Animated.View>
-            </View>
+              </View>
+            </Animated.View>
           </View>
 
           {/* Treadle column numbers (bottom) — positioned just below the grid */}

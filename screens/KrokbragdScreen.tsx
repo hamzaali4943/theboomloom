@@ -79,15 +79,16 @@ export function KrokbragdScreen() {
     [baseCellWidth],
   );
 
-  // Smoothly animate the treadle band width on expand/collapse.
-  const widthAnim = useRef(new Animated.Value(naturalTreadleGridWidth)).current;
+  // The Skia canvas can't resize smoothly (its dimensions are discrete props),
+  // so animating the wrapper width clips the canvas mid-transition. Instead the
+  // band snaps to its new width while a quick opacity crossfade hides the jump.
+  const fadeAnim = useRef(new Animated.Value(1)).current;
   useEffect(() => {
-    Animated.timing(widthAnim, {
-      toValue: treadleGridWidth,
-      duration: 180,
-      useNativeDriver: false,
-    }).start();
-  }, [treadleGridWidth, widthAnim]);
+    Animated.sequence([
+      Animated.timing(fadeAnim, { toValue: 0.25, duration: 90, useNativeDriver: true }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 150, useNativeDriver: true }),
+    ]).start();
+  }, [treadleGridWidth, fadeAnim]);
 
   const {
     selectedColor,
@@ -172,7 +173,16 @@ export function KrokbragdScreen() {
       'Are you sure you want to clear the pattern?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Reset', style: 'destructive', onPress: resetAll },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: () => {
+            // Reset returns to the original collapsed layout.
+            setExpanded(false);
+            setSelectedRowIndex(-1);
+            resetAll();
+          },
+        },
       ],
     );
   }, [resetAll]);
@@ -274,7 +284,9 @@ export function KrokbragdScreen() {
                   zIndex: 1,
                 }}
               >
-                <View style={{ flexDirection: 'row' }}>
+                {/* Pattern + treadle resize together on expand; fade the whole
+                    row as one unit so the Skia canvas resize is hidden. */}
+                <Animated.View style={{ flexDirection: 'row', opacity: fadeAnim }}>
                   {/* Krokbragd pattern grid (display only, row selection) */}
                   <Pressable onPress={handlePatternTouch}>
                     <SkiaKrokbragdGrid
@@ -295,7 +307,7 @@ export function KrokbragdScreen() {
                   <View style={{ width: GRID_GAP }} />
 
                   {/* Krokbragd staggered treadle grid — widens when expanded */}
-                  <Animated.View style={{ width: widthAnim, overflow: 'hidden' }}>
+                  <View style={{ width: treadleGridWidth }}>
                     <Pressable onPress={handleTreadleTouch}>
                       <SkiaKrokbragdTreadleGrid
                         S={S}
@@ -307,8 +319,8 @@ export function KrokbragdScreen() {
                         cellWidth={treadleCellWidth}
                       />
                     </Pressable>
-                  </Animated.View>
-                </View>
+                  </View>
+                </Animated.View>
               </View>
 
               {/* Treadle column numbers (bottom) */}

@@ -24,6 +24,8 @@ export function PlainScreen() {
   const scheme = useColorScheme() ?? 'light';
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [tapMode, setTapMode] = useState<'thread' | 'row'>('thread');
+  // Bumped on reset to force the treadle grid back to collapsed.
+  const [resetKey, setResetKey] = useState(0);
   const { pendingLoad, clearPendingLoad } = useDesignLoad();
 
   const screenWidth = Dimensions.get('window').width;
@@ -74,7 +76,16 @@ export function PlainScreen() {
       'Are you sure you want to clear the pattern?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Reset', style: 'destructive', onPress: resetAll },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: () => {
+            // Reset returns to the default warp mode and collapsed layout.
+            setTapMode('thread');
+            setResetKey((k) => k + 1);
+            resetAll();
+          },
+        },
       ],
     );
   }, [resetAll]);
@@ -157,6 +168,7 @@ export function PlainScreen() {
           gridHeight={gridHeight}
           selectedWarpIndex={loomData.selectedWarpIndex}
           tapMode={tapMode}
+          resetKey={resetKey}
           onColorWarp={colorWarp}
           onResetWarp={resetWarp}
           onSelectWarp={setSelectedWarp}
