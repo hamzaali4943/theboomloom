@@ -118,7 +118,7 @@ export function DiamondScreen() {
                 { color: Colors[scheme].textSecondary },
               ]}
             >
-              Tap to customize
+              tap to customize
             </ThemedText>
           </View>
         </Pressable>
@@ -129,7 +129,7 @@ export function DiamondScreen() {
             onPress={() => handleTapModeChange('thread')}
           >
             <ThemedText style={[styles.modeBtnText, tapMode === 'thread' && styles.modeBtnTextActive]}>
-              Warp
+              warp
             </ThemedText>
           </Pressable>
           <Pressable
@@ -137,7 +137,7 @@ export function DiamondScreen() {
             onPress={() => handleTapModeChange('row')}
           >
             <ThemedText style={[styles.modeBtnText, tapMode === 'row' && styles.modeBtnTextActive]}>
-              Weft
+              weft
             </ThemedText>
           </Pressable>
         </View>

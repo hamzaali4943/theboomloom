@@ -168,13 +168,13 @@ export function SavedDesignsScreen() {
                           onPress={() => handleLoad(design)}
                           style={[styles.cardBtn, { borderColor: accent }]}
                         >
-                          <ThemedText style={[styles.cardBtnText, { color: accent }]}>Load</ThemedText>
+                          <ThemedText style={[styles.cardBtnText, { color: accent }]}>load</ThemedText>
                         </Pressable>
                         <Pressable
                           onPress={() => handleDelete(design)}
                           style={styles.deleteBtn}
                         >
-                          <ThemedText style={styles.deleteBtnText}>Delete</ThemedText>
+                          <ThemedText style={styles.deleteBtnText}>delete</ThemedText>
                         </Pressable>
                       </View>
                     </View>
