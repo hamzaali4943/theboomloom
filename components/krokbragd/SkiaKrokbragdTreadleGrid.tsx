@@ -17,6 +17,8 @@ type Props = {
   gridHeight: number;
   topOffset?: number;
   selectedRowIndex?: number;
+  /** Width of each treadle column. Defaults to DH; widened when the grid is expanded. */
+  cellWidth?: number;
 };
 
 /**
@@ -31,10 +33,10 @@ export const SkiaKrokbragdTreadleGrid = React.memo(function SkiaKrokbragdTreadle
   gridHeight,
   topOffset = 0,
   selectedRowIndex = -1,
+  cellWidth = DH,
 }: Props) {
   const resumeKey = useSkiaResumeKey();
   const cellHeight = CELL_HEIGHT;
-  const cellWidth = DH;
   const hshift = HSHIFT_RATIO * cellWidth;
   const vshift = VSHIFT_RATIO * cellHeight;
 
@@ -120,8 +122,7 @@ export const SkiaKrokbragdTreadleGrid = React.memo(function SkiaKrokbragdTreadle
 });
 
 /** Exported so the screen can compute total treadle grid width */
-export function getKrokbragdTreadleGridWidth() {
-  const cellWidth = DH;
+export function getKrokbragdTreadleGridWidth(cellWidth: number = DH) {
   const hshift = HSHIFT_RATIO * cellWidth;
   return KB_TREADLE_COUNT * cellWidth + (KB_TREADLE_COUNT - 1) * hshift;
 }
@@ -132,9 +133,9 @@ export function getKrokbragdTreadleHitTest(
   y: number,
   topOffset: number,
   gridHeight: number,
+  cellWidth: number = DH,
 ): { row: number; col: number } | null {
   const cellHeight = CELL_HEIGHT;
-  const cellWidth = DH;
   const hshift = HSHIFT_RATIO * cellWidth;
   const vshift = VSHIFT_RATIO * cellHeight;
 

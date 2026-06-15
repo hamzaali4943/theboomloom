@@ -1,7 +1,8 @@
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
+  Animated,
   Dimensions,
   GestureResponderEvent,
   Pressable,
@@ -36,18 +37,57 @@ export function KrokbragdScreen() {
   const scheme = useColorScheme() ?? 'light';
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
+  // Tapping the treadle grid expands it to ~1/3 of the screen for easier tapping;
+  // tapping the pattern workspace collapses it back.
+  const [expanded, setExpanded] = useState(false);
   const { pendingLoad, clearPendingLoad } = useDesignLoad();
 
   const screenWidth = Dimensions.get('window').width;
-  const treadleGridWidth = getKrokbragdTreadleGridWidth();
-  const cellWidth = useMemo(
-    () => Math.floor((screenWidth - 16 - GRID_GAP - treadleGridWidth) / KB_WARP_COUNT),
-    [screenWidth, treadleGridWidth],
+
+  // Natural (collapsed) treadle band width — drives the base pattern cell width.
+  const naturalTreadleGridWidth = getKrokbragdTreadleGridWidth();
+
+  // Treadle column width: DH normally, widened when expanded so the staggered
+  // treadle band spans ~1/3 of the screen.
+  const expandedTreadleCellWidth = useMemo(() => {
+    // Invert getKrokbragdTreadleGridWidth() for a target width of screenWidth/3:
+    // width = tr*cw + (tr-1)*hshift, hshift = (8.33/16.67)*cw → width = cw*(tr + (tr-1)*ratio)
+    const ratio = 8.33 / 16.67;
+    const factor = 3 + 2 * ratio; // KB_TREADLE_COUNT = 3
+    return Math.max(DH, Math.round(screenWidth / 3 / factor));
+  }, [screenWidth]);
+  const treadleCellWidth = expanded ? expandedTreadleCellWidth : DH;
+  const treadleGridWidth = getKrokbragdTreadleGridWidth(treadleCellWidth);
+
+  // Base pattern cell width uses the natural treadle band so the collapsed
+  // layout is unchanged. When expanded, the pattern grid compresses to fit.
+  const baseCellWidth = useMemo(
+    () => Math.floor((screenWidth - 16 - GRID_GAP - naturalTreadleGridWidth) / KB_WARP_COUNT),
+    [screenWidth, naturalTreadleGridWidth],
   );
+  const cellWidth = useMemo(() => {
+    if (!expanded) return baseCellWidth;
+    const available = screenWidth - treadleGridWidth - GRID_GAP - 16;
+    const shrunk = Math.floor(available / KB_WARP_COUNT);
+    return Math.max(2, Math.min(baseCellWidth, shrunk));
+  }, [expanded, baseCellWidth, screenWidth, treadleGridWidth]);
+
+  // gridHeight stays tied to the natural cell width so the loom height (and the
+  // treadle/pattern row alignment) does not jump when expanding.
   const gridHeight = useMemo(
-    () => Math.round(KB_WARP_COUNT * cellWidth * PATTERN_ASPECT),
-    [cellWidth],
+    () => Math.round(KB_WARP_COUNT * baseCellWidth * PATTERN_ASPECT),
+    [baseCellWidth],
   );
+
+  // Smoothly animate the treadle band width on expand/collapse.
+  const widthAnim = useRef(new Animated.Value(naturalTreadleGridWidth)).current;
+  useEffect(() => {
+    Animated.timing(widthAnim, {
+      toValue: treadleGridWidth,
+      duration: 180,
+      useNativeDriver: false,
+    }).start();
+  }, [treadleGridWidth, widthAnim]);
 
   const {
     selectedColor,
@@ -66,6 +106,9 @@ export function KrokbragdScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      // Re-entering the tab starts in normal mode (treadle grid collapsed).
+      setExpanded(false);
+      setSelectedRowIndex(-1);
       if (pendingLoad?.patternType === 'krokbragd') {
         loadDesign(pendingLoad.snapshot as KrokbragdSnapshot);
         clearPendingLoad();
@@ -95,18 +138,22 @@ export function KrokbragdScreen() {
     (e: GestureResponderEvent) => {
       const x = e.nativeEvent.locationX;
       const y = e.nativeEvent.locationY;
-      const hit = getKrokbragdTreadleHitTest(x, y, loomTopPad, gridHeight);
+      const hit = getKrokbragdTreadleHitTest(x, y, loomTopPad, gridHeight, treadleCellWidth);
       if (hit && hit.row >= 0 && hit.row < sNum) {
+        // Interacting with the treadle cells expands the grid for easier tapping.
+        setExpanded(true);
         toggleTreadle(hit.row, hit.col);
       }
     },
-    [loomTopPad, gridHeight, sNum, toggleTreadle],
+    [loomTopPad, gridHeight, sNum, treadleCellWidth, toggleTreadle],
   );
 
   // Touch handler for pattern grid — row selection only (no warp coloring)
   const handlePatternTouch = useCallback(
     (e: GestureResponderEvent) => {
       const y = e.nativeEvent.locationY;
+      // Tapping back on the main workspace collapses the expanded treadle grid.
+      setExpanded(false);
       const row = Math.floor((loomTopPad + gridHeight - y) / cellHeight);
       if (row >= 0 && row < sNum) {
         setSelectedRowIndex((prev) => (prev === row ? -1 : row));
@@ -116,7 +163,7 @@ export function KrokbragdScreen() {
   );
 
   // Treadle column numbers (1, 2, 3) — positioned to match staggered columns
-  const treadleColStep = DH + DH * (8.33 / 16.67); // cellWidth + hshift
+  const treadleColStep = treadleCellWidth + treadleCellWidth * (8.33 / 16.67); // cellWidth + hshift
   const treadleNumbers = [1, 2, 3];
 
   const handleReset = useCallback(() => {
@@ -204,7 +251,7 @@ export function KrokbragdScreen() {
                       {
                         position: 'absolute',
                         left: i * treadleColStep,
-                        width: DH,
+                        width: treadleCellWidth,
                         color: Colors[scheme].textSecondary,
                         fontSize: Math.max(DH - 1, 8),
                         lineHeight: 14,
@@ -247,17 +294,20 @@ export function KrokbragdScreen() {
                   {/* Gap */}
                   <View style={{ width: GRID_GAP }} />
 
-                  {/* Krokbragd staggered treadle grid */}
-                  <Pressable onPress={handleTreadleTouch}>
-                    <SkiaKrokbragdTreadleGrid
-                      S={S}
-                      colorCells={colorCells}
-                      sNum={sNum}
-                      gridHeight={gridHeight}
-                      topOffset={loomTopPad}
-                      selectedRowIndex={selectedRowIndex}
-                    />
-                  </Pressable>
+                  {/* Krokbragd staggered treadle grid — widens when expanded */}
+                  <Animated.View style={{ width: widthAnim, overflow: 'hidden' }}>
+                    <Pressable onPress={handleTreadleTouch}>
+                      <SkiaKrokbragdTreadleGrid
+                        S={S}
+                        colorCells={colorCells}
+                        sNum={sNum}
+                        gridHeight={gridHeight}
+                        topOffset={loomTopPad}
+                        selectedRowIndex={selectedRowIndex}
+                        cellWidth={treadleCellWidth}
+                      />
+                    </Pressable>
+                  </Animated.View>
                 </View>
               </View>
 
@@ -280,7 +330,7 @@ export function KrokbragdScreen() {
                       {
                         position: 'absolute',
                         left: i * treadleColStep,
-                        width: DH,
+                        width: treadleCellWidth,
                         color: Colors[scheme].textSecondary,
                         fontSize: Math.max(DH - 1, 8),
                         lineHeight: 14,

@@ -13,6 +13,8 @@ type Props = {
   topOffset?: number;
   /** Row index to highlight (-1 = none) — mirrors the pattern grid selection */
   selectedRowIndex?: number;
+  /** Width of each treadle column. Defaults to DH; widened when the grid is expanded. */
+  cellWidth?: number;
 };
 
 /**
@@ -27,10 +29,10 @@ export const SkiaTreadleGrid = React.memo(function SkiaTreadleGrid({
   gridHeight,
   topOffset = 0,
   selectedRowIndex = -1,
+  cellWidth = DH,
 }: Props) {
   const resumeKey = useSkiaResumeKey();
   const cellHeight = ROW_HEIGHT;
-  const cellWidth = DH;
   const width = TREADLE_COUNT * cellWidth;
   const height = gridHeight + 2 * topOffset;
 

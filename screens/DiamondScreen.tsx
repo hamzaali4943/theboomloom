@@ -23,7 +23,7 @@ const GRID_GAP = Math.round(1.5 * DH);
 export function DiamondScreen() {
   const scheme = useColorScheme() ?? 'light';
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
-  const [tapMode, setTapMode] = useState<'thread' | 'row'>('row');
+  const [tapMode, setTapMode] = useState<'thread' | 'row'>('thread');
   const { pendingLoad, clearPendingLoad } = useDesignLoad();
 
   const screenWidth = Dimensions.get('window').width;
@@ -52,6 +52,8 @@ export function DiamondScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      // Re-entering the tab defaults to warp mode (treadle grid not expanded).
+      setTapMode('thread');
       if (pendingLoad?.patternType === 'diamond') {
         loadDesign(pendingLoad.snapshot as WeavingSnapshot);
         clearPendingLoad();
