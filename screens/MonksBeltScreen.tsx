@@ -162,10 +162,10 @@ export function MonksBeltScreen() {
 
         <View style={styles.actionRow}>
           <Pressable onPress={handleSave} style={[styles.actionBtn, styles.saveBtn]}>
-            <ThemedText style={styles.saveBtnText}>Save Design</ThemedText>
+            <ThemedText style={styles.saveBtnText}>save design</ThemedText>
           </Pressable>
           <Pressable onPress={handleReset} style={[styles.actionBtn, styles.resetBtn]}>
-            <ThemedText style={styles.resetText}>Reset</ThemedText>
+            <ThemedText style={styles.resetText}>reset</ThemedText>
           </Pressable>
         </View>
       </ScrollView>
