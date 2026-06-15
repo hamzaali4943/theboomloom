@@ -345,13 +345,13 @@ export function KrokbragdScreen() {
           </View>
         </ScrollView>
 
-        {/* Color sequence display */}
-        <View style={[styles.seqContainer, { backgroundColor: Colors[scheme].surface }]}>
-          <ThemedText style={styles.seqHeading}>
-            Bar positions, from bottom to top
-          </ThemedText>
-          <View style={styles.seqBox}>
-            {colorSequence.length > 0 ? (
+        {/* Color sequence display — only shown once a pattern has been drawn */}
+        {colorSequence.length > 0 && (
+          <View style={[styles.seqContainer, { backgroundColor: Colors[scheme].surface }]}>
+            <ThemedText style={styles.seqHeading}>
+              Bar positions, from bottom to top
+            </ThemedText>
+            <View style={styles.seqBox}>
               <View style={styles.seqRow}>
                 {colorSequence.map((group, i) => (
                   <View key={i} style={styles.seqGroup}>
@@ -368,13 +368,9 @@ export function KrokbragdScreen() {
                   </View>
                 ))}
               </View>
-            ) : (
-              <ThemedText style={styles.seqEmpty}>
-                Tap the treadle grid to start weaving
-              </ThemedText>
-            )}
+            </View>
           </View>
-        </View>
+        )}
 
         <View style={styles.actionRow}>
           <Pressable onPress={handleSave} style={[styles.actionBtn, styles.saveBtn]}>
@@ -475,12 +471,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     minWidth: 24,
-    textAlign: 'center',
-  },
-  seqEmpty: {
-    fontFamily: 'monospace',
-    fontSize: 15,
-    color: '#708df4',
     textAlign: 'center',
   },
   actionRow: {
