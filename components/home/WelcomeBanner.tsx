@@ -12,7 +12,7 @@ export function WelcomeBanner() {
   return (
     <View style={[styles.container, { backgroundColor: brandBlue }]}>
       <ThemedText style={styles.greeting}>Welcome, designer!</ThemedText>
-      <ThemedText style={styles.sub}>Pick a pattern to begin</ThemedText>
+      <ThemedText style={styles.sub}>Pick a pattern to begin.</ThemedText>
     </View>
   );
 }

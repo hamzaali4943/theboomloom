@@ -13,7 +13,7 @@ const TOOLS = [
     key: 'plain' as const,
     letter: 'P',
     label: 'plain weave',
-    description: 'Classic over-under pattern',
+    description: 'classic over-under pattern',
     accent: '#D97706',
   },
   {
