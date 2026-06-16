@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -7,13 +7,14 @@ import { Colors } from '@/constants/theme';
 
 type Props = {
   letter: string;
+  icon?: ImageSourcePropType;
   label: string;
   description: string;
   accent: string;
   onPress: () => void;
 };
 
-export function QuickToolCard({ letter, label, description, accent, onPress }: Props) {
+export function QuickToolCard({ letter, icon, label, description, accent, onPress }: Props) {
   const scheme = useColorScheme() ?? 'light';
   const surface = Colors[scheme].surface;
   const border = Colors[scheme].border;
@@ -25,9 +26,13 @@ export function QuickToolCard({ letter, label, description, accent, onPress }: P
       onPress={onPress}
       activeOpacity={0.85}
     >
-      {/* Letter badge */}
+      {/* Icon badge — image when provided, otherwise the letter */}
       <View style={[styles.imageWrap, { backgroundColor: accent + '18' }]}>
-        <Text style={[styles.letter, { color: accent }]}>{letter}</Text>
+        {icon ? (
+          <Image source={icon} style={styles.iconImage} resizeMode="contain" />
+        ) : (
+          <Text style={[styles.letter, { color: accent }]}>{letter}</Text>
+        )}
       </View>
 
       {/* Text */}
@@ -67,6 +72,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
+  },
+  iconImage: {
+    width: 60,
+    height: 48,
   },
   letter: {
     fontSize: 32,

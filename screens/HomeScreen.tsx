@@ -19,6 +19,7 @@ const TOOLS = [
   {
     key: 'twill' as const,
     letter: 'T',
+    icon: require('@/assets/images/22twill.png'),
     label: '2/2 twill',
     description: 'diagonal rib',
     accent: '#B45309',
@@ -26,6 +27,7 @@ const TOOLS = [
   {
     key: 'diamond' as const,
     letter: 'D',
+    icon: require('@/assets/images/diamond.png'),
     label: 'diamond',
     description: 'diamond twill',
     accent: '#9BA2DD',
@@ -33,6 +35,7 @@ const TOOLS = [
   {
     key: 'monks-belt' as const,
     letter: 'M',
+    icon: require('@/assets/images/monksbelt.png'),
     label: "monk's belt",
     description: "grid of floats on plain weave",
     accent: '#7C3AED',
@@ -40,6 +43,7 @@ const TOOLS = [
   {
     key: 'krokbragd' as const,
     letter: 'K',
+    icon: require('@/assets/images/krokbragd.png'),
     label: 'krokbragd',
     description: 'Scandinavian rug weave',
     accent: '#0F434F',
@@ -66,6 +70,7 @@ export function HomeScreen() {
             <QuickToolCard
               key={tool.key}
               letter={tool.letter}
+              icon={tool.icon}
               label={tool.label}
               description={tool.description}
               accent={tool.accent}
