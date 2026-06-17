@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ImageSourcePropType, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -9,6 +9,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 type HowTo = {
   key: string;
   emoji: string;
+  image?: ImageSourcePropType;
   title: string;
   description: string;
   url: string;
@@ -20,6 +21,7 @@ const HOW_TOS: HowTo[] = [
   {
     key: 'videos',
     emoji: '▶',
+    image: require('@/assets/images/videocamera.png'),
     title: 'videos & instructions',
     description: 'Setup videos, make-it projects, and printable step-by-step guides',
     url: 'https://www.theboomloom.com/boomloom-boss-videos',
@@ -59,9 +61,13 @@ export function HowTosSection() {
       onPress={() => openUrl(item.url)}
       activeOpacity={0.85}
     >
-      {/* Icon badge */}
+      {/* Icon badge — image when provided, otherwise the emoji */}
       <View style={[styles.iconWrap, { backgroundColor: item.accent + '18' }]}>
-        <Text style={[styles.icon, { color: item.accent }]}>{item.emoji}</Text>
+        {item.image ? (
+          <Image source={item.image} style={styles.iconImage} resizeMode="contain" />
+        ) : (
+          <Text style={[styles.icon, { color: item.accent }]}>{item.emoji}</Text>
+        )}
       </View>
 
       {/* Text */}
@@ -141,6 +147,10 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 26,
     fontWeight: '800',
+  },
+  iconImage: {
+    width: 30,
+    height: 30,
   },
   textBlock: {
     flex: 1,

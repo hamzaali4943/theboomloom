@@ -12,6 +12,7 @@ const TOOLS = [
   {
     key: 'plain' as const,
     letter: 'P',
+    icon: require('@/assets/images/plainweave.png'),
     label: 'plain weave',
     description: 'classic over-under pattern',
     accent: '#D97706',

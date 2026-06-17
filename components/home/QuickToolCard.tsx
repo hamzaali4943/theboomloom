@@ -74,8 +74,8 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   iconImage: {
-    width: 60,
-    height: 48,
+    width: 52,
+    height: 52,
   },
   letter: {
     fontSize: 32,
