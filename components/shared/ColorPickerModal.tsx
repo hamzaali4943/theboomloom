@@ -151,8 +151,9 @@ export function ColorPickerModal({ visible, selectedColor, onSelectColor, onClos
           <View style={[styles.handle, { backgroundColor: Colors[scheme].border }]} />
 
           <ThemedText style={styles.title}>Select Color</ThemedText>
-          <Pressable onPress={onClose} style={styles.closeBtn}>
-            <ThemedText style={styles.closeBtnText}>Close</ThemedText>
+          {/* save — commits the current preview color (the parent closes the modal) */}
+          <Pressable onPress={() => onSelectColor(previewColor)} style={styles.closeBtn}>
+            <ThemedText style={styles.closeBtnText}>save</ThemedText>
           </Pressable>
 
           {/* Live preview circle */}
@@ -232,14 +233,6 @@ export function ColorPickerModal({ visible, selectedColor, onSelectColor, onClos
               />
             ))}
           </View>
-
-          {/* Done — commits the current preview color */}
-          <Pressable
-            onPress={() => onSelectColor(previewColor)}
-            style={[styles.doneBtn, { borderColor: Colors[scheme].border }]}
-          >
-            <ThemedText style={styles.doneBtnText}>Done</ThemedText>
-          </Pressable>
 
           </View>
         </Pressable>
@@ -335,19 +328,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
-  },
-  // Done button
-  doneBtn: {
-    width: '100%',
-    height: 48,
-    borderRadius: 12,
-    borderWidth: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  doneBtnText: {
-    fontSize: 16,
-    fontWeight: '600',
   },
   closeBtn: {
     position: 'absolute',

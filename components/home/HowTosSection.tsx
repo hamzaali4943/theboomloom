@@ -87,41 +87,16 @@ export function HowTosSection() {
 
   return (
     <View style={styles.root}>
-      {/* how-to's */}
-      <View style={styles.wrap}>
-        <View style={styles.heading}>
-          <ThemedText style={styles.sectionTitle}>how-to&apos;s</ThemedText>
-        </View>
-        {HOW_TOS.map(renderCard)}
-      </View>
-
-      {/* shop */}
-      <View style={styles.wrap}>
-        <View style={styles.heading}>
-          <ThemedText style={styles.sectionTitle}>shop</ThemedText>
-        </View>
-        {SHOP.map(renderCard)}
-      </View>
+      {HOW_TOS.map(renderCard)}
+      {SHOP.map(renderCard)}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: {
-    gap: 18,
-    marginTop: 6,
-  },
-  wrap: {
     gap: 10,
-  },
-  heading: {
-    marginBottom: 2,
-    paddingHorizontal: 2,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+    marginTop: 6,
   },
   card: {
     flexDirection: 'row',
