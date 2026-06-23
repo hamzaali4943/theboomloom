@@ -15,7 +15,7 @@ type Props = {
 
 /**
  * Compact square tile for the home grid: a colored icon panel on top with the
- * (black) logo, and the pattern name underneath. Sized to fit 2 per row.
+ * (black) logo, and the pattern name underneath. Sized to fit 3 per row.
  */
 export function PatternGridCard({ letter, icon, iconBg, label, accent, onPress }: Props) {
   const scheme = useColorScheme() ?? 'light';
