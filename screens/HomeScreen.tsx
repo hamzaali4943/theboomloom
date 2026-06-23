@@ -3,7 +3,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { HowTosSection } from '@/components/home/HowTosSection';
-import { QuickToolCard } from '@/components/home/QuickToolCard';
+import { PatternGridCard } from '@/components/home/PatternGridCard';
 import { WelcomeBanner } from '@/components/home/WelcomeBanner';
 import { Header } from '@/components/shared/Header';
 import { SafeScreen } from '@/components/shared/SafeScreen';
@@ -16,6 +16,7 @@ const TOOLS = [
     label: 'plain weave',
     description: 'classic over-under pattern',
     accent: '#D97706',
+    bg: '#FDFF89', // light yellow
   },
   {
     key: 'twill' as const,
@@ -24,6 +25,7 @@ const TOOLS = [
     label: '2/2 twill',
     description: 'diagonal rib',
     accent: '#B45309',
+    bg: '#FF3130', // red
   },
   {
     key: 'diamond' as const,
@@ -32,6 +34,7 @@ const TOOLS = [
     label: 'diamond',
     description: 'diamond twill',
     accent: '#9BA2DD',
+    bg: '#C7C3F5', // lavender
   },
   {
     key: 'monks-belt' as const,
@@ -40,6 +43,7 @@ const TOOLS = [
     label: "monk's belt",
     description: "grid of floats on plain weave",
     accent: '#7C3AED',
+    bg: '#B0B0B0', // grey
   },
   {
     key: 'krokbragd' as const,
@@ -48,6 +52,7 @@ const TOOLS = [
     label: 'krokbragd',
     description: 'Scandinavian rug weave',
     accent: '#0F434F',
+    bg: '#BFF747', // lime green
   },
 ];
 
@@ -66,14 +71,14 @@ export function HomeScreen() {
         contentContainerStyle={styles.content}
       >
         <WelcomeBanner />
-        <View style={styles.toolsRow}>
+        <View style={styles.grid}>
           {TOOLS.map((tool) => (
-            <QuickToolCard
+            <PatternGridCard
               key={tool.key}
               letter={tool.letter}
               icon={tool.icon}
+              iconBg={tool.bg}
               label={tool.label}
-              description={tool.description}
               accent={tool.accent}
               onPress={() => router.push(`/(tabs)/${tool.key}`)}
             />
@@ -95,8 +100,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     gap: 10,
   },
-  toolsRow: {
-    flexDirection: 'column',
-    gap: 10,
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    columnGap: 12,
+    rowGap: 12,
   },
 });

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 
@@ -10,12 +9,15 @@ type Props = {
   icon?: ImageSourcePropType;
   iconBg?: string;
   label: string;
-  description: string;
   accent: string;
   onPress: () => void;
 };
 
-export function QuickToolCard({ letter, icon, iconBg, label, description, accent, onPress }: Props) {
+/**
+ * Compact square tile for the home grid: a colored icon panel on top with the
+ * (black) logo, and the pattern name underneath. Sized to fit 2 per row.
+ */
+export function PatternGridCard({ letter, icon, iconBg, label, accent, onPress }: Props) {
   const scheme = useColorScheme() ?? 'light';
   const surface = Colors[scheme].surface;
   const border = Colors[scheme].border;
@@ -27,8 +29,8 @@ export function QuickToolCard({ letter, icon, iconBg, label, description, accent
       onPress={onPress}
       activeOpacity={0.85}
     >
-      {/* Icon badge — solid color background with black logo, otherwise the letter */}
-      <View style={[styles.imageWrap, { backgroundColor: iconBg ?? accent + '18' }]}>
+      {/* Colored icon panel */}
+      <View style={[styles.iconPanel, { backgroundColor: iconBg ?? accent + '18' }]}>
         {icon ? (
           <Image source={icon} style={styles.iconImage} resizeMode="contain" />
         ) : (
@@ -36,71 +38,48 @@ export function QuickToolCard({ letter, icon, iconBg, label, description, accent
         )}
       </View>
 
-      {/* Text */}
-      <View style={styles.textBlock}>
-        <ThemedText style={styles.label}>{label}</ThemedText>
-        <ThemedText style={[styles.desc, { color: Colors[scheme].textSecondary }]} numberOfLines={1}>
-          {description}
-        </ThemedText>
-      </View>
-
-      {/* Arrow */}
-      <View style={[styles.arrow, { backgroundColor: accent + '20' }]}>
-        <IconSymbol name="chevron.right" size={16} color={accent} />
-      </View>
+      {/* Label */}
+      <ThemedText style={styles.label} numberOfLines={1}>
+        {label}
+      </ThemedText>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 16,
+    flexBasis: '30%',
+    maxWidth: '32%',
+    flexGrow: 1,
+    borderRadius: 14,
     borderWidth: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    padding: 7,
+    alignItems: 'center',
+    gap: 6,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07,
     shadowRadius: 8,
     elevation: 2,
-    gap: 14,
   },
-  imageWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  iconImage: {
-    width: 52,
-    height: 52,
-  },
-  letter: {
-    fontSize: 32,
-    fontWeight: '800',
-    letterSpacing: -1,
-  },
-  textBlock: {
-    flex: 1,
-    gap: 3,
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  desc: {
-    fontSize: 12,
-    lineHeight: 16,
-  },
-  arrow: {
-    width: 32,
-    height: 32,
+  iconPanel: {
+    width: '100%',
+    aspectRatio: 1,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    flexShrink: 0,
+  },
+  iconImage: {
+    width: '78%',
+    height: '78%',
+  },
+  letter: {
+    fontSize: 30,
+    fontWeight: '800',
+    letterSpacing: -1,
+  },
+  label: {
+    fontSize: 11,
+    fontWeight: '700',
+    textAlign: 'center',
   },
 });
