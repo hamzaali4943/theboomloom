@@ -54,6 +54,15 @@ const TOOLS = [
     accent: '#0F434F',
     bg: '#BFF747', // lime green
   },
+  {
+    key: 'saved' as const,
+    letter: 'S',
+    icon: undefined,
+    label: 'saved',
+    description: 'your saved designs',
+    accent: '#0F434F',
+    bg: '#F5F5F5', // off-white
+  },
 ];
 
 export function HomeScreen() {
