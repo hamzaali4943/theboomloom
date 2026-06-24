@@ -38,6 +38,9 @@ export function PatternGridCard({ letter, icon, iconBg, label, accent, onPress }
         )}
       </View>
 
+      {/* Hairline between logo and label */}
+      <View style={[styles.divider, { backgroundColor: border }]} />
+
       {/* Label — stretches full width */}
       <View style={styles.labelWrap}>
         <ThemedText style={styles.label} numberOfLines={1}>
@@ -66,7 +69,12 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 12,
+    padding: 10,
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    width: '100%',
+    opacity: 0.5,
   },
   iconImage: {
     width: '100%',
@@ -79,7 +87,7 @@ const styles = StyleSheet.create({
   },
   labelWrap: {
     width: '100%',
-    paddingVertical: 8,
+    paddingVertical: 5,
     paddingHorizontal: 4,
     alignItems: 'center',
   },
