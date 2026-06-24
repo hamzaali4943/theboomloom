@@ -38,9 +38,6 @@ export function PatternGridCard({ letter, icon, iconBg, label, accent, onPress }
         )}
       </View>
 
-      {/* Soft inset divider — subtle, modern */}
-      <View style={styles.divider} />
-
       {/* Label — stretches full width */}
       <View style={styles.labelWrap}>
         <ThemedText style={styles.label} numberOfLines={1}>
@@ -56,7 +53,7 @@ const styles = StyleSheet.create({
     flexBasis: '30%',
     maxWidth: '32%',
     flexGrow: 1,
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 1,
     overflow: 'hidden',
     shadowOffset: { width: 0, height: 2 },
@@ -69,7 +66,7 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: 12,
   },
   iconImage: {
     width: '100%',
@@ -80,20 +77,11 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: -1,
   },
-  divider: {
-    height: StyleSheet.hairlineWidth,
-    alignSelf: 'center',
-    width: '80%',
-    backgroundColor: 'rgba(17,24,39,0.06)',
-  },
   labelWrap: {
     width: '100%',
-    paddingVertical: 10,
-    paddingHorizontal: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
     alignItems: 'center',
-    // Faint tint so the footer reads as a distinct band even on the
-    // all-white "plain" tile (where panel + card are both white).
-    backgroundColor: 'rgba(17,24,39,0.03)',
   },
   label: {
     fontSize: 13,
