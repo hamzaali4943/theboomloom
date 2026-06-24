@@ -16,7 +16,7 @@ const TOOLS = [
     label: 'plain weave',
     description: 'classic over-under pattern',
     accent: '#D97706',
-    bg: '#FDFF89', // light yellow
+    bg: '#FFFFFF', // white
   },
   {
     key: 'twill' as const,
@@ -53,15 +53,6 @@ const TOOLS = [
     description: 'Scandinavian rug weave',
     accent: '#0F434F',
     bg: '#BFF747', // lime green
-  },
-  {
-    key: 'saved' as const,
-    letter: 'S',
-    icon: undefined,
-    label: 'saved',
-    description: 'your saved designs',
-    accent: '#0F434F',
-    bg: '#F5F5F5', // off-white
   },
 ];
 

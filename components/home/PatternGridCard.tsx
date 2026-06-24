@@ -29,7 +29,7 @@ export function PatternGridCard({ letter, icon, iconBg, label, accent, onPress }
       onPress={onPress}
       activeOpacity={0.85}
     >
-      {/* Colored icon panel */}
+      {/* Colored icon panel — fills the tile edge-to-edge */}
       <View style={[styles.iconPanel, { backgroundColor: iconBg ?? accent + '18' }]}>
         {icon ? (
           <Image source={icon} style={styles.iconImage} resizeMode="contain" />
@@ -38,10 +38,15 @@ export function PatternGridCard({ letter, icon, iconBg, label, accent, onPress }
         )}
       </View>
 
-      {/* Label */}
-      <ThemedText style={styles.label} numberOfLines={1}>
-        {label}
-      </ThemedText>
+      {/* Soft inset divider — subtle, modern */}
+      <View style={styles.divider} />
+
+      {/* Label — stretches full width */}
+      <View style={styles.labelWrap}>
+        <ThemedText style={styles.label} numberOfLines={1}>
+          {label}
+        </ThemedText>
+      </View>
     </TouchableOpacity>
   );
 }
@@ -53,9 +58,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     borderRadius: 14,
     borderWidth: 1,
-    padding: 7,
-    alignItems: 'center',
-    gap: 6,
+    overflow: 'hidden',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07,
     shadowRadius: 8,
@@ -64,21 +67,36 @@ const styles = StyleSheet.create({
   iconPanel: {
     width: '100%',
     aspectRatio: 1,
-    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 20,
   },
   iconImage: {
-    width: '78%',
-    height: '78%',
+    width: '100%',
+    height: '100%',
   },
   letter: {
-    fontSize: 30,
+    fontSize: 34,
     fontWeight: '800',
     letterSpacing: -1,
   },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    alignSelf: 'center',
+    width: '80%',
+    backgroundColor: 'rgba(17,24,39,0.06)',
+  },
+  labelWrap: {
+    width: '100%',
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    alignItems: 'center',
+    // Faint tint so the footer reads as a distinct band even on the
+    // all-white "plain" tile (where panel + card are both white).
+    backgroundColor: 'rgba(17,24,39,0.03)',
+  },
   label: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '700',
     textAlign: 'center',
   },
