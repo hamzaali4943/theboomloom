@@ -1,5 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { SafeScreen } from '@/components/shared/SafeScreen';
@@ -27,6 +27,24 @@ export function PlainScreen() {
   // Bumped on reset to force the treadle grid back to collapsed.
   const [resetKey, setResetKey] = useState(0);
   const { pendingLoad, clearPendingLoad } = useDesignLoad();
+
+  // Weaving builds from the bottom up, so start the view resting at the bottom
+  // of the loom (row 0) instead of the top. Scroll to the end once the content
+  // has laid out; the guard keeps later content changes from yanking the view.
+  const scrollRef = useRef<ScrollView>(null);
+  const didInitialScroll = useRef(false);
+  const scrollToBottom = useCallback(() => {
+    if (didInitialScroll.current) return;
+    didInitialScroll.current = true;
+    scrollRef.current?.scrollToEnd({ animated: false });
+  }, []);
+  // On tab switch the content size may not change (the loom is already laid
+  // out), so onContentSizeChange won't fire. Reset the view to the bottom
+  // directly on focus after layout has settled.
+  const resetViewToBottom = useCallback(() => {
+    didInitialScroll.current = false;
+    requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: false }));
+  }, []);
 
   const screenWidth = Dimensions.get('window').width;
   const cellWidth = useMemo(
@@ -57,11 +75,13 @@ export function PlainScreen() {
     useCallback(() => {
       // Re-entering the tab defaults to warp mode (treadle grid not expanded).
       setTapMode('thread');
+      // Reset the bottom-first view on every re-entry (e.g. switching patterns).
+      resetViewToBottom();
       if (pendingLoad?.patternType === 'plain') {
         loadDesign(pendingLoad.snapshot as WeavingSnapshot);
         clearPendingLoad();
       }
-    }, [pendingLoad, loadDesign, clearPendingLoad]),
+    }, [pendingLoad, loadDesign, clearPendingLoad, resetViewToBottom]),
   );
 
   const handleSave = useCallback(() => {
@@ -110,10 +130,33 @@ export function PlainScreen() {
       />
 
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
+        onContentSizeChange={scrollToBottom}
       >
+        <WeavingLoom
+          currentPattern={loomData.currentPattern}
+          colorWa={loomData.colorWa}
+          colorS={loomData.colorS}
+          S={loomData.S}
+          pattern={loomData.pattern}
+          sNum={loomData.sNum}
+          cellWidth={cellWidth}
+          cellHeight={loomData.cellHeight}
+          gridHeight={gridHeight}
+          selectedWarpIndex={loomData.selectedWarpIndex}
+          tapMode={tapMode}
+          resetKey={resetKey}
+          onColorWarp={colorWarp}
+          onResetWarp={resetWarp}
+          onSelectWarp={setSelectedWarp}
+          onToggleTreadle={toggleTreadle}
+        />
+
+        {/* Color + mode controls sit below the loom, near your focus at the
+            bottom of the weave. */}
         <Pressable
           onPress={openColorPicker}
           style={styles.colorBtnRow}
@@ -155,25 +198,6 @@ export function PlainScreen() {
             </ThemedText>
           </Pressable>
         </View>
-
-        <WeavingLoom
-          currentPattern={loomData.currentPattern}
-          colorWa={loomData.colorWa}
-          colorS={loomData.colorS}
-          S={loomData.S}
-          pattern={loomData.pattern}
-          sNum={loomData.sNum}
-          cellWidth={cellWidth}
-          cellHeight={loomData.cellHeight}
-          gridHeight={gridHeight}
-          selectedWarpIndex={loomData.selectedWarpIndex}
-          tapMode={tapMode}
-          resetKey={resetKey}
-          onColorWarp={colorWarp}
-          onResetWarp={resetWarp}
-          onSelectWarp={setSelectedWarp}
-          onToggleTreadle={toggleTreadle}
-        />
 
         <TreadlingSequence sequence={treadlingSequence} />
 
@@ -226,6 +250,7 @@ const styles = StyleSheet.create({
   actionRow: {
     flexDirection: 'row',
     marginHorizontal: 16,
+    marginTop: 12,
     gap: 10,
   },
   actionBtn: {

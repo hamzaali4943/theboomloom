@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Animated, Dimensions, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';
 
 import { ThemedText } from '@/components/themed-text';
@@ -49,6 +49,8 @@ const PANEL_W = 260;
 const PANEL_H = 160;
 const HUE_H   = 22;
 
+const SCREEN_H = Dimensions.get('window').height;
+
 // Rainbow stops for the hue bar
 const HUE_COLORS: string[] = [
   '#ff0000', '#ffff00', '#00ff00',
@@ -71,9 +73,41 @@ export function ColorPickerModal({ visible, selectedColor, onSelectColor, onClos
   const [hue, setHue] = useState(0);
   const [sat, setSat] = useState(1);
   const [val, setVal] = useState(1);
-  // sheet drag state for slide-to-close
-  const [dragTranslate, setDragTranslate] = useState(0);
+
+  // Open/close animation — matches InstructionsModal: the RN Modal's built-in
+  // "slide" also slides the backdrop, which looks off. We keep the Modal
+  // animation off and drive only the sheet ourselves (backdrop just shows).
+  // `mounted` keeps the Modal alive during the out-animation.
+  const [mounted, setMounted] = useState(false);
+  const sheetTranslate = useRef(new Animated.Value(SCREEN_H)).current;
+  // Drag-to-close feeds the same animated value.
   const dragStartRef = useRef<number | null>(null);
+  const dragDyRef = useRef(0);
+
+  useEffect(() => {
+    if (visible) {
+      setMounted(true);
+      sheetTranslate.setValue(SCREEN_H);
+      // Spring gives a smooth ease-out glide as the sheet settles, instead of
+      // the flat, slightly snappy feel of linear timing. No bounce/overshoot.
+      Animated.spring(sheetTranslate, {
+        toValue: 0,
+        damping: 22,
+        stiffness: 220,
+        mass: 0.9,
+        overshootClamping: true,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(sheetTranslate, {
+        toValue: SCREEN_H,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) setMounted(false);
+      });
+    }
+  }, [visible, sheetTranslate]);
 
   // Initialise picker to current color whenever the modal opens
   useEffect(() => {
@@ -107,39 +141,45 @@ export function ColorPickerModal({ visible, selectedColor, onSelectColor, onClos
   const svCursorY = Math.max(0, Math.min(PANEL_H - 16, (1 - val) * PANEL_H - 8));
   const hueCursorX = Math.max(0, Math.min(PANEL_W - 10, (hue / 360) * PANEL_W - 5));
 
-  // sheet responder handlers to allow sliding down to close
+  // sheet responder handlers to allow sliding down to close — feeds the same
+  // animated value that drives the open/close slide.
   const onSheetResponderGrant = (e: any) => {
     dragStartRef.current = e.nativeEvent.pageY;
-    setDragTranslate(0);
+    dragDyRef.current = 0;
   };
 
   const onSheetResponderMove = (e: any) => {
     if (dragStartRef.current == null) return;
     const dy = e.nativeEvent.pageY - dragStartRef.current;
-    if (dy > 0) setDragTranslate(dy);
+    dragDyRef.current = dy;
+    if (dy > 0) sheetTranslate.setValue(dy);
   };
 
   const onSheetResponderRelease = () => {
-    const threshold = 120;
-    if (dragTranslate > threshold) {
-      setDragTranslate(0);
-      dragStartRef.current = null;
-      onClose();
-      return;
-    }
-    setDragTranslate(0);
+    const dy = dragDyRef.current;
     dragStartRef.current = null;
+    dragDyRef.current = 0;
+    if (dy > 120) {
+      // Past the threshold — close (the out-animation continues from here).
+      onClose();
+    } else {
+      Animated.timing(sheetTranslate, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    }
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      {/* Tap outside sheet → close */}
+    <Modal visible={mounted} animationType="none" transparent onRequestClose={onClose}>
+      {/* Tap outside sheet → close. Backdrop does NOT animate; only the sheet slides. */}
       <Pressable style={styles.backdrop} onPress={onClose}>
         {/* Stop sheet taps from bubbling to backdrop but allow gesture-handler touches */}
-        <View
+        <Animated.View
           style={[
             styles.sheet,
-            { backgroundColor: Colors[scheme].card, transform: [{ translateY: dragTranslate }] },
+            { backgroundColor: Colors[scheme].card, transform: [{ translateY: sheetTranslate }] },
           ]}
           onStartShouldSetResponder={() => true}
           onResponderGrant={onSheetResponderGrant}
@@ -234,7 +274,7 @@ export function ColorPickerModal({ visible, selectedColor, onSelectColor, onClos
             ))}
           </View>
 
-          </View>
+          </Animated.View>
         </Pressable>
     </Modal>
   );

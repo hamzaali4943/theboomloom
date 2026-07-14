@@ -66,9 +66,10 @@ export const WeavingLoom = React.memo(function WeavingLoom({
   const scheme = useColorScheme() ?? 'light';
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
   // The treadling grid can widen to ~1/3 of the screen (and compress the pattern
-  // grid) so its cells are comfortable to tap. Tapping the treadle grid expands
-  // it in either mode; tapping the pattern workspace collapses it. Weft mode
-  // starts expanded by default.
+  // grid) so its cells are comfortable to tap. While collapsed, the first tap on
+  // the treadle grid only pops it out (no toggle); once expanded, taps toggle
+  // treadles. Tapping the pattern workspace collapses it again. Weft mode starts
+  // expanded by default, so taps there act immediately.
   const [expanded, setExpanded] = useState(tapMode === 'row');
 
   // Switching mode resets the layout: weft starts expanded, warp starts collapsed.
@@ -128,6 +129,14 @@ export const WeavingLoom = React.memo(function WeavingLoom({
   // Touch handler for treadling grid — content draws from bottom up
   const handleTreadleTouch = useCallback(
     (e: GestureResponderEvent) => {
+      // First tap while collapsed only pops the band out — it does NOT toggle a
+      // treadle. This stops accidental edits from a guess at the tiny collapsed
+      // cells; you open the band first, then work on the comfortable wide cells.
+      if (!expanded) {
+        setExpanded(true);
+        return;
+      }
+
       const x = e.nativeEvent.locationX;
       const y = e.nativeEvent.locationY;
       const col = Math.floor(x / treadleCellWidth);
@@ -139,12 +148,10 @@ export const WeavingLoom = React.memo(function WeavingLoom({
         row >= 0 &&
         row < sNum
       ) {
-        // Interacting with the treadle cells expands the grid for easier tapping.
-        setExpanded(true);
         onToggleTreadle(row, col);
       }
     },
-    [treadleCellWidth, cellHeight, loomTopPad, gridHeight, sNum, onToggleTreadle],
+    [expanded, treadleCellWidth, cellHeight, loomTopPad, gridHeight, sNum, onToggleTreadle],
   );
 
   // Touch handler for pattern grid — behaviour depends on tapMode

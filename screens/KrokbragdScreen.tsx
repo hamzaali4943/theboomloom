@@ -37,10 +37,37 @@ export function KrokbragdScreen() {
   const scheme = useColorScheme() ?? 'light';
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [selectedRowIndex, setSelectedRowIndex] = useState(-1);
-  // Tapping the treadle grid expands it to ~1/3 of the screen for easier tapping;
-  // tapping the pattern workspace collapses it back.
+  // The first tap on the treadle grid only pops it out to ~1/3 of the screen for
+  // easier tapping; once expanded, taps toggle treadles. Tapping the pattern
+  // workspace collapses it back.
   const [expanded, setExpanded] = useState(false);
   const { pendingLoad, clearPendingLoad } = useDesignLoad();
+
+  // Weaving builds from the bottom up, so start the view resting at the bottom
+  // of the loom (row 0) instead of the top. Scroll to the end once the content
+  // has laid out; the guard keeps later content changes from yanking the view.
+  const scrollRef = useRef<ScrollView>(null);
+  const didInitialScroll = useRef(false);
+  const scrollToBottom = useCallback(() => {
+    if (didInitialScroll.current) return;
+    didInitialScroll.current = true;
+    scrollRef.current?.scrollToEnd({ animated: false });
+  }, []);
+  // On tab switch the content size may not change (the loom is already laid
+  // out), so onContentSizeChange won't fire. Reset the view to the bottom
+  // directly on focus. The Krokbragd loom is Skia-rendered and its final
+  // height only settles a couple of frames after focus, so a single rAF fires
+  // too early and the scroll lands short. Retry over several frames to catch
+  // the settled layout.
+  const resetViewToBottom = useCallback(() => {
+    didInitialScroll.current = false;
+    let frame = 0;
+    const tick = () => {
+      scrollRef.current?.scrollToEnd({ animated: false });
+      if (frame++ < 5) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, []);
 
   const screenWidth = Dimensions.get('window').width;
 
@@ -110,11 +137,13 @@ export function KrokbragdScreen() {
       // Re-entering the tab starts in normal mode (treadle grid collapsed).
       setExpanded(false);
       setSelectedRowIndex(-1);
+      // Reset the bottom-first view on every re-entry (e.g. switching patterns).
+      resetViewToBottom();
       if (pendingLoad?.patternType === 'krokbragd') {
         loadDesign(pendingLoad.snapshot as KrokbragdSnapshot);
         clearPendingLoad();
       }
-    }, [pendingLoad, loadDesign, clearPendingLoad]),
+    }, [pendingLoad, loadDesign, clearPendingLoad, resetViewToBottom]),
   );
 
   const handleSave = useCallback(() => {
@@ -137,16 +166,22 @@ export function KrokbragdScreen() {
   // Touch handler for the staggered treadle grid
   const handleTreadleTouch = useCallback(
     (e: GestureResponderEvent) => {
+      // First tap while collapsed only pops the band out — it does NOT toggle a
+      // treadle. This stops accidental edits from a guess at the tiny collapsed
+      // cells; you open the band first, then work on the comfortable wide cells.
+      if (!expanded) {
+        setExpanded(true);
+        return;
+      }
+
       const x = e.nativeEvent.locationX;
       const y = e.nativeEvent.locationY;
       const hit = getKrokbragdTreadleHitTest(x, y, loomTopPad, gridHeight, treadleCellWidth);
       if (hit && hit.row >= 0 && hit.row < sNum) {
-        // Interacting with the treadle cells expands the grid for easier tapping.
-        setExpanded(true);
         toggleTreadle(hit.row, hit.col);
       }
     },
-    [loomTopPad, gridHeight, sNum, treadleCellWidth, toggleTreadle],
+    [expanded, loomTopPad, gridHeight, sNum, treadleCellWidth, toggleTreadle],
   );
 
   // Touch handler for pattern grid — row selection only (no warp coloring)
@@ -202,28 +237,12 @@ export function KrokbragdScreen() {
       />
 
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
+        onContentSizeChange={scrollToBottom}
       >
-        {/* Current color button → opens modal */}
-        <Pressable onPress={openColorPicker} style={styles.colorBtnRow}>
-          <View
-            style={[
-              styles.colorCircle,
-              { backgroundColor: selectedColor, borderColor: '#708df4' },
-            ]}
-          />
-          <View>
-            <ThemedText style={styles.colorLabel}>current color</ThemedText>
-            <ThemedText
-              style={[styles.colorHint, { color: Colors[scheme].textSecondary }]}
-            >
-              tap to customize
-            </ThemedText>
-          </View>
-        </Pressable>
-
         {/* Loom area with custom Krokbragd grids */}
         <ScrollView
           horizontal
@@ -357,6 +376,25 @@ export function KrokbragdScreen() {
           </View>
         </ScrollView>
 
+        {/* Current color button sits below the loom, near your focus at the
+            bottom of the weave. */}
+        <Pressable onPress={openColorPicker} style={styles.colorBtnRow}>
+          <View
+            style={[
+              styles.colorCircle,
+              { backgroundColor: selectedColor, borderColor: '#708df4' },
+            ]}
+          />
+          <View>
+            <ThemedText style={styles.colorLabel}>current color</ThemedText>
+            <ThemedText
+              style={[styles.colorHint, { color: Colors[scheme].textSecondary }]}
+            >
+              tap to customize
+            </ThemedText>
+          </View>
+        </Pressable>
+
         {/* Color sequence display — only shown once a pattern has been drawn */}
         {colorSequence.length > 0 && (
           <View style={[styles.seqContainer, { backgroundColor: Colors[scheme].surface }]}>
@@ -488,6 +526,7 @@ const styles = StyleSheet.create({
   actionRow: {
     flexDirection: 'row',
     marginHorizontal: 16,
+    marginTop: 12,
     gap: 10,
   },
   actionBtn: {
