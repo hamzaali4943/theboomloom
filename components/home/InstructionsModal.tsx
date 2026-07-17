@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Animated, Dimensions, Linking, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
@@ -7,28 +7,31 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 const SCREEN_H = Dimensions.get('window').height;
 
-// A short, friendly guide to designing on the loom. Each tip is one quick,
-// scannable line so a new weaver actually stops and reads it.
-const TIPS: { emoji: string; title: string; body: string }[] = [
+// The how-to resource on theboomloom.com
+const HELP_URL = 'https://www.theboomloom.com/';
+
+// A short, friendly guide to designing on the loom. Each step is numbered so it
+// reads as a clear, premium walkthrough rather than a loose list of tips.
+const STEPS: { emoji: string; title: string; body: string }[] = [
   {
-    emoji: '🧵',
+    emoji: '◧',
     title: 'Pick your pattern',
-    body: 'Tap any tile on the home screen to open its loom and start designing.',
+    body: 'Tap any tile on the home screen to open a workspace.',
   },
   {
     emoji: '🎨',
     title: 'Choose a color',
-    body: 'Tap the color button, grab a swatch or mix your own, then hit save.',
-  },
-  {
-    emoji: '⬆️',
-    title: 'Build from the bottom up',
-    body: 'Just like real weaving, your design grows upward, one row at a time.',
+    body: 'Tap the current color circle to change it. Pick one of the preset colors or select from the palette and hit save.',
   },
   {
     emoji: '👆',
     title: 'Tap to weave',
-    body: 'Tap a thread or row to color it. Tap again to undo. That is it!',
+    body: 'Your loom is warped (vertical) with grey. To color a warp thread, tap on it and tap again to undo.\n\nTo weave a weft row (horizontal), tap in the pop-out grid on the right. Tap again to undo or change the color. Each number is one of the pattern-bar positions. Experiment with different bar positions to change the pattern. Boom, you are weaving!',
+  },
+  {
+    emoji: '🧶',
+    title: 'Now weave it IRL!',
+    body: 'When you’re done designing, find the bar positions to make your piece on the Boss at the bottom of the screen. Save your pattern for later by tapping Save.',
   },
 ];
 
@@ -41,6 +44,7 @@ export function InstructionsModal({ visible, onClose }: Props) {
   const scheme = useColorScheme() ?? 'light';
   const card = Colors[scheme].card;
   const border = Colors[scheme].border;
+  const text = Colors[scheme].text;
   const textSecondary = Colors[scheme].textSecondary;
   const accent = Colors[scheme].info;
 
@@ -115,7 +119,12 @@ export function InstructionsModal({ visible, onClose }: Props) {
         <Animated.View
           style={[
             styles.sheet,
-            { backgroundColor: card, transform: [{ translateY: sheetTranslate }] },
+            {
+              backgroundColor: card,
+              borderColor: border,
+              shadowColor: accent,
+              transform: [{ translateY: sheetTranslate }],
+            },
           ]}
         >
           {/* Header zone — drag down here to close */}
@@ -131,35 +140,63 @@ export function InstructionsModal({ visible, onClose }: Props) {
             {/* Drag handle */}
             <View style={[styles.handle, { backgroundColor: border }]} />
 
-            {/* Title */}
-            <ThemedText style={styles.title}>How weaving works</ThemedText>
+            {/* Eyebrow + title + subtitle */}
+            <ThemedText style={[styles.eyebrow, { color: accent }]}>GETTING STARTED</ThemedText>
+            <ThemedText style={[styles.title, { color: text }]}>How to use this app</ThemedText>
+            <ThemedText style={[styles.subtitle, { color: textSecondary }]}>
+              a quick tour of the studio ›
+            </ThemedText>
           </View>
 
-          <ThemedText style={[styles.intro, { color: textSecondary }]}>
-            New here? Weaving is easy. Here are four quick tips to get you going.
-          </ThemedText>
+          {/* Intro card — sets the brand context with a soft accent wash */}
+          <View style={[styles.introCard, { backgroundColor: accent + '0F', borderColor: accent + '22' }]}>
+            <ThemedText style={[styles.introText, { color: text }]}>
+              This app is made to work with the{' '}
+              <ThemedText style={[styles.introStrong, { color: text }]}>Boss from Boomloom</ThemedText>,
+              but the patterns can be woven on any loom.
+            </ThemedText>
+          </View>
 
           <ScrollView
             style={styles.steps}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.stepsContent}
           >
-            {TIPS.map((tip, i) => (
-              <View key={i} style={[styles.tip, { backgroundColor: accent + '12' }]}>
-                <View style={[styles.emojiWrap, { backgroundColor: accent + '20' }]}>
-                  <ThemedText style={styles.emoji}>{tip.emoji}</ThemedText>
+            {STEPS.map((step, i) => (
+              <View
+                key={i}
+                style={[styles.step, { backgroundColor: card, borderColor: border, shadowColor: accent }]}
+              >
+                {/* Emoji glyph in a soft accent tile */}
+                <View style={[styles.stepIcon, { backgroundColor: accent + '18' }]}>
+                  <ThemedText style={styles.stepEmoji}>{step.emoji}</ThemedText>
                 </View>
-                <View style={styles.tipText}>
-                  <ThemedText style={styles.tipTitle}>{tip.title}</ThemedText>
-                  <ThemedText style={[styles.tipBody, { color: textSecondary }]}>
-                    {tip.body}
+
+                <View style={styles.stepText}>
+                  <ThemedText style={[styles.stepTitle, { color: text }]}>{step.title}</ThemedText>
+                  <ThemedText style={[styles.stepBody, { color: textSecondary }]}>
+                    {step.body}
                   </ThemedText>
                 </View>
               </View>
             ))}
+
+            {/* Help link out to theboomloom.com */}
+            <ThemedText style={[styles.help, { color: textSecondary }]}>
+              For weaving help and sample projects, check out the how-to videos at{' '}
+              <ThemedText
+                style={[styles.helpLink, { color: accent }]}
+                onPress={() => Linking.openURL(HELP_URL).catch(() => {})}
+              >
+                theboomloom.com
+              </ThemedText>
+            </ThemedText>
           </ScrollView>
 
-          <Pressable onPress={onClose} style={[styles.doneBtn, { backgroundColor: accent }]}>
+          <Pressable
+            onPress={onClose}
+            style={[styles.doneBtn, { backgroundColor: accent, shadowColor: accent }]}
+          >
             <ThemedText style={styles.doneBtnText}>Let’s weave!</ThemedText>
           </Pressable>
         </Animated.View>
@@ -175,81 +212,136 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(15,16,40,0.55)',
   },
   sheet: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    paddingBottom: 40,
-    gap: 14,
-    maxHeight: '82%',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 22,
+    paddingTop: 12,
+    paddingBottom: 36,
+    gap: 16,
+    maxHeight: '86%',
+    // Soft lift off the backdrop
+    shadowOffset: { width: 0, height: -6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    elevation: 24,
   },
   headerZone: {
-    gap: 14,
+    gap: 4,
   },
   handle: {
-    width: 44,
+    width: 40,
     height: 5,
     borderRadius: 3,
     alignSelf: 'center',
+    marginBottom: 14,
+    opacity: 0.7,
+  },
+  eyebrow: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.5,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+    fontSize: 24,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+    marginTop: 3,
   },
-  intro: {
+  subtitle: {
     fontSize: 13,
-    lineHeight: 18,
-    marginTop: -4,
+    fontWeight: '600',
+    marginTop: 3,
+  },
+  introCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingVertical: 13,
+    paddingHorizontal: 15,
+  },
+  introText: {
+    fontSize: 13.5,
+    lineHeight: 20,
+  },
+  introStrong: {
+    fontWeight: '800',
   },
   steps: {
     flexGrow: 0,
   },
   stepsContent: {
-    gap: 10,
-    paddingVertical: 4,
+    gap: 12,
+    paddingVertical: 2,
+    paddingBottom: 6,
   },
-  tip: {
+  step: {
     flexDirection: 'row',
-    alignItems: 'center',
     gap: 14,
-    borderRadius: 16,
-    padding: 12,
+    borderRadius: 18,
+    borderWidth: 1,
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    // Subtle card elevation for depth
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
   },
-  emojiWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+  stepIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
-  emoji: {
-    fontSize: 22,
-    lineHeight: 28,
+  stepEmoji: {
+    fontSize: 20,
+    lineHeight: 24,
   },
-  tipText: {
+  stepText: {
     flex: 1,
-    gap: 2,
+    gap: 4,
+    paddingTop: 1,
   },
-  tipTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+  stepTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: -0.2,
   },
-  tipBody: {
+  stepBody: {
     fontSize: 13,
+    lineHeight: 19,
+  },
+  help: {
+    fontSize: 12,
     lineHeight: 18,
+    paddingHorizontal: 4,
+    paddingTop: 4,
+    textAlign: 'center',
+  },
+  helpLink: {
+    fontSize: 12,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
   },
   doneBtn: {
-    borderRadius: 14,
-    paddingVertical: 14,
+    borderRadius: 16,
+    paddingVertical: 16,
     alignItems: 'center',
+    // Accent glow lifts the primary CTA
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 6,
   },
   doneBtnText: {
     color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: 0.2,
   },
 });
