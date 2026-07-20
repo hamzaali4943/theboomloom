@@ -4,6 +4,7 @@ import { Animated, Dimensions, Linking, Modal, Pressable, ScrollView, StyleSheet
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { COLOR_PRESETS } from '@/components/shared/weaving-data';
 
 const SCREEN_H = Dimensions.get('window').height;
 
@@ -12,14 +13,15 @@ const HELP_URL = 'https://www.theboomloom.com/';
 
 // A short, friendly guide to designing on the loom. Each step is numbered so it
 // reads as a clear, premium walkthrough rather than a loose list of tips.
-const STEPS: { emoji: string; title: string; body: string }[] = [
+// `palette` swaps the emoji for a live color-palette circle (the app's presets).
+const STEPS: { emoji?: string; palette?: boolean; title: string; body: string }[] = [
   {
     emoji: '◧',
     title: 'Pick your pattern',
     body: 'Tap any tile on the home screen to open a workspace.',
   },
   {
-    emoji: '🎨',
+    palette: true,
     title: 'Choose a color',
     body: 'Tap the current color circle to change it. Pick one of the preset colors or select from the palette and hit save.',
   },
@@ -34,6 +36,29 @@ const STEPS: { emoji: string; title: string; body: string }[] = [
     body: 'When you’re done designing, find the bar positions to make your piece on the Boss at the bottom of the screen. Save your pattern for later by tapping Save.',
   },
 ];
+
+// A small multi-color palette circle built from the app's preset swatches.
+// Four color wedges arranged as quarter-circles inside a round, bordered dot.
+function PaletteCircle({ border }: { border: string }) {
+  const [c1, c2, c3, c4] = [
+    COLOR_PRESETS[1], // pink
+    COLOR_PRESETS[2], // green
+    COLOR_PRESETS[3], // yellow
+    COLOR_PRESETS[0], // red
+  ];
+  return (
+    <View style={[styles.palette, { borderColor: border }]}>
+      <View style={styles.paletteRow}>
+        <View style={[styles.paletteCell, { backgroundColor: c1 }]} />
+        <View style={[styles.paletteCell, { backgroundColor: c2 }]} />
+      </View>
+      <View style={styles.paletteRow}>
+        <View style={[styles.paletteCell, { backgroundColor: c3 }]} />
+        <View style={[styles.paletteCell, { backgroundColor: c4 }]} />
+      </View>
+    </View>
+  );
+}
 
 type Props = {
   visible: boolean;
@@ -167,10 +192,14 @@ export function InstructionsModal({ visible, onClose }: Props) {
                 key={i}
                 style={[styles.step, { backgroundColor: card, borderColor: border, shadowColor: accent }]}
               >
-                {/* Emoji glyph in a soft accent tile */}
-                <View style={[styles.stepIcon, { backgroundColor: accent + '18' }]}>
-                  <ThemedText style={styles.stepEmoji}>{step.emoji}</ThemedText>
-                </View>
+                {/* Palette circle for the color step; emoji circle otherwise */}
+                {step.palette ? (
+                  <PaletteCircle border={border} />
+                ) : (
+                  <View style={[styles.stepIcon, { backgroundColor: accent + '18' }]}>
+                    <ThemedText style={styles.stepEmoji}>{step.emoji}</ThemedText>
+                  </View>
+                )}
 
                 <View style={styles.stepText}>
                   <ThemedText style={[styles.stepTitle, { color: text }]}>{step.title}</ThemedText>
@@ -293,7 +322,7 @@ const styles = StyleSheet.create({
   stepIcon: {
     width: 40,
     height: 40,
-    borderRadius: 13,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
@@ -301,6 +330,20 @@ const styles = StyleSheet.create({
   stepEmoji: {
     fontSize: 20,
     lineHeight: 24,
+  },
+  palette: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2,
+    overflow: 'hidden',
+  },
+  paletteRow: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  paletteCell: {
+    flex: 1,
   },
   stepText: {
     flex: 1,
