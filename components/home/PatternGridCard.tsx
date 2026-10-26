@@ -7,6 +7,13 @@ import { Colors } from '@/constants/theme';
 type Props = {
   letter: string;
   icon?: ImageSourcePropType;
+  /**
+   * Text wordmark used when no `icon` image exists — one entry per line, e.g.
+   * ['rose', 'path']. Mimics the stacked lettering of the artwork tiles so a
+   * pattern without a supplied PNG still matches the grid. Drops away
+   * automatically once `icon` is provided.
+   */
+  wordmark?: string[];
   iconBg?: string;
   label: string;
   accent: string;
@@ -16,8 +23,11 @@ type Props = {
 /**
  * Compact square tile for the home grid: a colored icon panel on top with the
  * (black) logo, and the pattern name underneath. Sized to fit 3 per row.
+ *
+ * The panel shows, in order of preference: `icon` artwork, then a `wordmark`
+ * text stack, then a single `letter`.
  */
-export function PatternGridCard({ letter, icon, iconBg, label, accent, onPress }: Props) {
+export function PatternGridCard({ letter, icon, wordmark, iconBg, label, accent, onPress }: Props) {
   const scheme = useColorScheme() ?? 'light';
   const surface = Colors[scheme].surface;
   const border = Colors[scheme].border;
@@ -33,6 +43,20 @@ export function PatternGridCard({ letter, icon, iconBg, label, accent, onPress }
       <View style={[styles.iconPanel, { backgroundColor: iconBg ?? accent + '18' }]}>
         {icon ? (
           <Image source={icon} style={styles.iconImage} resizeMode="contain" />
+        ) : wordmark?.length ? (
+          <View style={styles.wordmarkWrap}>
+            {wordmark.map((line) => (
+              <Text
+                key={line}
+                style={styles.wordmarkLine}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.4}
+              >
+                {line}
+              </Text>
+            ))}
+          </View>
         ) : (
           <Text style={[styles.letter, { color: accent }]}>{letter}</Text>
         )}
@@ -84,6 +108,21 @@ const styles = StyleSheet.create({
     fontSize: 34,
     fontWeight: '800',
     letterSpacing: -1,
+  },
+  // Text stand-in for the artwork tiles: heavy black lettering, tightly
+  // stacked, filling the panel the way the supplied PNGs do.
+  wordmarkWrap: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  wordmarkLine: {
+    fontSize: 34,
+    lineHeight: 34,
+    fontWeight: '900',
+    letterSpacing: -1.5,
+    color: '#000000',
+    textAlign: 'center',
   },
   labelWrap: {
     width: '100%',

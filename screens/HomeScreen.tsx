@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ImageSourcePropType, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { HowTosSection } from '@/components/home/HowTosSection';
 import { InstructionsModal } from '@/components/home/InstructionsModal';
@@ -13,7 +13,20 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-const TOOLS = [
+type Tool = {
+  key:
+    | 'plain' | 'twill' | 'diamond' | 'waffle' | 'rosepath'
+    | 'monks-belt' | 'krokbragd' | 'saved';
+  letter: string;
+  icon?: ImageSourcePropType;
+  wordmark?: string[];
+  label: string;
+  description: string;
+  accent: string;
+  bg: string;
+};
+
+const TOOLS: Tool[] = [
   {
     key: 'plain' as const,
     letter: 'P',
@@ -21,7 +34,7 @@ const TOOLS = [
     label: 'plain weave',
     description: 'classic over-under pattern',
     accent: '#D97706',
-    bg: '#FFFFFF', // white
+    bg: '#FFFFFF',
   },
   {
     key: 'twill' as const,
@@ -30,7 +43,7 @@ const TOOLS = [
     label: '2/2 twill',
     description: 'diagonal rib',
     accent: '#B45309',
-    bg: '#FF3130', // red
+    bg: '#FF3130',
   },
   {
     key: 'diamond' as const,
@@ -39,29 +52,27 @@ const TOOLS = [
     label: 'diamond',
     description: 'diamond twill',
     accent: '#9BA2DD',
-    bg: '#C7C3F5', // lavender
+    bg: '#C7C3F5',
   },
   {
     key: 'waffle' as const,
     letter: 'W',
-    // TODO: swap in the client's waffle.png once supplied; falls back to the
-    // letter tile until then (same as the 'saved' entry below).
     icon: undefined,
+    wordmark: ['waffle'],
     label: 'waffle',
     description: 'deep textured cells',
     accent: '#C2410C',
-    bg: '#F2D5B3', // warm tan
+    bg: '#F2D5B3',
   },
   {
     key: 'rosepath' as const,
     letter: 'R',
-    // TODO: swap in the client's rosepath.png once supplied; falls back to the
-    // letter tile until then (same as the 'saved' entry below).
     icon: undefined,
+    wordmark: ['rose', 'path'],
     label: 'rosepath',
     description: 'stepping diamond motif',
     accent: '#BE185D',
-    bg: '#F7D4DF', // pale rose
+    bg: '#F7D4DF',
   },
   {
     key: 'monks-belt' as const,
@@ -70,7 +81,7 @@ const TOOLS = [
     label: "monk's belt",
     description: "grid of floats on plain weave",
     accent: '#7C3AED',
-    bg: '#B0B0B0', // grey
+    bg: '#B0B0B0',
   },
   {
     key: 'krokbragd' as const,
@@ -79,7 +90,7 @@ const TOOLS = [
     label: 'krokbragd',
     description: 'Scandinavian rug weave',
     accent: '#0F434F',
-    bg: '#BFF747', // lime green
+    bg: '#BFF747',
   },
   {
     key: 'saved' as const,
@@ -88,7 +99,7 @@ const TOOLS = [
     label: 'saved',
     description: 'your saved designs',
     accent: '#0F434F',
-    bg: '#F5F5F5', // off-white
+    bg: '#F5F5F5',
   },
 ];
 
@@ -116,7 +127,6 @@ export function HomeScreen() {
       >
         <WelcomeBanner />
 
-        {/* New-here? → opens the in-app instructions */}
         <Pressable
           style={[styles.helpBtn, { backgroundColor: surface, borderColor: border, shadowColor: shadow }]}
           onPress={() => setInstructionsOpen(true)}
@@ -142,6 +152,7 @@ export function HomeScreen() {
               key={tool.key}
               letter={tool.letter}
               icon={tool.icon}
+              wordmark={tool.wordmark}
               iconBg={tool.bg}
               label={tool.label}
               accent={tool.accent}
