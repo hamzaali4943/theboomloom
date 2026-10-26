@@ -1,3 +1,19 @@
+/**
+ * PatternStudioScreen — the single screen behind Plain, 2/2 Twill, Diamond
+ * and Waffle.
+ *
+ * These four patterns share one state engine (useWeavingState): 40 warps,
+ * 4 treadles, one treadle active per row, one weft colour per row. They
+ * differed only in a pattern index and a few labels, so they are driven from
+ * here instead of four near-identical copies.
+ *
+ * Each tab route is a thin wrapper that supplies the props below, e.g.
+ *   <PatternStudioScreen patternType="waffle" patternIndex={3} … />
+ *
+ * NOT used by Monk's Belt (different snapshot shape — see WAFFLE_PATTERN_PLAN
+ * §5) or Krokbragd (different grid, treadle count, colour model and renderer).
+ */
+
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, View } from 'react-native';
@@ -9,18 +25,33 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 import { useWeavingState } from '@/components/pattern-studio/useWeavingState';
+import type { PatternIndex } from '@/components/pattern-studio/pattern-data';
 import { WARP_COUNT, TREADLE_COUNT, DH, PATTERN_ASPECT } from '@/components/shared/weaving-data';
 import { ColorPickerModal } from '@/components/shared/ColorPickerModal';
 import { WeavingLoom } from '@/components/shared/WeavingLoom';
 import { TreadlingSequence } from '@/components/shared/TreadlingSequence';
 import { useDesignLoad } from '@/context/DesignLoadContext';
 import { saveDesign } from '@/utils/saveDesign';
-import type { WeavingSnapshot } from '@/types/saved-design';
+import type { PatternType, WeavingSnapshot } from '@/types/saved-design';
 
 const TREADLE_WIDTH = TREADLE_COUNT * DH;
 const GRID_GAP = Math.round(1.5 * DH);
 
-export function PlainScreen() {
+type Props = {
+  /** Which saved-design bucket this screen reads and writes. */
+  patternType: PatternType;
+  /** Index into PATTERN_ROWS — 0 plain, 1 twill, 2 diamond, 3 waffle. */
+  patternIndex: PatternIndex;
+  title: string;
+  subtitle: string;
+};
+
+export function PatternStudioScreen({
+  patternType,
+  patternIndex,
+  title,
+  subtitle,
+}: Props) {
   const scheme = useColorScheme() ?? 'light';
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
   const [tapMode, setTapMode] = useState<'thread' | 'row'>('thread');
@@ -68,27 +99,28 @@ export function PlainScreen() {
     resetAll,
     loadDesign,
     getSnapshot,
-  } = useWeavingState(gridHeight, 0);
+  } = useWeavingState(gridHeight, patternIndex);
 
-  // When this screen gains focus and a 'plain' design is pending, restore it
+  // When this screen gains focus and a design for this pattern is pending,
+  // restore it.
   useFocusEffect(
     useCallback(() => {
       // Re-entering the tab defaults to warp mode (treadle grid not expanded).
       setTapMode('thread');
       // Reset the bottom-first view on every re-entry (e.g. switching patterns).
       resetViewToBottom();
-      if (pendingLoad?.patternType === 'plain') {
+      if (pendingLoad?.patternType === patternType) {
         loadDesign(pendingLoad.snapshot as WeavingSnapshot);
         clearPendingLoad();
       }
-    }, [pendingLoad, loadDesign, clearPendingLoad, resetViewToBottom]),
+    }, [pendingLoad, patternType, loadDesign, clearPendingLoad, resetViewToBottom]),
   );
 
   const handleSave = useCallback(() => {
-    saveDesign('plain', getSnapshot())
+    saveDesign(patternType, getSnapshot())
       .then(() => Alert.alert('Saved', 'Design saved to your collection.'))
       .catch((err) => Alert.alert('Cannot Save', err?.message ?? 'Could not save the design.'));
-  }, [getSnapshot]);
+  }, [patternType, getSnapshot]);
 
   const handleReset = useCallback(() => {
     Alert.alert(
@@ -125,8 +157,8 @@ export function PlainScreen() {
   return (
     <SafeScreen>
       <Header
-        title="plain weave"
-        subtitle="classic over-under"
+        title={title}
+        subtitle={subtitle}
       />
 
       <ScrollView

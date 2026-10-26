@@ -42,6 +42,28 @@ const TOOLS = [
     bg: '#C7C3F5', // lavender
   },
   {
+    key: 'waffle' as const,
+    letter: 'W',
+    // TODO: swap in the client's waffle.png once supplied; falls back to the
+    // letter tile until then (same as the 'saved' entry below).
+    icon: undefined,
+    label: 'waffle',
+    description: 'deep textured cells',
+    accent: '#C2410C',
+    bg: '#F2D5B3', // warm tan
+  },
+  {
+    key: 'rosepath' as const,
+    letter: 'R',
+    // TODO: swap in the client's rosepath.png once supplied; falls back to the
+    // letter tile until then (same as the 'saved' entry below).
+    icon: undefined,
+    label: 'rosepath',
+    description: 'stepping diamond motif',
+    accent: '#BE185D',
+    bg: '#F7D4DF', // pale rose
+  },
+  {
     key: 'monks-belt' as const,
     letter: 'M',
     icon: require('@/assets/images/monksbelt.png'),

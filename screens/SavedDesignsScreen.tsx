@@ -34,13 +34,18 @@ import { DESIGNS_PER_PATTERN_LIMIT } from '@/utils/saveDesign';
 import type { PatternType, SavedDesign } from '@/types/saved-design';
 
 // Canonical display order for pattern sections
-const PATTERN_ORDER: PatternType[] = ['plain', 'twill', 'diamond', 'monks-belt', 'krokbragd'];
+// NOTE: this is a plain array, not a Record<PatternType, …>, so TypeScript
+// will NOT flag a missing pattern here. Omitting one silently hides every
+// design of that type from this screen. Add new patterns here too.
+const PATTERN_ORDER: PatternType[] = ['plain', 'twill', 'diamond', 'waffle', 'rosepath', 'monks-belt', 'krokbragd'];
 
 // Maps each patternType to its tab route path
 const TAB_PATH: Record<PatternType, string> = {
   plain: '/(tabs)/plain',
   twill: '/(tabs)/twill',
   diamond: '/(tabs)/diamond',
+  waffle: '/(tabs)/waffle',
+  rosepath: '/(tabs)/rosepath',
   'monks-belt': '/(tabs)/monks-belt',
   krokbragd: '/(tabs)/krokbragd',
 };
@@ -50,6 +55,8 @@ const PATTERN_ACCENT: Record<PatternType, string> = {
   plain: '#D97706',
   twill: '#B45309',
   diamond: '#9BA2DD',
+  waffle: '#C2410C', // TODO: replace with the client's brand colour
+  rosepath: '#BE185D', // TODO: replace with the client's brand colour
   'monks-belt': '#7C3AED',
   krokbragd: '#0F434F',
 };
@@ -58,6 +65,8 @@ const PATTERN_LABEL: Record<PatternType, string> = {
   plain: 'Plain Weave',
   twill: '2/2 Twill',
   diamond: 'Diamond',
+  waffle: 'Waffle',
+  rosepath: 'Rosepath',
   'monks-belt': "Monk's Belt",
   krokbragd: 'Krokbragd',
 };

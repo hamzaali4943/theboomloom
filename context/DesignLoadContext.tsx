@@ -13,7 +13,7 @@
  *   1. User taps "Load" on a design in SavedDesignsScreen
  *   2. `scheduleLoad({ patternType, snapshot })` is called → context state updates
  *   3. `router.push('/(tabs)/plain')` navigates to the correct tab
- *   4. PlainScreen gains focus → its `useFocusEffect` fires
+ *   4. The target screen gains focus → its `useFocusEffect` fires
  *   5. It reads `pendingLoad` from context, calls `loadDesign(snapshot)`,
  *      then calls `clearPendingLoad()` so it doesn't reload on next focus
  *

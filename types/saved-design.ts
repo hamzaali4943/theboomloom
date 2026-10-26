@@ -3,7 +3,8 @@
  *
  * Three distinct snapshot shapes exist because each pattern tool
  * has a different state structure:
- *  - WeavingSnapshot  → Plain, Twill, Diamond  (share useWeavingState)
+ *  - WeavingSnapshot  → Plain, Twill, Diamond, Waffle, Rosepath
+ *                       (all share useWeavingState)
  *  - MonksBeltSnapshot → Monk's Belt
  *  - KrokbragdSnapshot → Krokbragd
  *
@@ -16,12 +17,15 @@ export type PatternType =
   | 'plain'
   | 'twill'
   | 'diamond'
+  | 'waffle'
+  | 'rosepath'
   | 'monks-belt'
   | 'krokbragd';
 
-// ── Snapshot for Plain / Twill / Diamond ─────────────────────────────────────
+// ── Snapshot for Plain / Twill / Diamond / Waffle / Rosepath ─────────────────
 export interface WeavingSnapshot {
-  currentPattern: 0 | 1 | 2;    // 0=Plain, 1=Twill, 2=Diamond
+  // 0=Plain, 1=Twill, 2=Diamond, 3=Waffle, 4=Rosepath
+  currentPattern: 0 | 1 | 2 | 3 | 4;
   colorWa: string[];             // warp thread colors  [WARP_COUNT]
   colorS: string[];              // weft thread colors  [MAX_WEFT]
   S: boolean[][];                // treadle activations [MAX_WEFT][TREADLE_COUNT]

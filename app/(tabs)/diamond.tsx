@@ -1,3 +1,12 @@
-import { DiamondScreen } from '@/screens/DiamondScreen';
+import { PatternStudioScreen } from '@/screens/PatternStudioScreen';
 
-export default DiamondScreen;
+export default function DiamondTab() {
+  return (
+    <PatternStudioScreen
+      patternType="diamond"
+      patternIndex={2}
+      title="diamond"
+      subtitle="diamond weave pattern"
+    />
+  );
+}

@@ -23,6 +23,8 @@ const PATTERN_LABELS: Record<PatternType, string> = {
   plain: 'Plain Weave',
   twill: '2/2 Twill',
   diamond: 'Diamond',
+  waffle: 'Waffle',
+  rosepath: 'Rosepath',
   'monks-belt': "Monk's Belt",
   krokbragd: 'Krokbragd',
 };

@@ -28,6 +28,12 @@ export default function TabLayout() {
         tabBarInactiveTintColor: Colors[colorScheme].tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
+        // Icon-only tabs. With nine tabs there is not enough width for text —
+        // labels truncated to "2/2 T...", "Diam...", "Rose..." and so on, which
+        // read worse than nothing. Each pattern's icon is its initial letter.
+        // `title` is kept on every screen so screen readers still announce the
+        // full name.
+        tabBarShowLabel: false,
         // Position absolutely so the bar is flush with screen bottom on mobile
         tabBarStyle: {
           position: 'absolute',
@@ -38,12 +44,9 @@ export default function TabLayout() {
           borderTopColor: border,
           borderTopWidth: 1,
           height: tabBarHeight,
-          paddingBottom: 8 + bottomInset,
-          paddingTop: 4,
-        },
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '600',
+          // No label row to leave space for, so the icon centres in the bar.
+          paddingBottom: bottomInset,
+          paddingTop: 0,
         },
       }}>
       <Tabs.Screen
@@ -72,6 +75,20 @@ export default function TabLayout() {
         options={{
           title: 'Diamond',
           tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>D</Text>,
+        }}
+      />
+      <Tabs.Screen
+        name="waffle"
+        options={{
+          title: 'Waffle',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>W</Text>,
+        }}
+      />
+      <Tabs.Screen
+        name="rosepath"
+        options={{
+          title: 'Rosepath',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>R</Text>,
         }}
       />
       <Tabs.Screen
