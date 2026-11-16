@@ -5,9 +5,11 @@ import { StyleSheet, View } from 'react-native';
 type Props = {
   title: string;
   subtitle?: string;
+  /** Short weaving instruction shown under the subtitle, e.g. which treadles to use. */
+  hint?: string;
 };
 
-export function Header({ title, subtitle }: Props) {
+export function Header({ title, subtitle, hint }: Props) {
   const surface = useThemeColor({}, 'surface');
   const border = useThemeColor({}, 'border');
   const textSecondary = useThemeColor({}, 'textSecondary');
@@ -21,6 +23,7 @@ export function Header({ title, subtitle }: Props) {
             {subtitle}
           </ThemedText>
         ) : null}
+        {hint ? <ThemedText style={styles.hint}>{hint}</ThemedText> : null}
       </View>
     </View>
   );
@@ -46,6 +49,11 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     marginTop: 2,
+  },
+  hint: {
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 4,
   },
   
 });

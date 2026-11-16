@@ -44,6 +44,8 @@ type Props = {
   patternIndex: PatternIndex;
   title: string;
   subtitle: string;
+  /** Optional weaving instruction shown in the header under the subtitle. */
+  hint?: string;
 };
 
 export function PatternStudioScreen({
@@ -51,6 +53,7 @@ export function PatternStudioScreen({
   patternIndex,
   title,
   subtitle,
+  hint,
 }: Props) {
   const scheme = useColorScheme() ?? 'light';
   const [colorPickerVisible, setColorPickerVisible] = useState(false);
@@ -159,6 +162,7 @@ export function PatternStudioScreen({
       <Header
         title={title}
         subtitle={subtitle}
+        hint={hint}
       />
 
       <ScrollView

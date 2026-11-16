@@ -6,7 +6,8 @@ export default function RosepathTab() {
       patternType="rosepath"
       patternIndex={4}
       title="rosepath"
-      subtitle="stepping diamond motif"
+      subtitle="diamond motif"
+      hint="basic pattern: 1, 2, 3, 4, 3, 2, 1"
     />
   );
 }

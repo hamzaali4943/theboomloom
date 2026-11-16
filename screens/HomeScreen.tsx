@@ -57,22 +57,20 @@ const TOOLS: Tool[] = [
   {
     key: 'waffle' as const,
     letter: 'W',
-    icon: undefined,
-    wordmark: ['waffle'],
+    icon: require('@/assets/images/waffle.png'),
     label: 'waffle',
-    description: 'deep textured cells',
+    description: 'dimensional cells',
     accent: '#C2410C',
-    bg: '#F2D5B3',
+    bg: '#1CE460',
   },
   {
     key: 'rosepath' as const,
     letter: 'R',
-    icon: undefined,
-    wordmark: ['rose', 'path'],
+    icon: require('@/assets/images/rosepath.png'),
     label: 'rosepath',
-    description: 'stepping diamond motif',
+    description: 'diamond motif',
     accent: '#BE185D',
-    bg: '#F7D4DF',
+    bg: '#FFA2C4',
   },
   {
     key: 'monks-belt' as const,
@@ -174,7 +172,7 @@ export function HomeScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flex: 1,
-  },
+},
   content: {
     paddingTop: 16,
     paddingBottom: 70,

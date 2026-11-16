@@ -234,6 +234,7 @@ export function KrokbragdScreen() {
       <Header
         title="krokbragd"
         subtitle="Scandinavian rug weave"
+        hint="always 1, 2, 3. change the colors"
       />
 
       <ScrollView

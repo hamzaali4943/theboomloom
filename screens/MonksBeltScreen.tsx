@@ -124,8 +124,9 @@ export function MonksBeltScreen() {
   return (
     <SafeScreen>
       <Header
-        title="pattern picker"
-        subtitle="monk's belt bars"
+        title="monk's belt"
+        subtitle="old garment weave"
+        hint={'1 + 3 makes plain weave, 2 + 4 make floats\nbasic pattern: 1, 2 or 1, 4, 3, 4'}
       />
 
       <ScrollView

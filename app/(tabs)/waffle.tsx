@@ -6,7 +6,8 @@ export default function WaffleTab() {
       patternType="waffle"
       patternIndex={3}
       title="waffle"
-      subtitle="deep textured cells"
+      subtitle="dimensional cells"
+      hint="basic pattern: 1, 2, 3, 4, 3, 2, 1"
     />
   );
 }

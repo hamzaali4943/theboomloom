@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Text } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HapticTab } from '@/components/haptic-tab';
@@ -20,6 +20,29 @@ export default function TabLayout() {
   const TAB_HEIGHT = 60;
   const tabBarHeight = TAB_HEIGHT + bottomInset;
 
+  // Centring the two visible tabs.
+  //
+  // React Navigation renders the items inside its own content View, which is
+  // `{ flex: 1, flexDirection: 'row' }` and is not exposed as a style prop.
+  // Its justifyContent defaults to flex-start, so once the items stop
+  // stretching (tabBarItemStyle flex: 0) they pack to the LEFT. Setting
+  // justifyContent on tabBarStyle does nothing, because that targets the outer
+  // container whose single child already fills it.
+  //
+  // So we centre by padding the outer container symmetrically instead. The bar
+  // background and border still span the full width; only the items are inset.
+  //
+  // NOTE: VISIBLE_TABS must match the number of tabs WITHOUT `href: null`.
+  const { width: screenWidth } = useWindowDimensions();
+  // Each item centres its icon, so this width also sets the visual gap between
+  // the two icons. Keep it comfortably above the ~48dp minimum touch target.
+  const TAB_ITEM_WIDTH = 50;
+  const VISIBLE_TABS = 2; // Home + Saved
+  const tabSidePadding = Math.max(
+    (screenWidth - TAB_ITEM_WIDTH * VISIBLE_TABS) / 2,
+    0,
+  );
+
   return (
     <DesignLoadProvider>
     <Tabs
@@ -28,11 +51,6 @@ export default function TabLayout() {
         tabBarInactiveTintColor: Colors[colorScheme].tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
-        // Icon-only tabs. With nine tabs there is not enough width for text —
-        // labels truncated to "2/2 T...", "Diam...", "Rose..." and so on, which
-        // read worse than nothing. Each pattern's icon is its initial letter.
-        // `title` is kept on every screen so screen readers still announce the
-        // full name.
         tabBarShowLabel: false,
         // Position absolutely so the bar is flush with screen bottom on mobile
         tabBarStyle: {
@@ -47,6 +65,14 @@ export default function TabLayout() {
           // No label row to leave space for, so the icon centres in the bar.
           paddingBottom: bottomInset,
           paddingTop: 0,
+          // Squeezes the inner content View so the items land centred.
+          paddingHorizontal: tabSidePadding,
+        },
+        // flex:0 stops each item claiming an equal share of the bar; without
+        // it they stretch and the padding above has nothing to centre.
+        tabBarItemStyle: {
+          flex: 0,
+          width: TAB_ITEM_WIDTH,
         },
       }}>
       <Tabs.Screen
@@ -56,60 +82,22 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={22} name="house.fill" color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="plain"
-        options={{
-          title: 'Plain',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>P</Text>,
-        }}
-      />
-      <Tabs.Screen
-        name="twill"
-        options={{
-          title: '2/2 Twill',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>T</Text>,
-        }}
-      />
-      <Tabs.Screen
-        name="diamond"
-        options={{
-          title: 'Diamond',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>D</Text>,
-        }}
-      />
-      <Tabs.Screen
-        name="waffle"
-        options={{
-          title: 'Waffle',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>W</Text>,
-        }}
-      />
-      <Tabs.Screen
-        name="rosepath"
-        options={{
-          title: 'Rosepath',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>R</Text>,
-        }}
-      />
-      <Tabs.Screen
-        name="monks-belt"
-        options={{
-          title: "Monk's Belt",
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>M</Text>,
-        }}
-      />
-      <Tabs.Screen
-        name="krokbragd"
-        options={{
-          title: 'Krokbragd',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>K</Text>,
-        }}
-      />
+      {/* Pattern routes stay registered and navigable — the Home grid and the
+          Saved tab both push to them — but `href: null` keeps them out of the
+          tab bar, leaving only Home and Saved. */}
+      <Tabs.Screen name="plain" options={{ title: 'Plain', href: null }} />
+      <Tabs.Screen name="twill" options={{ title: '2/2 Twill', href: null }} />
+      <Tabs.Screen name="diamond" options={{ title: 'Diamond', href: null }} />
+      <Tabs.Screen name="waffle" options={{ title: 'Waffle', href: null }} />
+      <Tabs.Screen name="rosepath" options={{ title: 'Rosepath', href: null }} />
+      <Tabs.Screen name="monks-belt" options={{ title: "Monk's Belt", href: null }} />
+      <Tabs.Screen name="krokbragd" options={{ title: 'Krokbragd', href: null }} />
+
       <Tabs.Screen
         name="saved"
         options={{
           title: 'Saved',
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20, fontWeight: '800' }}>S</Text>,
+          tabBarIcon: ({ color }) => <IconSymbol size={22} name="bookmark.fill" color={color} />,
         }}
       />
     </Tabs>

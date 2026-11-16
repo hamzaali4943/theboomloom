@@ -25,6 +25,7 @@ const MAPPING = {
   'paintpalette.fill': 'palette',
   'books.vertical.fill': 'menu-book',
   'wand.and.stars': 'auto-fix-high',
+  'bookmark.fill': 'bookmark',
   // UI actions
   'magnifyingglass': 'search',
   'xmark': 'close',
