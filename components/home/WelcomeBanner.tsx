@@ -7,7 +7,6 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 export function WelcomeBanner() {
   const scheme = useColorScheme() ?? 'light';
   const brandBlue = Colors[scheme].info;
-  console.log("Brand Blue:", brandBlue);
 
   return (
     <View style={[styles.container, { backgroundColor: brandBlue }]}>

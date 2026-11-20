@@ -37,7 +37,7 @@ import type { PatternType, SavedDesign } from '@/types/saved-design';
 // NOTE: this is a plain array, not a Record<PatternType, …>, so TypeScript
 // will NOT flag a missing pattern here. Omitting one silently hides every
 // design of that type from this screen. Add new patterns here too.
-const PATTERN_ORDER: PatternType[] = ['plain', 'twill', 'diamond', 'waffle', 'rosepath', 'monks-belt', 'krokbragd'];
+const PATTERN_ORDER: PatternType[] = ['plain', 'twill', 'diamond', 'monks-belt', 'krokbragd', 'rosepath', 'waffle'];
 
 // Maps each patternType to its tab route path
 const TAB_PATH: Record<PatternType, string> = {
@@ -55,7 +55,7 @@ const PATTERN_ACCENT: Record<PatternType, string> = {
   plain: '#D97706',
   twill: '#B45309',
   diamond: '#9BA2DD',
-  waffle: '#C2410C', // TODO: replace with the client's brand colour
+  waffle: '#FF7E14',
   rosepath: '#BE185D', // TODO: replace with the client's brand colour
   'monks-belt': '#7C3AED',
   krokbragd: '#0F434F',

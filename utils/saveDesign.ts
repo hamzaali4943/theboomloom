@@ -81,16 +81,5 @@ export async function saveDesign(
   const updatedList = [newDesign, ...existing];
   await AsyncStorage.setItem(DESIGNS_STORAGE_KEY, JSON.stringify(updatedList));
 
-  console.log('──────────────────────────────────────────');
-  console.log('[saveDesign] Design saved successfully');
-  console.log('  Name       :', newDesign.name);
-  console.log('  ID         :', newDesign.id);
-  console.log('  Pattern    :', newDesign.patternType);
-  console.log('  Saved at   :', new Date(newDesign.savedAt).toLocaleString());
-  console.log('  Snapshot   :', JSON.stringify(newDesign.snapshot, null, 2));
-  console.log('  Total saved (this type):', updatedList.filter(d => d.patternType === patternType).length, '/', DESIGNS_PER_PATTERN_LIMIT);
-  console.log('  Total saved (all types):', updatedList.length);
-  console.log('──────────────────────────────────────────');
-
   return newDesign;
 }
